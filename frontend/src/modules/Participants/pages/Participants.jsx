@@ -1,470 +1,950 @@
-import React, { useEffect } from 'react'
-import Table from '../../../core/components/Table/Table'
-import axiosRequest from '../../../utils/AxiosConfig';
-
-const ParticipationStatus = Object.freeze({
-    PAID: 'Paid',
-    PENDING: 'Pending',
-    CANCELED: 'Canceled'
-  });
-  
+import React, { useEffect, useState } from "react";
+import Table from "../../../core/components/Table/Table";
+import axiosRequest from "../../../utils/AxiosConfig";
+import CustomSideBar from "../../../core/components/Sidebar/CustomSideBar";
+import ParticipantsCard from "../components/ParticipantsCard";
 
 function Participants() {
-    const participants = [
-        {
-            id: 1,
-            email: "slim@gmail.com",
-            fullName: "Slim Skhab",
-            status: ParticipationStatus.PAID,
-            createDate: "2024-06-01",
-            data: {}
-        },
-        {
-            id: 2,
-            email: "amira@gmail.com",
-            fullName: "Amira Ben Salah",
-            status: ParticipationStatus.PENDING,
-            createDate: "2024-06-05",
-            data: {}
-        },
-        {
-            id: 3,
-            email: "ahmed@gmail.com",
-            fullName: "Ahmed Ben Ali",
-            status: ParticipationStatus.CANCELED,
-            createDate: "2024-06-10",
-            data: {}
-        },
-        {
-            id: 4,
-            email: "rachid@gmail.com",
-            fullName: "Rachid Zouari",
-            status: ParticipationStatus.PAID,
-            createDate: "2024-06-15",
-            data: {}
-        },
-        {
-            id: 5,
-            email: "sara@gmail.com",
-            fullName: "Sara Mansour",
-            status: ParticipationStatus.PENDING,
-            createDate: "2024-06-20",
-            data: {}
-        }
-    ];
+  const [openSideBar,setOpenSideBar]=useState(true);
 
-    const filteredParticipants=participants
-const getStatusIcon=(status)=>{
-    switch(status){
-        case ParticipationStatus.PAID:
-            return <span class="badge bg-label-success">Paid </span>
-        case ParticipationStatus.PENDING:
-            return <span class="badge bg-label-warning">Pending </span>
-        case ParticipationStatus.CANCELED:
-            return <span class="badge bg-label-danger">Canceled </span>
-        default:
-            return <i className="bx bx-info-circle text-info"></i>
-    }
-}
-
-const handleSearchChange=()=>{
-    
-}
-
-useEffect(()=>{
-  axiosRequest.post("/participant")
-},[])
-
-    return (
-        <div className="card" >
-  <div className="card-datatable table-responsive">
-    <div
-      id="DataTables_Table_0_wrapper"
-      className="dataTables_wrapper dt-bootstrap5 no-footer"
-    >
-      <div className="row mx-1">
-        <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
-          <div className="dataTables_length" id="DataTables_Table_0_length">
-            <label>
-              <select
-                name="DataTables_Table_0_length"
-                aria-controls="DataTables_Table_0"
-                className="form-select"
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </label>
-          </div>
-          <div className="dt-action-buttons text-xl-end text-lg-start text-md-end text-start mt-md-0 mt-3">
-            <div className="dt-buttons btn-group flex-wrap">
-              <button
-                className="btn btn-secondary btn-primary"
-                tabIndex={0}
-                aria-controls="DataTables_Table_0"
-                type="button"
-              >
-                <span>
-                  <i className="bx bx-plus me-md-1" />
-                  <span className="d-md-inline-block d-none">
-                    Create Invoice
-                  </span>
-                </span>
-              </button>{" "}
-            </div>
-          </div>
-        </div>
-        <div className="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
-         <div id="DataTables_Table_0_filter" className="dataTables_filter">
-                <label>
-                  <input
-                    type="search"
-                    className="form-control"
-                    placeholder="Search Invoice"
-                    aria-controls="DataTables_Table_0"
-                    onChange={handleSearchChange}
-                  />
-                </label>
-              </div>
-          <div className="invoice_status mb-3 mb-md-0">
-            <select id="UserRole" className="form-select">
-              <option value=""> Select Status </option>
-              <option value="Downloaded" className="text-capitalize">
-                Downloaded
-              </option>
-              <option value="Draft" className="text-capitalize">
-                Draft
-              </option>
-              <option value="Paid" className="text-capitalize">
-                Paid
-              </option>
-              <option value="Partial Payment" className="text-capitalize">
-                Partial Payment
-              </option>
-              <option value="Past Due" className="text-capitalize">
-                Past Due
-              </option>
-              <option value="Sent" className="text-capitalize">
-                Sent
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <table
-        className="invoice-list-table table border-top dataTable no-footer dtr-column"
-        id="DataTables_Table_0"
-        aria-describedby="DataTables_Table_0_info"
-        style={{ width: 1275 }}
-      >
-        <thead>
-          <tr>
-            {/* <th
-              className="control sorting"
-              tabIndex={0}
-              aria-controls="DataTables_Table_0"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 0, display: "none" }}
-              aria-label=": activate to sort column ascending"
-            /> */}
-            <th
-              className="sorting sorting_desc"
-              tabIndex={0}
-              aria-controls="DataTables_Table_0"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 92 }}
-              aria-label="#ID: activate to sort column ascending"
-              aria-sort="descending"
-            >
-              #ID
-            </th>
-
-            <th
-              className="sorting"
-              tabIndex={0}
-              aria-controls="DataTables_Table_0"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 100 }}
-              aria-label="Client: activate to sort column ascending"
-            >
-              Client
-            </th>
-            <th
-              className="sorting"
-              tabIndex={0}
-              aria-controls="DataTables_Table_0"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 96 }}
-              aria-label="Total: activate to sort column ascending"
-            >
-              Email
-            </th>
-            <th
-              className="text-truncate sorting"
-              tabIndex={0}
-              aria-controls="DataTables_Table_0"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 168 }}
-              aria-label="Issued Date: activate to sort column ascending"
-            >
-              Issued Date
-            </th>
-            <th
-              className="cell-fit sorting_disabled"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 76 }}
-              aria-label="Actions"
-            >
-              Status
-            </th>
-            <th
-              className="cell-fit sorting_disabled"
-              rowSpan={1}
-              colSpan={1}
-              style={{ width: 76 }}
-              aria-label="Actions"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            participants && participants.map((participant,index) =>{
-                return <tr className={`${index/2===0?"even":"odd"}`}>
-                <td
-                  className="  control"
-                  tabIndex={0}
-                  style={{ display: "none" }}
-                />
-                <td className="sorting_1">
-                    <span className="fw-medium" style={{fontWeight: "500",
-    color: "#646cff",
-    textDecoration: "inherit",cursor:"pointer"}}>#{participant.id}</span>
-                </td>
-                
-                <td>
-                  <div className="d-flex justify-content-start align-items-center">
-                    <div className="avatar-wrapper">
-                      <div className="avatar avatar-sm me-2">
-                        <span className="avatar-initial rounded-circle bg-label-dark">
-                        <i class='bx bx-user'></i>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="d-flex flex-column">
-                      <a
-                        href="pages-profile-user.html"
-                        className="text-body text-truncate"
-                      >
-                        <span className="fw-medium">{participant.fullName}</span>
-                      </a>
-                     
-                    </div>
-                  </div>
-                </td>
-                <td>
-                <div className="d-flex justify-content-start align-items-center">
-                    <div className="d-flex flex-column">
-                      <a
-                        href="pages-profile-user.html"
-                        className="text-body text-truncate"
-                      >
-                        <span className="fw-medium">{participant.email}</span>
-                      </a>
-                     
-                    </div>
-                  </div>
-                </td>
-                <td className=''>
-                  <span className="d-none"></span>09 May 2020
-                </td>
-                <td>
-                  {getStatusIcon(participant.status)}
-                </td>
-                <td>
-                  <div className="d-flex align-items-center">
-                    <a
-                      href="javascript:;"
-                      data-bs-toggle="tooltip"
-                      className="text-body"
-                      data-bs-placement="top"
-                      aria-label="Send Mail"
-                      data-bs-original-title="Send Mail"
-                    >
-                      <i className="bx bx-send mx-1" />
-                    </a>
-                    <a
-                      href="app-invoice-preview.html"
-                      data-bs-toggle="tooltip"
-                      className="text-body"
-                      data-bs-placement="top"
-                      aria-label="Preview Invoice"
-                      data-bs-original-title="Preview Invoice"
-                    >
-                      <i className="bx bx-show mx-1" />
-                    </a>
-                    <div className="dropdown">
-                      <a
-                        href="javascript:;"
-                        className="btn dropdown-toggle hide-arrow text-body p-0"
-                        data-bs-toggle="dropdown"
-                      >
-                        <i className="bx bx-dots-vertical-rounded" />
-                      </a>
-                      <div className="dropdown-menu dropdown-menu-end">
-                        <a href="javascript:;" className="dropdown-item">
-                          Download
-                        </a>
-                        <a href="app-invoice-edit.html" className="dropdown-item">
-                          Edit
-                        </a>
-                        <a href="javascript:;" className="dropdown-item">
-                          Duplicate
-                        </a>
-                        <div className="dropdown-divider" />
-                        <a
-                          href="javascript:;"
-                          className="dropdown-item delete-record text-danger"
-                        >
-                          Delete
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            })
+  const toggleSideBar=()=>{
+    console.log("clicked")
+      setOpenSideBar(prev=>!prev);
+  }
+  return (
+    <div class="layout-container">
+      <CustomSideBar openSideBar={openSideBar} toggleSideBar={toggleSideBar}/>
+      <div
+        className="layout-page"
+        style={{ display: "flex", flexDirection: "column" }}
+        onClick={()=>{
+          if(openSideBar){
+            toggleSideBar();
           }
+        }}
+      >
+        {/* Navbar */}
+        <nav
+          className="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+          id="layout-navbar"
+        >
+          <div className="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0   d-xl-none ">
 
-        </tbody>
-      </table>
-      <div className="row mx-2">
-        <div className="col-sm-12 col-md-6">
-          <div
-            className="dataTables_info"
-            id="DataTables_Table_0_info"
-            role="status"
-            aria-live="polite"
-          >
-            Showing 1 to 10 of 50 entries
+              <i className="bx bx-menu bx-sm" style={{cursor:"pointer"}} onClick={toggleSideBar}/>
           </div>
-        </div>
-        <div className="col-sm-12 col-md-6">
           <div
-            className="dataTables_paginate paging_simple_numbers"
-            id="DataTables_Table_0_paginate"
+            className="navbar-nav-right d-flex align-items-center"
+            id="navbar-collapse"
           >
-            <ul className="pagination">
-              <li
-                className="paginate_button page-item previous disabled"
-                id="DataTables_Table_0_previous"
-              >
+            {/* Search */}
+            <div className="navbar-nav align-items-center">
+              <div className="nav-item navbar-search-wrapper mb-0">
                 <a
-                  aria-controls="DataTables_Table_0"
-                  aria-disabled="true"
-                  role="link"
-                  data-dt-idx="previous"
-                  tabIndex={-1}
-                  className="page-link"
+                  className="nav-item nav-link search-toggler px-0"
+                  href="javascript:void(0);"
                 >
-                  Previous
+                  <i className="bx bx-search bx-sm" />
+                  <span className="d-none d-md-inline-block text-muted">
+                    Search
+                  </span>
                 </a>
-              </li>
-              <li className="paginate_button page-item active">
+              </div>
+            </div>
+            {/* /Search */}
+            <ul className="navbar-nav flex-row align-items-center ms-auto">
+              {/* Language */}
+              <li className="nav-item dropdown-language dropdown me-2 me-xl-0">
                 <a
-                  href="#"
-                  aria-controls="DataTables_Table_0"
-                  role="link"
-                  aria-current="page"
-                  data-dt-idx={0}
-                  tabIndex={0}
-                  className="page-link"
+                  className="nav-link dropdown-toggle hide-arrow"
+                  href="javascript:void(0);"
+                  data-bs-toggle="dropdown"
                 >
-                  1
+                  <i className="bx bx-globe bx-sm" />
                 </a>
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a
+                      className="dropdown-item active"
+                      href="javascript:void(0);"
+                      data-language="en"
+                      data-text-direction="ltr"
+                    >
+                      <span className="align-middle">English</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="javascript:void(0);"
+                      data-language="fr"
+                      data-text-direction="ltr"
+                    >
+                      <span className="align-middle">French</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="javascript:void(0);"
+                      data-language="ar"
+                      data-text-direction="rtl"
+                    >
+                      <span className="align-middle">Arabic</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="javascript:void(0);"
+                      data-language="de"
+                      data-text-direction="ltr"
+                    >
+                      <span className="align-middle">German</span>
+                    </a>
+                  </li>
+                </ul>
               </li>
-              <li className="paginate_button page-item ">
+              {/* /Language */}
+              {/* Quick links  */}
+              <li className="nav-item dropdown-shortcuts navbar-dropdown dropdown me-2 me-xl-0">
                 <a
-                  href="#"
-                  aria-controls="DataTables_Table_0"
-                  role="link"
-                  data-dt-idx={1}
-                  tabIndex={0}
-                  className="page-link"
+                  className="nav-link dropdown-toggle hide-arrow"
+                  href="javascript:void(0);"
+                  data-bs-toggle="dropdown"
+                  data-bs-auto-close="outside"
+                  aria-expanded="false"
                 >
-                  2
+                  <i className="bx bx-grid-alt bx-sm" />
                 </a>
+                <div className="dropdown-menu dropdown-menu-end py-0">
+                  <div className="dropdown-menu-header border-bottom">
+                    <div className="dropdown-header d-flex align-items-center py-3">
+                      <h5 className="text-body mb-0 me-auto">Shortcuts</h5>
+                      <a
+                        href="javascript:void(0)"
+                        className="dropdown-shortcuts-add text-body"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        aria-label="Add shortcuts"
+                        data-bs-original-title="Add shortcuts"
+                      >
+                        <i className="bx bx-sm bx-plus-circle" />
+                      </a>
+                    </div>
+                  </div>
+                  <div className="dropdown-shortcuts-list scrollable-container ps">
+                    <div className="row row-bordered overflow-visible g-0">
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-calendar fs-4" />
+                        </span>
+                        <a href="app-calendar.html" className="stretched-link">
+                          Calendar
+                        </a>
+                        <small className="text-muted mb-0">Appointments</small>
+                      </div>
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-food-menu fs-4" />
+                        </span>
+                        <a
+                          href="app-invoice-list.html"
+                          className="stretched-link"
+                        >
+                          Invoice App
+                        </a>
+                        <small className="text-muted mb-0">
+                          Manage Accounts
+                        </small>
+                      </div>
+                    </div>
+                    <div className="row row-bordered overflow-visible g-0">
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-user fs-4" />
+                        </span>
+                        <a href="app-user-list.html" className="stretched-link">
+                          User App
+                        </a>
+                        <small className="text-muted mb-0">Manage Users</small>
+                      </div>
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-check-shield fs-4" />
+                        </span>
+                        <a
+                          href="app-access-roles.html"
+                          className="stretched-link"
+                        >
+                          Role Management
+                        </a>
+                        <small className="text-muted mb-0">Permission</small>
+                      </div>
+                    </div>
+                    <div className="row row-bordered overflow-visible g-0">
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-pie-chart-alt-2 fs-4" />
+                        </span>
+                        <a href="index.html" className="stretched-link">
+                          Dashboard
+                        </a>
+                        <small className="text-muted mb-0">User Profile</small>
+                      </div>
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-cog fs-4" />
+                        </span>
+                        <a
+                          href="pages-account-settings-account.html"
+                          className="stretched-link"
+                        >
+                          Setting
+                        </a>
+                        <small className="text-muted mb-0">
+                          Account Settings
+                        </small>
+                      </div>
+                    </div>
+                    <div className="row row-bordered overflow-visible g-0">
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-help-circle fs-4" />
+                        </span>
+                        <a href="pages-faq.html" className="stretched-link">
+                          FAQs
+                        </a>
+                        <small className="text-muted mb-0">
+                          FAQs &amp; Articles
+                        </small>
+                      </div>
+                      <div className="dropdown-shortcuts-item col">
+                        <span className="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
+                          <i className="bx bx-window-open fs-4" />
+                        </span>
+                        <a
+                          href="modal-examples.html"
+                          className="stretched-link"
+                        >
+                          Modals
+                        </a>
+                        <small className="text-muted mb-0">Useful Popups</small>
+                      </div>
+                    </div>
+                    <div className="ps__rail-x" style={{ left: 0, bottom: 0 }}>
+                      <div
+                        className="ps__thumb-x"
+                        tabIndex={0}
+                        style={{ left: 0, width: 0 }}
+                      />
+                    </div>
+                    <div className="ps__rail-y" style={{ top: 0, right: 0 }}>
+                      <div
+                        className="ps__thumb-y"
+                        tabIndex={0}
+                        style={{ top: 0, height: 0 }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </li>
-              <li className="paginate_button page-item ">
+              {/* Quick links */}
+              {/* Style Switcher */}
+              <li className="nav-item dropdown-style-switcher dropdown me-2 me-xl-0">
                 <a
-                  href="#"
-                  aria-controls="DataTables_Table_0"
-                  role="link"
-                  data-dt-idx={2}
-                  tabIndex={0}
-                  className="page-link"
+                  className="nav-link dropdown-toggle hide-arrow"
+                  href="javascript:void(0);"
+                  data-bs-toggle="dropdown"
                 >
-                  3
+                  <i className="bx bx-sm bx-sun" />
                 </a>
+                <ul className="dropdown-menu dropdown-menu-end dropdown-styles">
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="javascript:void(0);"
+                      data-theme="light"
+                    >
+                      <span className="align-middle">
+                        <i className="bx bx-sun me-2" />
+                        Light
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="javascript:void(0);"
+                      data-theme="dark"
+                    >
+                      <span className="align-middle">
+                        <i className="bx bx-moon me-2" />
+                        Dark
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="javascript:void(0);"
+                      data-theme="system"
+                    >
+                      <span className="align-middle">
+                        <i className="bx bx-desktop me-2" />
+                        System
+                      </span>
+                    </a>
+                  </li>
+                </ul>
               </li>
-              <li className="paginate_button page-item ">
+              {/* / Style Switcher*/}
+              {/* Notification */}
+              <li className="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
                 <a
-                  href="#"
-                  aria-controls="DataTables_Table_0"
-                  role="link"
-                  data-dt-idx={3}
-                  tabIndex={0}
-                  className="page-link"
+                  className="nav-link dropdown-toggle hide-arrow"
+                  href="javascript:void(0);"
+                  data-bs-toggle="dropdown"
+                  data-bs-auto-close="outside"
+                  aria-expanded="false"
                 >
-                  4
+                  <i className="bx bx-bell bx-sm" />
+                  <span className="badge bg-danger rounded-pill badge-notifications">
+                    5
+                  </span>
                 </a>
+                <ul className="dropdown-menu dropdown-menu-end py-0">
+                  <li className="dropdown-menu-header border-bottom">
+                    <div className="dropdown-header d-flex align-items-center py-3">
+                      <h5 className="text-body mb-0 me-auto">Notification</h5>
+                      <a
+                        href="javascript:void(0)"
+                        className="dropdown-notifications-all text-body"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        aria-label="Mark all as read"
+                        data-bs-original-title="Mark all as read"
+                      >
+                        <i className="bx fs-4 bx-envelope-open" />
+                      </a>
+                    </div>
+                  </li>
+                  <li className="dropdown-notifications-list scrollable-container ps">
+                    <ul className="list-group list-group-flush">
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <img
+                                src="../../assets/img/avatars/1.png"
+                                alt=""
+                                className="w-px-40 h-auto rounded-circle"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">Congratulation Lettie 🎉</h6>
+                            <p className="mb-0">
+                              Won the monthly best seller gold badge
+                            </p>
+                            <small className="text-muted">1h ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <span className="avatar-initial rounded-circle bg-label-danger">
+                                CF
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">Charles Franklin</h6>
+                            <p className="mb-0">Accepted your connection</p>
+                            <small className="text-muted">12hr ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <img
+                                src="../../assets/img/avatars/2.png"
+                                alt=""
+                                className="w-px-40 h-auto rounded-circle"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">New Message ✉️</h6>
+                            <p className="mb-0">
+                              You have new message from Natalie
+                            </p>
+                            <small className="text-muted">1h ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <span className="avatar-initial rounded-circle bg-label-success">
+                                <i className="bx bx-cart" />
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">
+                              Whoo! You have new order 🛒{" "}
+                            </h6>
+                            <p className="mb-0">
+                              ACME Inc. made new order $1,154
+                            </p>
+                            <small className="text-muted">1 day ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <img
+                                src="../../assets/img/avatars/9.png"
+                                alt=""
+                                className="w-px-40 h-auto rounded-circle"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">
+                              Application has been approved 🚀{" "}
+                            </h6>
+                            <p className="mb-0">
+                              Your ABC project application has been approved.
+                            </p>
+                            <small className="text-muted">2 days ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <span className="avatar-initial rounded-circle bg-label-success">
+                                <i className="bx bx-pie-chart-alt" />
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">
+                              Monthly report is generated
+                            </h6>
+                            <p className="mb-0">
+                              July monthly financial report is generated{" "}
+                            </p>
+                            <small className="text-muted">3 days ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <img
+                                src="../../assets/img/avatars/5.png"
+                                alt=""
+                                className="w-px-40 h-auto rounded-circle"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">Send connection request</h6>
+                            <p className="mb-0">
+                              Peter sent you connection request
+                            </p>
+                            <small className="text-muted">4 days ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <img
+                                src="../../assets/img/avatars/6.png"
+                                alt=""
+                                className="w-px-40 h-auto rounded-circle"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">New message from Jane</h6>
+                            <p className="mb-0">
+                              Your have new message from Jane
+                            </p>
+                            <small className="text-muted">5 days ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                        <div className="d-flex">
+                          <div className="flex-shrink-0 me-3">
+                            <div className="avatar">
+                              <span className="avatar-initial rounded-circle bg-label-warning">
+                                <i className="bx bx-error" />
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex-grow-1">
+                            <h6 className="mb-1">CPU is running high</h6>
+                            <p className="mb-0">
+                              CPU Utilization Percent is currently at 88.63%,
+                            </p>
+                            <small className="text-muted">5 days ago</small>
+                          </div>
+                          <div className="flex-shrink-0 dropdown-notifications-actions">
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-read"
+                            >
+                              <span className="badge badge-dot" />
+                            </a>
+                            <a
+                              href="javascript:void(0)"
+                              className="dropdown-notifications-archive"
+                            >
+                              <span className="bx bx-x" />
+                            </a>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                    <div className="ps__rail-x" style={{ left: 0, bottom: 0 }}>
+                      <div
+                        className="ps__thumb-x"
+                        tabIndex={0}
+                        style={{ left: 0, width: 0 }}
+                      />
+                    </div>
+                    <div className="ps__rail-y" style={{ top: 0, right: 0 }}>
+                      <div
+                        className="ps__thumb-y"
+                        tabIndex={0}
+                        style={{ top: 0, height: 0 }}
+                      />
+                    </div>
+                  </li>
+                  <li className="dropdown-menu-footer border-top p-3">
+                    <button className="btn btn-primary text-uppercase w-100">
+                      view all notifications
+                    </button>
+                  </li>
+                </ul>
               </li>
-              <li className="paginate_button page-item ">
+              {/*/ Notification */}
+              {/* User */}
+              <li className="nav-item navbar-dropdown dropdown-user dropdown">
                 <a
-                  href="#"
-                  aria-controls="DataTables_Table_0"
-                  role="link"
-                  data-dt-idx={4}
-                  tabIndex={0}
-                  className="page-link"
+                  className="nav-link dropdown-toggle hide-arrow"
+                  href="javascript:void(0);"
+                  data-bs-toggle="dropdown"
                 >
-                  5
+                  <div className="avatar avatar-online">
+                    <img
+                      src="../../assets/img/avatars/1.png"
+                      alt=""
+                      className="w-px-40 h-auto rounded-circle"
+                    />
+                  </div>
                 </a>
+                <ul className="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="pages-account-settings-account.html"
+                    >
+                      <div className="d-flex">
+                        <div className="flex-shrink-0 me-3">
+                          <div className="avatar avatar-online">
+                            <img
+                              src="../../assets/img/avatars/1.png"
+                              alt=""
+                              className="w-px-40 h-auto rounded-circle"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex-grow-1">
+                          <span className="fw-medium d-block">John Doe</span>
+                          <small className="text-muted">Admin</small>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                  <li>
+                    <div className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a className="dropdown-item" href="pages-profile-user.html">
+                      <i className="bx bx-user me-2" />
+                      <span className="align-middle">My Profile</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="pages-account-settings-account.html"
+                    >
+                      <i className="bx bx-cog me-2" />
+                      <span className="align-middle">Settings</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="pages-account-settings-billing.html"
+                    >
+                      <span className="d-flex align-items-center align-middle">
+                        <i className="flex-shrink-0 bx bx-credit-card me-2" />
+                        <span className="flex-grow-1 align-middle">
+                          Billing
+                        </span>
+                        <span className="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">
+                          4
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <div className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a className="dropdown-item" href="pages-faq.html">
+                      <i className="bx bx-help-circle me-2" />
+                      <span className="align-middle">FAQ</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a className="dropdown-item" href="pages-pricing.html">
+                      <i className="bx bx-dollar me-2" />
+                      <span className="align-middle">Pricing</span>
+                    </a>
+                  </li>
+                  <li>
+                    <div className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <a
+                      className="dropdown-item"
+                      href="auth-login-cover.html"
+                      target="_blank"
+                    >
+                      <i className="bx bx-power-off me-2" />
+                      <span className="align-middle">Log Out</span>
+                    </a>
+                  </li>
+                </ul>
               </li>
-              <li
-                className="paginate_button page-item next"
-                id="DataTables_Table_0_next"
-              >
-                <a
-                  href="#"
-                  aria-controls="DataTables_Table_0"
-                  role="link"
-                  data-dt-idx="next"
-                  tabIndex={0}
-                  className="page-link"
-                >
-                  Next
-                </a>
-              </li>
+              {/*/ User */}
             </ul>
           </div>
+          {/* Search Small Screens */}
+          <div className="navbar-search-wrapper search-input-wrapper d-none">
+            <span
+              className="twitter-typeahead"
+              style={{ position: "relative", display: "inline-block" }}
+            >
+              <input
+                type="text"
+                className="form-control search-input container-xxl border-0 tt-input"
+                placeholder="Search..."
+                aria-label="Search..."
+                autoComplete="off"
+                spellCheck="false"
+                dir="auto"
+                style={{ position: "relative", verticalAlign: "top" }}
+              />
+              <pre
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  visibility: "hidden",
+                  whiteSpace: "pre",
+                  fontFamily:
+                    '"Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+                  fontSize: 15,
+                  fontStyle: "normal",
+                  fontVariant: "normal",
+                  fontWeight: 400,
+                  wordSpacing: 0,
+                  letterSpacing: 0,
+                  textIndent: 0,
+                  textRendering: "auto",
+                  textTransform: "none",
+                }}
+              />
+              <div
+                className="tt-menu navbar-search-suggestion ps"
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  zIndex: 100,
+                  display: "none",
+                }}
+              >
+                <div className="tt-dataset tt-dataset-pages" />
+                <div className="tt-dataset tt-dataset-files" />
+                <div className="tt-dataset tt-dataset-members" />
+                <div className="ps__rail-x" style={{ left: 0, bottom: 0 }}>
+                  <div
+                    className="ps__thumb-x"
+                    tabIndex={0}
+                    style={{ left: 0, width: 0 }}
+                  />
+                </div>
+                <div className="ps__rail-y" style={{ top: 0, right: 0 }}>
+                  <div
+                    className="ps__thumb-y"
+                    tabIndex={0}
+                    style={{ top: 0, height: 0 }}
+                  />
+                </div>
+              </div>
+            </span>
+            <i className="bx bx-x bx-sm search-toggler cursor-pointer" />
+          </div>
+        </nav>
+        {/* / Navbar */}
+        {/* Content wrapper */}
+        <div className="content-wrapper">
+          {/* Content */}
+          <div className="container-xxl flex-grow-1 container-p-y">
+            <h4 className="py-3 mb-4">
+              <span className="text-muted fw-light">Workshops /</span> Participants
+            </h4>
+            {/* Invoice List Widget */}
+            <div className="card mb-4">
+              <div className="card-widget-separator-wrapper">
+                <div className="card-body card-widget-separator">
+                  <div className="row gy-4 gy-sm-1">
+                    <div className="col-sm-6 col-lg-3">
+                      <div className="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
+                        <div>
+                          <h3 className="mb-1">24</h3>
+                          <p className="mb-0">Clients</p>
+                        </div>
+                        <div className="avatar me-sm-4">
+                          <span className="avatar-initial rounded bg-label-secondary">
+                            <i className="bx bx-user bx-sm" />
+                          </span>
+                        </div>
+                      </div>
+                      <hr className="d-none d-sm-block d-lg-none me-4" />
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div className="d-flex justify-content-between align-items-start card-widget-2 border-end pb-3 pb-sm-0">
+                        <div>
+                          <h3 className="mb-1">165</h3>
+                          <p className="mb-0">Invoices</p>
+                        </div>
+                        <div className="avatar me-lg-4">
+                          <span className="avatar-initial rounded bg-label-secondary">
+                            <i className="bx bx-file bx-sm" />
+                          </span>
+                        </div>
+                      </div>
+                      <hr className="d-none d-sm-block d-lg-none" />
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div className="d-flex justify-content-between align-items-start border-end pb-3 pb-sm-0 card-widget-3">
+                        <div>
+                          <h3 className="mb-1">$2.46k</h3>
+                          <p className="mb-0">Paid</p>
+                        </div>
+                        <div className="avatar me-sm-4">
+                          <span className="avatar-initial rounded bg-label-secondary">
+                            <i className="bx bx-check-double bx-sm" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-sm-6 col-lg-3">
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div>
+                          <h3 className="mb-1">$876</h3>
+                          <p className="mb-0">Unpaid</p>
+                        </div>
+                        <div className="avatar">
+                          <span className="avatar-initial rounded bg-label-secondary">
+                            <i className="bx bx-error-circle bx-sm" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Invoice List Table */}
+            <ParticipantsCard/>
+          </div>
+          {/* / Content */}
+          {/* Footer */}
+          <footer className="content-footer footer bg-footer-theme">
+            <div className="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
+              <div className="mb-2 mb-md-0">
+                © 2024, made with ❤️ by{" "}
+                <a
+                  href="https://themeselection.com"
+                  target="_blank"
+                  className="footer-link fw-medium"
+                >
+                  EventBox
+                </a>
+              </div>
+              <div className="d-none d-lg-inline-block">
+                <a
+                  href="https://themeselection.com/license/"
+                  className="footer-link me-4"
+                  target="_blank"
+                >
+                  Terms & Conditions
+                </a>
+                <a
+                  href="https://themeselection.com/"
+                  target="_blank"
+                  className="footer-link me-4"
+                >
+                  Contact Us
+                </a>
+              </div>
+            </div>
+          </footer>
+          {/* / Footer */}
+          <div className="content-backdrop fade" />
         </div>
+        
+        {/* Content wrapper */}
+       {
+        openSideBar&& <div class="layout-overlay layout-menu-toggle" style={{display:"block"}}></div>
+       }
       </div>
     </div>
-  </div>
-</div>
-
-
-    )
+  );
 }
 
-export default Participants
+export default Participants;
