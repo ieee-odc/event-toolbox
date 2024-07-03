@@ -52,7 +52,7 @@ function Participations() {
         }
     ];
 
-    const filteredParticipants=[]
+    const filteredParticipants=participants
 const getStatusIcon=(status)=>{
     switch(status){
         case ParticipationStatus.PAID:
