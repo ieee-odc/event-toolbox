@@ -1,18 +1,28 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import Button from './core/components/Button/Button'
-import Login from './view/pages/Login/Login'
-import Participations from './view/pages/Participations/Participations'
+import Participants from './modules/Participants/pages/Participants';
+import { Route, Routes } from 'react-router-dom';
+import PrivateRoute from './utils/PrivateRoute';
+
+
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-   <div>
-    <Participations/>
-   </div>
+    <div className="App">
+   {/* for private routes use Private Route like this
+   <Route path= "/participants" element ={<PrivateRoute allowedRoles={['organizer']}>
+<Participants />
+</PrivateRoute>}  />  */}
+<Routes >
+  {/* <Route path= "/login" element ={<Login/>}  />
+  <Route path= "/signup" element ={<Signup/>}  />
+  <Route path= "/" element ={<Homepage/>}  /> */}
+  <Route path= "/participants" element ={
+<Participants />}  />
+</Routes>
+    
+    </div>
   )
 }
 
