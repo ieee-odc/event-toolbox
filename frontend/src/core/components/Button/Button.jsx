@@ -10,7 +10,7 @@ function Button({variant,color,style}) {
     }
 
   return (
-    <button type="button" class={`btn btn${getVariant()}-${color}`} style={style}>Primary</button>
+    <button type="button" className={`btn btn${getVariant()}-${color}`} style={style}>Sign in</button>
   )
 }
 
