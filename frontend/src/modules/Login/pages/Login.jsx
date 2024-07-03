@@ -46,7 +46,7 @@ function Login() {
             </div>
             <div className="mb-3">
               
-              <Button color={"primary"}/>
+              <Button color={"primary"} label="Sign in" />
             </div>
           </form>
 

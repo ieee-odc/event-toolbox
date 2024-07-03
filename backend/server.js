@@ -4,12 +4,14 @@ const mongoose = require("mongoose");
 const cors = require('cors');
 const dotenv = require("dotenv");
 const path  = require('path')
+const bodyParser = require('body-parser');
 
 dotenv.config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors());
+app.use(bodyParser.json());
 
 
 
@@ -27,6 +29,8 @@ db.once('open', () => {
 
 const ParticipantRouter = require("./routes/ParticipantRoutes")
 app.use("/participant", ParticipantRouter)
+const authRoutes = require('./routes/authRoutes')
+app.use('/auth', authRoutes);
 
 
 const server = app.listen(process.env.PORT, () => {
