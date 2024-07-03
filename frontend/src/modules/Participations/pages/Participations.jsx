@@ -1,5 +1,6 @@
 import React from 'react'
 import Table from '../../../core/components/Table/Table'
+import axiosRequest from '../../../utils/AxiosConfig';
 
 const ParticipationStatus = Object.freeze({
     PAID: 'Paid',
@@ -52,7 +53,7 @@ function Participations() {
         }
     ];
 
-    const filteredParticipants=[]
+    const filteredParticipants=participants
 const getStatusIcon=(status)=>{
     switch(status){
         case ParticipationStatus.PAID:
@@ -65,6 +66,10 @@ const getStatusIcon=(status)=>{
             return <i className="bx bx-info-circle text-info"></i>
     }
 }
+
+useEffect(()=>{
+  axiosRequest.post("/participant")
+},[])
 
     return (
         <div className="card" >
