@@ -55,7 +55,7 @@ function SignUp() {
 
               <p className="text-center move-down">
                 <span className="space-right">Already have an account?</span>
-                <a href="auth-login-basic.html">
+                <a href="/Login">
                   <span>Sign in instead</span>
                 </a>
               </p>

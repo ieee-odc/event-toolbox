@@ -52,7 +52,7 @@ function Login() {
 
           <p className="text-center move-down">
             <span  className="space-right">New on our platform?</span>
-            <a href="auth-register-basic.html">
+            <a href="/SignUp">
               <span>Create an account</span>
             </a>
           </p>
