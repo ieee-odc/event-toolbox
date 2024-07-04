@@ -6,8 +6,9 @@ import Login from './modules/Login/pages/Login'
 import SignUp from './modules/Signup/pages/SignUp'
 import PrivateRoute from './utils/PrivateRoute';
 import Participants from './modules/Participants/pages/Participants';
-
-
+import ForgetPassword from './modules/ForgetPass/pages/ForgetPassword'
+import Success from './modules/TestAuth/pages/Success';
+import ResetPassword from'./modules/ForgetPass/pages/ResetPassword'
 
 
 function App() {
@@ -22,9 +23,10 @@ function App() {
 <Routes >
           <Route path= "/signup" element ={<SignUp/>}  />
         <Route path= "/login" element ={<Login/>}  />
-  {/* <Route path= "/login" element ={<Login/>}  />
-  <Route path= "/signup" element ={<Signup/>}  />
-  <Route path= "/" element ={<Homepage/>}  /> */}
+        <Route path= "/forgetpassword" element ={<ForgetPassword/>}  />
+        <Route path= "/resetpassword" element ={<ResetPassword/>}  />
+        <Route path="/success" element={<Success />} />
+
   <Route path= "/participants" element ={
 <Participants />}  />
 </Routes>

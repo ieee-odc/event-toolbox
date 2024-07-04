@@ -1,7 +1,10 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const User = require('../models/OrganizerModel');
+const Counter = require('../models/CounterModel');
 
 
 
@@ -11,7 +14,13 @@ const Register = async (req, res) => {
     const user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: 'User already exists' });
 
-    const newUser = new User({ username, email, password });
+    const counter = await Counter.findOneAndUpdate(
+      { id: "autovalOrganizer" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const newUser = new User({ id:counter.seq,username, email, password });
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(password, salt);
 
@@ -21,6 +30,7 @@ const Register = async (req, res) => {
 
     res.status(201).json({ token });
   } catch (err) {
+    console.log(err)
     res.status(500).json({ msg: 'Server error' });
   }
 };
@@ -44,7 +54,90 @@ const SignIn = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ msg: 'Email is required' });
+  }
+
+  try {
+    let user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ msg: 'User not found' });
+    }
+
+    const resetToken = jwt.sign({ id: user._id.toString() }, 'secret', { expiresIn: '15m' });
+    const resetURL = `http://localhost:5173/resetpassword?token=${resetToken}`;
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'boualiamino0123@gmail.com',
+        pass: 'kshn mwrg cjyt uzgo',
+      },
+    });
+    const mailOptions = {
+      from: 'boualiamino0123@gmail.com',
+      to: email,
+      subject: 'Password Reset',
+      text: `You requested a password reset. Use the following token to reset your password: ${resetToken}`,
+      html: `<p>You requested a password reset. Click the link below to reset your password:</p>
+                <a href="${resetURL}">${resetURL}</a>`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error.message);
+        return res.status(500).json({ msg: 'Error sending email' });
+      }
+      console.log('Email sent:', info.response);
+      res.json({ msg: 'Password reset token generated and email sent', resetToken });
+    });
+  } catch (err) {
+    console.error('Server error:', err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
+const resetPassword = async (req, res) => {
+  const { token } = req.query;
+  const { newPassword } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, 'secret');
+    if (!decoded || !decoded.id) {
+      return res.status(400).json({ msg: 'Invalid or expired token' });
+    }
+
+    // Convert the ID from the token to a MongoDB ObjectId using the `new` keyword
+    const userId = new mongoose.Types.ObjectId(decoded.id);
+
+    let user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ msg: 'User not found' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.json({ msg: 'Password reset successfully' });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(400).json({ msg: 'Token has expired. Please request a new password reset.' });
+    }
+    console.error('Server error:', err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
+
+
 module.exports = {
     SignIn,
-    Register
+    Register,
+    forgotPassword,
+    resetPassword
   };

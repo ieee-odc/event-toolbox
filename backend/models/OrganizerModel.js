@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const OrganizerSchema = new mongoose.Schema({
   id:{
-    type:String,
+    type:Number,
     required: true
 },
   username: { type: String, required: true, unique: true },
