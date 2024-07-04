@@ -3,7 +3,6 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require('cors');
 const dotenv = require("dotenv");
-const path  = require('path')
 
 dotenv.config();
 app.use(express.json());
@@ -27,6 +26,9 @@ db.once('open', () => {
 
 const ParticipantRouter = require("./routes/ParticipantRoutes")
 app.use("/participant", ParticipantRouter)
+
+const WorkshopRouter = require("./routes/WorkshopRoutes")
+app.use("/workshop", WorkshopRouter)
 
 
 const server = app.listen(process.env.PORT, () => {
