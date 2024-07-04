@@ -103,9 +103,30 @@ const getSpaceWorkshops = async (req, res) => {
   }
 };
 
+const getEventWorkshops = async (req, res) => {
+    try {
+      const eventId = req.params.eventId;
+      const workshops = await Workshop.find({
+        eventId,
+      });
+  
+      return res.status(200).json({
+        status: "success",
+        message: "Workshop retrieved",
+        workshops: workshops,
+      });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({
+        message: "Server Error!",
+      });
+    }
+  };
+
 module.exports = {
   addWorkshop,
   deleteWorkshop,
   editWorkshop,
   getSpaceWorkshops,
+  getEventWorkshops,
 };
