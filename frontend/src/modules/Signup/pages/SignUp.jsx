@@ -15,7 +15,7 @@ function SignUp() {
           <div className="card">
             <div className="card-body">
               <h4 className="mb-2">Adventure starts here 🚀</h4>
-              <p className="mb-4">Make your app management easy and fun!</p>
+              <p className="mb-4">Make your event management easy and fun!</p>
 
               <form id="formAuthentication" className="mb-3" action="index.html">
                 <div className="mb-3 form-email-toggle">
@@ -25,7 +25,7 @@ function SignUp() {
 
                 <div className="mb-3 form-email-toggle">
                   <label htmlFor="email" className="col-auto col-form-label">Email</label>
-                  <input type="text" className="form-control" id="email" name="email" placeholder="Enter your email" />
+                  <input type="email" className="form-control" id="email" name="email" placeholder="Enter your email" />
                 </div>
 
                 <div className="mb-3 form-password-toggle">

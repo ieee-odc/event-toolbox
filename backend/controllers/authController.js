@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/OrganizerModel');
 
 
 
@@ -36,8 +36,9 @@ const SignIn = async (req, res) => {
 
     const payload = { id: user.id };
     const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+    const { password: _, ...userData } = user.toObject();
 
-    res.status(200).json({ token });
+    res.status(200).json({ token, user: userData });
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
   }
