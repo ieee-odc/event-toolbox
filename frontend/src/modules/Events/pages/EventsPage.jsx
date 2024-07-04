@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import EventForm from "../components/EventForm";
-
-function Events() {
-  <>
-    azdazd
-    <EventForm />
-  </>;
+function EventsPage() {
+  return (
+    <div>
+      <EventForm />
+    </div>
+  );
 }
-export default Events;
+
+export default EventsPage;

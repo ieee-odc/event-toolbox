@@ -5,9 +5,11 @@ import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/events" element={<Events />} />
-    </Routes>
+    <div>
+      <Routes>
+        <Route path="/events" element={<Events />} />
+      </Routes>
+    </div>
   );
 }
 
