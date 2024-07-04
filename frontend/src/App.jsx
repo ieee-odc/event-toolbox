@@ -3,8 +3,8 @@ import "./App.css";
 import Participants from "./modules/Participants/pages/Participants";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "./utils/PrivateRoute";
-
 import { Toaster } from "react-hot-toast";
+import EventsPage from "./modules/Events/pages/EventsPage";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         {/* <Route path= "/login" element ={<Login/>}  />
   <Route path= "/signup" element ={<Signup/>}  />
   <Route path= "/" element ={<Homepage/>}  /> */}
-        <Route path="/events" element={<Events />} />
+        <Route path="/events" element={<EventsPage />} />
       </Routes>
     </div>
   );
