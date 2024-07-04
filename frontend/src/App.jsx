@@ -1,20 +1,35 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { Route, Routes } from 'react-router-dom';
 import Button from './core/components/Button/Button'
 import Login from './modules/Login/pages/Login'
 import SignUp from './modules/Signup/pages/SignUp'
+import PrivateRoute from './utils/PrivateRoute';
+import Participants from './modules/Participants/pages/Participants';
+
+
 
 
 function App() {
 
   return (
-    <Routes >
-        <Route path= "/signup" element ={<SignUp/>}  />
+
+    <div className="App">
+   {/* for private routes use Private Route like this
+   <Route path= "/participants" element ={<PrivateRoute allowedRoles={['organizer']}>
+<Participants />
+</PrivateRoute>}  />  */}
+<Routes >
+          <Route path= "/signup" element ={<SignUp/>}  />
         <Route path= "/login" element ={<Login/>}  />
-    </Routes>
+  {/* <Route path= "/login" element ={<Login/>}  />
+  <Route path= "/signup" element ={<Signup/>}  />
+  <Route path= "/" element ={<Homepage/>}  /> */}
+  <Route path= "/participants" element ={
+<Participants />}  />
+</Routes>
+    
+    </div>
   )
 }
 

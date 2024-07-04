@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Table from '../../../core/components/Table/Table'
 import axiosRequest from '../../../utils/AxiosConfig';
 
@@ -9,7 +9,7 @@ const ParticipationStatus = Object.freeze({
   });
   
 
-function Participations() {
+function Participants() {
     const participants = [
         {
             id: 1,
@@ -65,6 +65,10 @@ const getStatusIcon=(status)=>{
         default:
             return <i className="bx bx-info-circle text-info"></i>
     }
+}
+
+const handleSearchChange=()=>{
+    
 }
 
 useEffect(()=>{
@@ -463,4 +467,4 @@ useEffect(()=>{
     )
 }
 
-export default Participations
+export default Participants
