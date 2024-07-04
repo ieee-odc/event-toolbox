@@ -8,13 +8,13 @@ const getEvents = async (req, res) => {
   res.status(200).json(events);
 };
 const createEvent = async (req, res) => {
-  const { eventName, startDate, endDate, eventDescription } = req.body;
+  const { Name, startDate, endDate, Description } = req.body;
   try {
     const newEvent = await event.create({
-      eventName,
+      Name,
       startDate,
       endDate,
-      eventDescription,
+      Description,
     });
     res.status(200).json(newEvent);
   } catch (error) {
@@ -24,7 +24,7 @@ const createEvent = async (req, res) => {
 
 // const updateEvent = async (req, res) => {
 //   try {
-//     const { eventName, startDate, endDate, eventDescription } = req.body;
+//     const { Name, startDate, endDate, Description } = req.body;
 //     const { id } = req.params;
 //     let file;
 //     // if (req.file) {
@@ -36,10 +36,10 @@ const createEvent = async (req, res) => {
 //     // }
 //     // Constructing the updatedData object with the fields to update
 //     const updatedData = {
-//       eventName,
+//       Name,
 //       startDate,
 //       endDate,
-//       eventDescription,
+//       Description,
 //     };
 
 //     // If no event was found to update, return an error response
@@ -47,10 +47,10 @@ const createEvent = async (req, res) => {
 //       return res.status(404).json({ message: "Event not found" });
 //     }
 //     // const updatedData = {};
-//     // if (eventName) updatedData.eventName = eventName;
+//     // if (Name) updatedData.Name = Name;
 //     // if (startDate) updatedData.startDate = startDate;
 //     // if (endDate) updatedData.endDate = endDate;
-//     // if (eventDescription) updatedData.eventDescription = eventDescription;
+//     // if (Description) updatedData.Description = Description;
 //     // if (file) {
 //     //   updatedData.noteImage = file;
 //     // }

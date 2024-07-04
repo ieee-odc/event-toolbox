@@ -1,19 +1,14 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Button from './core/components/Button/Button'
-import Login from './view/pages/Login/Login'
-import Participations from './view/pages/Participations/Participations'
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import "./App.css";
+import Events from "./modules/Events/pages/EventsPage";
+import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-   <div>
-    <Participations/>
-   </div>
-  )
+    <Routes>
+      <Route path="/events" element={<Events />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
