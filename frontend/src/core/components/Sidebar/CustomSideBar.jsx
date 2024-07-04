@@ -1,26 +1,56 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function CustomSideBar({openSideBar,toggleSideBar,activeTab}) {
-const navigate=useNavigate();
+function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
+  const navigate = useNavigate();
+
+  const routes = [
+    {
+      name: "Events",
+      icon: "bx bx-party",
+      route: "/events",
+      parentRoute: "Workshops",
+      isActive: activeTab === "/events",
+    },
+    {
+      name: "Spaces",
+      icon: "bx bx-home-alt",
+      route: "/spaces",
+      parentRoute: "Workshops",
+      isActive: activeTab === "/spaces",
+    },
+    {
+      name: "Participants",
+      icon: "bx bx-user",
+      route: "/participants",
+      parentRoute: "Workshops",
+      isActive: activeTab === "/participants",
+    },
+    {
+      name: "Forms",
+      icon: "bx bx-file",
+      route: "/forms",
+      parentRoute: "Workshops",
+      isActive: activeTab === "/forms",
+    },
+  ];
+
   return (
-
-
-<aside
-  id="layout-menu"
-  className="layout-menu menu-vertical menu bg-menu-theme"
-  data-bg-class="bg-menu-theme"
-  style={{
-    touchAction: "none",
-    userSelect: "none",
-    WebkitUserDrag: "none",
-    WebkitTapHighlightColor: "rgba(0, 0, 0, 0)",
-    flex:"none",
-    transition: 'transform 0.3s ease',
-    ...(openSideBar && { transform: "translate3d(0, 0, 0)" })
-}}
->
-  <div className="app-brand demo " >
+    <aside
+      id="layout-menu"
+      className="layout-menu menu-vertical menu bg-menu-theme"
+      data-bg-class="bg-menu-theme"
+      style={{
+        touchAction: "none",
+        userSelect: "none",
+        WebkitUserDrag: "none",
+        WebkitTapHighlightColor: "rgba(0, 0, 0, 0)",
+        flex: "none",
+        transition: "transform 0.3s ease",
+        ...(openSideBar && { transform: "translate3d(0, 0, 0)" }),
+      }}
+    >
+     <div className="app-brand demo " >
     <span className="app-brand-link">
       <span className="app-brand-logo demo">
         <svg
@@ -88,58 +118,37 @@ const navigate=useNavigate();
     <span
       className="layout-menu-toggle menu-link text-large ms-auto"
       style={{cursor: "pointer"}}
+      onClick={()=>{
+        toggleSideBar()
+      }}
     >
       <i className="bx bx-chevron-left bx-sm align-middle" />
     </span>
   </div>
-  <div className="menu-inner-shadow" style={{ display: "none" }} />
-  <ul className="menu-inner py-1 ps ps--active-y">
+      <div className="menu-inner-shadow" style={{ display: "none" }} />
+      <ul className="menu-inner py-1 ps ps--active-y">
+        <li className="menu-header small text-uppercase">
+          <span className="menu-header-text">Workshops</span>
+        </li>
 
-    {/* Apps & Pages */}
-    <li className="menu-header small text-uppercase">
-      <span className="menu-header-text" data-i18n="Apps & Pages">
-        Workshops
-      </span>
-    </li>
-    <li className="menu-item">
-      <a href="app-calendar.html" className="menu-link">
-        <i className="menu-icon tf-icons bx bx-party" />
-        <div className="text-truncate" data-i18n="party">
-          Events
-        </div>
-      </a>
-    </li>
-    <li className="menu-item">
-      <a href="app-calendar.html" className="menu-link">
-        <i className="menu-icon tf-icons bx bx-home-alt" />
-        <div className="text-truncate" data-i18n="home-alt">
-          Spaces
-        </div>
-      </a>
-    </li>
-    <li className="menu-item">
-      <a href="app-calendar.html" className="menu-link">
-        <i className="menu-icon tf-icons bx bx-user" />
-        <div className="text-truncate" data-i18n="User">
-          Participants
-        </div>
-      </a>
-    </li>
-    <li className="menu-item">
-      <a href="app-calendar.html" className="menu-link">
-        <i className="menu-icon tf-icons bx bx-file" />
-        <div className="text-truncate" data-i18n="file">
-          Forms
-        </div>
-      </a>
-    </li>
-
-  </ul>
-</aside>
- 
-
-
-  )
+        {routes.map((route, index) => (
+          <li key={index} className={`menu-item ${route.isActive ? 'active' : ''}`}>
+            <a
+              href={route.route} // You can change this to onClick={navigate(route.route)} for React Router navigation
+              className="menu-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(route.route);
+              }}
+            >
+              <i className={`menu-icon tf-icons ${route.icon}`} />
+              <div className="text-truncate">{route.name}</div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
 }
 
-export default CustomSideBar
+export default CustomSideBar;

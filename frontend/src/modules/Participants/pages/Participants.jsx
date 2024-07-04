@@ -14,7 +14,7 @@ function Participants() {
   }
   return (
     <div class="layout-container">
-      <CustomSideBar openSideBar={openSideBar} toggleSideBar={toggleSideBar}/>
+      <CustomSideBar openSideBar={openSideBar} toggleSideBar={toggleSideBar} activeTab="/participants"/>
       <div
         className="layout-page"
         style={{ display: "flex", flexDirection: "column" }}
