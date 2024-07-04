@@ -1,6 +1,6 @@
 import React from 'react'
 
-function ParticipantTableHeader({handleSearchChange}) {
+function ParticipantTableHeader({handleSearchChange,setIsModalOpen}) {
   return (
     <div className="row mx-1">
     <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -25,6 +25,9 @@ function ParticipantTableHeader({handleSearchChange}) {
             tabIndex={0}
             aria-controls="DataTables_Table_0"
             type="button"
+            onClick={()=>{
+              setIsModalOpen(true)
+            }}
           >
             <span>
               <i className="bx bx-plus me-md-1" />

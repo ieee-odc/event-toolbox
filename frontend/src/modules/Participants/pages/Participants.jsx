@@ -6,6 +6,7 @@ import ParticipantsCard from "../components/ParticipantsCard";
 
 function Participants() {
   const [openSideBar,setOpenSideBar]=useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleSideBar=()=>{
     console.log("clicked")
@@ -900,7 +901,7 @@ function Participants() {
               </div>
             </div>
             {/* Invoice List Table */}
-            <ParticipantsCard/>
+            <ParticipantsCard isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
           </div>
           {/* / Content */}
           {/* Footer */}
@@ -940,8 +941,13 @@ function Participants() {
         
         {/* Content wrapper */}
        {
-        openSideBar&& <div class="layout-overlay layout-menu-toggle" style={{display:"block"}}></div>
+        openSideBar &&<div class="layout-overlay layout-menu-toggle" style={{display:"block"}}></div>
        }
+
+       {
+        isModalOpen &&<div class="content-backdrop fade" style={{zIndex:"999",opacity:"0.3"}}>azdazd</div>
+       }
+       
       </div>
     </div>
   );
