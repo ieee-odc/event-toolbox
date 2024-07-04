@@ -1,12 +1,15 @@
 import { useState } from "react";
 import "./App.css";
-import Events from "./modules/Events/pages/EventsPage";
+import Participants from "./modules/Participants/pages/Participants";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "./utils/PrivateRoute";
+
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <div className="App">
+      <Toaster />
       {/* for private routes use Private Route like this
    <Route path= "/participants" element ={<PrivateRoute allowedRoles={['organizer']}>
 <Participants />
