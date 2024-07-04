@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-function CustomSideBar({openSideBar,toggleSideBar}) {
+function CustomSideBar({openSideBar,toggleSideBar,activeTab}) {
 const navigate=useNavigate();
   return (
 
@@ -117,7 +117,7 @@ const navigate=useNavigate();
         </div>
       </a>
     </li>
-    <li className="menu-item active">
+    <li className="menu-item">
       <a href="app-calendar.html" className="menu-link">
         <i className="menu-icon tf-icons bx bx-user" />
         <div className="text-truncate" data-i18n="User">
