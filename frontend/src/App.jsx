@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import Participants from "./modules/Participants/pages/Participants";
+import Events from "./modules/Events/pages/EventsPage";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "./utils/PrivateRoute";
 
@@ -16,8 +16,6 @@ function App() {
   <Route path= "/signup" element ={<Signup/>}  />
   <Route path= "/" element ={<Homepage/>}  /> */}
         <Route path="/events" element={<Events />} />
-
-        <Route path="/participants" element={<Participants />} />
       </Routes>
     </div>
   );
