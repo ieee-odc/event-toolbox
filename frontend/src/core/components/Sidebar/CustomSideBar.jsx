@@ -1,39 +1,43 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./CustomSideBar.css"
 function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
   const navigate = useNavigate();
-
-  const routes = [
+  const [routes, setRoutes] = useState([
     {
       name: "Events",
       icon: "bx bx-party",
       route: "/events",
-      parentRoute: "Workshops",
       isActive: activeTab === "/events",
+      isSubMenuOpen: false,
+      childRoutes: [
+        {
+          name: "Spaces",
+          icon: "bx bx-home-alt",
+          route: "/spaces",
+          isActive: activeTab === "/spaces",
+        },
+        {
+          name: "Participants",
+          icon: "bx bx-user",
+          route: "/participants",
+          isActive: activeTab === "/participants",
+        },
+        {
+          name: "Forms",
+          icon: "bx bx-file",
+          route: "/forms",
+          isActive: activeTab === "/forms",
+        },
+      ],
     },
-    {
-      name: "Spaces",
-      icon: "bx bx-home-alt",
-      route: "/spaces",
-      parentRoute: "Workshops",
-      isActive: activeTab === "/spaces",
-    },
-    {
-      name: "Participants",
-      icon: "bx bx-user",
-      route: "/participants",
-      parentRoute: "Workshops",
-      isActive: activeTab === "/participants",
-    },
-    {
-      name: "Forms",
-      icon: "bx bx-file",
-      route: "/forms",
-      parentRoute: "Workshops",
-      isActive: activeTab === "/forms",
-    },
-  ];
+  ]);
+
+  const toggleSubMenu = (index) => {
+    const updatedRoutes = [...routes];
+    updatedRoutes[index].isSubMenuOpen = !updatedRoutes[index].isSubMenuOpen;
+    setRoutes(updatedRoutes);
+  };
 
   return (
     <aside
@@ -50,7 +54,7 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
         ...(openSideBar && { transform: "translate3d(0, 0, 0)" }),
       }}
     >
-     <div className="app-brand demo " >
+        <div className="app-brand demo " >
     <span className="app-brand-link">
       <span className="app-brand-logo demo">
         <svg
@@ -127,23 +131,45 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
   </div>
       <div className="menu-inner-shadow" style={{ display: "none" }} />
       <ul className="menu-inner py-1 ps ps--active-y">
-        <li className="menu-header small text-uppercase">
-          <span className="menu-header-text">Workshops</span>
-        </li>
-
         {routes.map((route, index) => (
-          <li key={index} className={`menu-item ${route.isActive ? 'active' : ''}`}>
+          <li
+            key={index}
+            className={`menu-item ${route.isActive ? "active" : ""} ${route.isSubMenuOpen ? "open" : ""}`}
+          >
             <a
-              href={route.route} // You can change this to onClick={navigate(route.route)} for React Router navigation
-              className="menu-link"
+              className="menu-link menu-toggle"
               onClick={(e) => {
                 e.preventDefault();
-                navigate(route.route);
+                toggleSubMenu(index);
               }}
             >
               <i className={`menu-icon tf-icons ${route.icon}`} />
               <div className="text-truncate">{route.name}</div>
             </a>
+
+            {/* Conditionally render submenu with CSS transition */}
+            <ul
+              className="menu-sub"
+              style={{
+                display: route.isSubMenuOpen ? "flex" : "none",
+                height:"45px"
+              }}
+            >
+              {route.childRoutes.map((childRoute, childIndex) => (
+                <li key={childIndex} className="menu-item">
+                  <a
+                    href={childRoute.route}
+                    className={`menu-link ${childRoute.isActive ? "active" : ""}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(childRoute.route);
+                    }}
+                  >
+                    <div className="text-truncate">{childRoute.name}</div>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>

@@ -3,6 +3,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
 import { toast } from "react-hot-toast";
+import { formatDate } from "../../../utils/helpers/FormatDate";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -230,7 +231,7 @@ const ParticipantsCard = ({setIsModalOpen,isModalOpen}) => {
                       </div>
                     </td>
                     <td className="">
-                      <span className="d-none"></span>09 May 2020
+                      <span className="d-none"></span>{formatDate(participant.createdAt)}
                     </td>
                     <td>{getStatusIcon(participant.status)}</td>
                     <td>
