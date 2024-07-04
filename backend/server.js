@@ -27,8 +27,8 @@ db.once('open', () => {
 
 const ParticipantRouter = require("./routes/ParticipantRoutes")
 app.use("/participant", ParticipantRouter)
-const authRoutes = require('./routes/authRoutes')
-app.use('/auth', authRoutes);
+const authRouter = require('./routes/authRoutes')
+app.use('/auth', authRouter);
 
 
 const server = app.listen(process.env.PORT, () => {
