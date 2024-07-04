@@ -15,6 +15,7 @@ router.post('/createform', async (req, res) => {
     }
 });
 router.get('/getform/:formId', formController.getFormById);
+router.get('/:eventId', formController.getFormsByEventId);
 
 //get All
 /*router.get('/getAllForms', async (req, res) => {

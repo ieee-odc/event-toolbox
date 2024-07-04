@@ -3,6 +3,10 @@ import './App.css'
 import Participants from './modules/Participants/pages/Participants';
 import { Route, Routes } from 'react-router-dom';
 import PrivateRoute from './utils/PrivateRoute';
+import Form from './modules/Form/components/Form';
+import FormLandingPage from './modules/Form/pages/FormLandingPage';
+
+
 
 
 
@@ -15,11 +19,17 @@ function App() {
 <Participants />
 </PrivateRoute>}  />  */}
 <Routes >
-  {/* <Route path= "/login" element ={<Login/>}  />
-  <Route path= "/signup" element ={<Signup/>}  />
-  <Route path= "/" element ={<Homepage/>}  /> */}
-  <Route path= "/participants" element ={
-<Participants />}  />
+      {/* <Route path= "/login" element ={<Login/>}  />
+      <Route path= "/signup" element ={<Signup/>}  />
+      <Route path= "/participantform" element ={<Form/>}  />
+      <Route path= "/" element ={<Homepage/>}  /> */}
+      <Route path= "/participants" element ={ <Participants />}  />
+      {/* Route to your Form component */}
+      <Route path="/form" element={<Form/>} />
+      <Route path="/showform" element={<Form/>} />
+      <Route path="/formlandingpage/:eventId" element={<FormLandingPage />} />
+
+
 </Routes>
     
     </div>

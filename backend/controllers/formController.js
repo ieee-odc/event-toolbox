@@ -61,6 +61,16 @@ const getFormById = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+// Get Form By Event 
+const getFormsByEventId = async (req,res) => {
+    const {eventId} = req.params;
+    try{
+        const forms = await Form.find({ eventId });
+        res.json(forms);
+    }catch(error){
+        console.error('Error in getFormsByEventId controller:', error.message);
+        res.status(500).json({ error: 'Internal server error' });    }
+}
 
 // const getFormById = async (formId) =>{
 //     try{
@@ -106,6 +116,7 @@ const deleteFormById = async (formId) =>{
 module.exports={
     createForm,
     getFormById,
+    getFormsByEventId,
     updateFormById,
     deleteFormById
 }

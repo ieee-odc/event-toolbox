@@ -1,8 +1,8 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { UserRole} from "./UserRole";
+import { UserData } from "./UserData";
 function PrivateRoute({ children, allowedRoles }) {
-const role = UserRole();
+const role = UserData();
 console.log(role)
 if (role) {
 return (
