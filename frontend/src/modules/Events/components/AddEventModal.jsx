@@ -1,7 +1,7 @@
 import React from "react";
 import "../Events.css";
 
-function EventModal({
+function AddEventModal({
   isOpen,
   toggleModal,
   handleSubmit,
@@ -113,4 +113,4 @@ function EventModal({
   );
 }
 
-export default EventModal;
+export default AddEventModal;

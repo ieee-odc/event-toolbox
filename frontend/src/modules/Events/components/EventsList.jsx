@@ -3,7 +3,7 @@ import axios from "axios";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 
-function EventsList({ onAddEventClick }) {
+function EventsList({ onAddEventClick, onEditEventClick }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -62,7 +62,9 @@ function EventsList({ onAddEventClick }) {
       console.error("Error creating event:", error);
     }
   };
-
+  const handleEditClick = (eventId) => {
+    onEditEventClick(eventId);
+  };
   const calculateDurationInDays = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -289,13 +291,20 @@ function EventsList({ onAddEventClick }) {
                           >
                             <i className="bx bxs-trash me-2"></i>Delete
                           </button>
-                          <a
+                          <button
+                            className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
+                            onClick={() => handleEditClick(event._id)}
+                          >
+                            Edit
+                            <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>
+                          </button>
+                          {/* <a
                             className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
                             href="app-academy-course-details.html"
                           >
                             <span className="me-0">Continue</span>
                             <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>
-                          </a>
+                          </a> */}
                         </div>
                       </div>
                     </div>
