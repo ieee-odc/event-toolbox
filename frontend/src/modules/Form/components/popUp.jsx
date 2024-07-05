@@ -30,7 +30,7 @@ function EventModal({
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel1">
-                Add Event
+                Update Form
               </h5>
               <button
                 type="button"
@@ -43,7 +43,7 @@ function EventModal({
               <div className="modal-body">
                 <div className="mb-3">
                   <label htmlFor="name" className="form-label">
-                    Name
+                    Price
                   </label>
                   <input
                     type="text"
@@ -54,44 +54,26 @@ function EventModal({
                     onChange={handleInputChange}
                   />
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="description" className="form-label">
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    className="form-control"
-                    placeholder="Enter Description"
-                    value={newEvent.description}
-                    onChange={handleInputChange}
-                  ></textarea>
-                </div>
-                <div className="row g-2">
-                  <div className="col">
-                    <label htmlFor="startDate" className="form-label">
-                      Start Date
+                 {/* Dynamically generate input fields based on newEvent.data */}
+                 {Object.keys(newEvent.data).map((key) => (
+                  <div className="mb-3" key={key}>
+                    <label htmlFor={key} className="form-label">
+                      {key}
                     </label>
                     <input
-                      type="date"
-                      id="startDate"
+                      type="text"
+                      id={key}
                       className="form-control"
-                      value={newEvent.startDate}
-                      onChange={handleInputChange}
+                      placeholder={`Enter ${key}`}
+                      value={newEvent.data[key]}
+                      onChange={(e) =>
+                        handleInputChange({
+                          target: { id: `data.${key}`, value: e.target.value },
+                        })
+                      }
                     />
                   </div>
-                  <div className="col">
-                    <label htmlFor="endDate" className="form-label">
-                      End Date
-                    </label>
-                    <input
-                      type="date"
-                      id="endDate"
-                      className="form-control"
-                      value={newEvent.endDate}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
               <div className="modal-footer">
                 <button

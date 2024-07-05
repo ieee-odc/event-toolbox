@@ -46,9 +46,7 @@ router.delete('/delete/:formId', formController.deleteFormById);
 
 //router.get("/getform/:id",getFormById);
 
-//router.delete("/deleteform/:id",deleteFormById);
 
-//router.put("/updateForm/:id",updateFormById);
 
 //export default router;
 module.exports = router;

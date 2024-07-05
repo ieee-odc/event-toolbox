@@ -10,8 +10,9 @@ const FormLandingPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal open/close
     const [currentForm, setCurrentForm] = useState({
         price: '',
-        data: ''
+        data: {}
     });
+    const [fieldNames, setFieldNames] = useState([]); // State to manage field names
 
     useEffect(() => {
         fetchFormsByEventId();
@@ -20,7 +21,17 @@ const FormLandingPage = () => {
     const fetchFormsByEventId = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/form/${eventId}`);
-            setForms(response.data);
+            const formsData = response.data;
+            setForms(formsData);
+
+            // Extract unique field names from the forms data
+            const allFieldNames = new Set();
+            formsData.forEach(form => {
+                Object.keys(form.data).forEach(fieldName => {
+                    allFieldNames.add(fieldName);
+                });
+            });
+            setFieldNames(Array.from(allFieldNames));
         } catch (error) {
             console.error('Error fetching forms:', error);
         }
@@ -63,11 +74,23 @@ const FormLandingPage = () => {
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
-        setCurrentForm(prevState => ({
+        if (id.startsWith('data.')) {
+          const field = id.split('.')[1];
+          setCurrentForm(prevState => ({
+            ...prevState,
+            data: {
+              ...prevState.data,
+              [field]: value
+            }
+          }));
+        } else {
+          setCurrentForm(prevState => ({
             ...prevState,
             [id]: value
-        }));
-    };
+          }));
+        }
+      };
+      
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
@@ -84,15 +107,19 @@ const FormLandingPage = () => {
                         <thead>
                             <tr>
                                 <th scope="col">Price</th>
-                                <th scope="col">Data</th>
+                                {fieldNames.map((fieldName) => (
+                                    <th scope="col" key={fieldName}>{fieldName}</th>
+                                ))}
                                 <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {forms.map((form) => (
-                                <tr key={form.id}>
+                                <tr key={form._id}>
                                     <td>{form.price}</td>
-                                    <td>{JSON.stringify(form.data)}</td>
+                                    {fieldNames.map((fieldName) => (
+                                        <td key={fieldName}>{form.data[fieldName]}</td>
+                                    ))}
                                     <td>
                                         <div className="dropdown">
                                             <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -108,7 +135,7 @@ const FormLandingPage = () => {
                             ))}
                             {forms.length === 0 && (
                                 <tr>
-                                    <td colSpan="3" className="text-center">No forms available</td>
+                                    <td colSpan={fieldNames.length + 2} className="text-center">No forms available</td>
                                 </tr>
                             )}
                         </tbody>
