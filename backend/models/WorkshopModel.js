@@ -5,6 +5,14 @@ const WorkshopSchema=mongoose.Schema({
         type:Number,
         required:true,
     },
+    name:{
+        type:String,
+        required:true,
+    },
+    description:{
+        type:String,
+        required:true,
+    },
     startTime:{
         type:Date,
         required:true,
@@ -13,9 +21,10 @@ const WorkshopSchema=mongoose.Schema({
         type:Date,
         required:true,
     },
-    currentParticipats:{
+    currentParticipants:{
         type:Number,
         required:true,
+        default:0
     },
     spaceId:{
         type:Number,
@@ -24,6 +33,9 @@ const WorkshopSchema=mongoose.Schema({
     eventId:{
         type:Number,
         required:true,
+    },
+    formId:{
+        type:Number,
     }
     
 } ,{ timestamps: true })

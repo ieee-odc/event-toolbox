@@ -7,8 +7,8 @@ const { addWorkshop, deleteWorkshop, editWorkshop, getSpaceWorkshops, getEventWo
 router.get("/get-space/:spaceId",getSpaceWorkshops)
 router.get("/get-event/:eventId",getEventWorkshops)
 router.post("/add",  addWorkshop);
-router.post("/edit/:participantId",editWorkshop)
-router.post("/delete/:participantId",deleteWorkshop);
+router.post("/edit/:workshopId",editWorkshop)
+router.post("/delete/:workshopId",deleteWorkshop);
 
 
 
