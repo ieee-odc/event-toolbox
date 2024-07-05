@@ -5,6 +5,9 @@ import { Route, Routes } from 'react-router-dom';
 import PrivateRoute from './utils/PrivateRoute';
 import Form from './modules/Form/components/Form';
 import FormLandingPage from './modules/Form/pages/FormLandingPage';
+import Table from './core/components/Table/Table';
+import Page from './modules/Form/pages/Page';
+import Base from './modules/Form/pages/base';
 
 
 
@@ -28,6 +31,11 @@ function App() {
       <Route path="/form" element={<Form/>} />
       <Route path="/showform" element={<Form/>} />
       <Route path="/formlandingpage/:eventId" element={<FormLandingPage />} />
+      <Route path="/table" element={<Table/>} />
+      <Route path="/aaa" element={<Page/>} /> 
+      <Route path="/base" element={<Base/>} /> 
+
+
 
 
 </Routes>

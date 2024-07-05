@@ -27,26 +27,22 @@ router.get('/:eventId', formController.getFormsByEventId);
     }
 });*/
 // Update a form by ID
-router.put('/:formId', async (req, res) => {
-    const { formId } = req.params;
-    const { price, data } = req.body;
-    try {
-        const updatedForm = await formController.updateFormById(formId, price, data);
-        res.json(updatedForm);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+router.put('/update/:formId', formController.updateFormById);
+
+// router.put('update/:formId', async (req, res) => {
+//     const { formId } = req.params;
+//     const { price, data } = req.body;
+//     try {
+//         const updatedForm = await formController.updateFormById(formId, price, data);
+//         res.json(updatedForm);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// });
+
 // Delete a form by ID
-router.delete('/:formId', async (req, res) => {
-    const { formId } = req.params;
-    try {
-        const result = await formController.deleteFormById(formId);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+router.delete('/delete/:formId', formController.deleteFormById);
+
 
 //router.get("/getform/:id",getFormById);
 

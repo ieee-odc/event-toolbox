@@ -3,7 +3,6 @@ const mongoose =require('mongoose');
 const Form= require('../models/FormModel');
 const Event= require('../models/EventModel');
 
-// Create a new Form
 /*const createForm = async (req,res) => {
     try{
      const {eventId, price, data} = req.body;
@@ -25,7 +24,7 @@ const Event= require('../models/EventModel');
         res.status(500).json({error:"Internal Server Error"})
      }
     } */
-
+// Create a new Form
  const createForm = async (eventId, price, data) => {
     try{
         // Check if the event exists
@@ -85,34 +84,70 @@ const getFormsByEventId = async (req,res) => {
 //     }
 // }
 // Update a form by ID
-const updateFormById =async (formId, price, date) =>{
-    try{
-        const updateForm =await Form.findByIdAndUpdate(
+const updateFormById = async (req, res) => {
+    const { formId } = req.params;
+    const { price, date } = req.body;
+    try {
+        const updatedForm = await Form.findByIdAndUpdate(
             formId,
-            {price,date},
-            {new : true}
+            { price, date },
+            { new: true }
         );
-        if(!updateForm){
-            return res.status(400).json({error: "Form not found"});
+        if (!updatedForm) {
+            return res.status(404).json({ error: "Form not found" });
         }
-
-    }catch(error){
-        console.log("Error in the updateForm controller")
-        res.status(500).json({error:"Internal Server Error"})
+        res.json(updatedForm); // Respond with the updated form
+    } catch (error) {
+        console.error('Error updating form:', error.message);
+        res.status(500).json({ error: "Internal Server Error" }); // Handle any errors
     }
 };
-const deleteFormById = async (formId) =>{
-    try{
-        const deletedForm =await Form.findByIdAndDelete(formId);
-        if(!deletedForm){
-            return res.status(400).json({error: "Form not found"});
-        }
 
-    }catch(error){
-        console.log("Error in the deleteForm controller")
-        res.status(500).json({error:"Internal Server Error"})
+
+
+// const updateFormById =async (formId, price, date) =>{
+//     try{
+//         const updateForm =await Form.findByIdAndUpdate(
+//             formId,
+//             {price,date},
+//             {new : true}
+//         );
+//         if(!updateForm){
+//             return res.status(400).json({error: "Form not found"});
+//         }
+
+//     }catch(error){
+//         console.log("Error in the updateForm controller")
+//         res.status(500).json({error:"Internal Server Error"})
+//     }
+// };
+
+const deleteFormById = async (req, res) => {
+    const { formId } = req.params;
+    try {
+        const deletedForm = await Form.findByIdAndDelete(formId);
+        if (!deletedForm) {
+            return res.status(404).json({ error: "Form not found" });
+        }
+        res.json(deletedForm); // Respond with the deleted form
+    } catch (error) {
+        console.error('Error deleting form:', error.message);
+        res.status(500).json({ error: "Internal Server Error" }); // Handle any errors
     }
 };
+
+// const deleteFormById = async (formId) =>{
+//     try{
+//         const deletedForm =await Form.findByIdAndDelete(formId);
+//         if(!deletedForm){
+//             return res.status(400).json({error: "Form not found"});
+//         }
+
+//     }catch(error){
+//         console.log("Error in the deleteForm controller")
+//         res.status(500).json({error:"Internal Server Error"})
+//     }
+// };
 module.exports={
     createForm,
     getFormById,
