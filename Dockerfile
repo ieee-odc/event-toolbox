@@ -10,5 +10,5 @@ RUN npm install
 COPY backend ./backend
 COPY frontend ./frontend
 
-CMD ["npm", "start"]
+CMD ["npm", "run"]
 
