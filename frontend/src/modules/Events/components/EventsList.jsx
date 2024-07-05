@@ -11,6 +11,9 @@ function EventsList() {
     name: "",
     description: "",
   });
+  const [filterStatus, setFilterStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [eventsPerPage] = useState(6); // Number of events per page
 
   useEffect(() => {
     fetchEvents();
@@ -85,21 +88,41 @@ function EventsList() {
     }
   };
 
+  const handleStatusChange = (e) => {
+    setFilterStatus(e.target.value);
+    setCurrentPage(1); // Reset current page when filter changes
+  };
+
+  const filteredEvents = filterStatus
+    ? events.filter(
+        (event) =>
+          getEventStatus(event.startDate, event.endDate).status === filterStatus
+      )
+    : events;
+
+  // Logic for pagination
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredEvents.slice(
+    indexOfFirstEvent,
+    indexOfLastEvent
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="content-wrapper">
       <div className="container-xxl flex-grow-1 container-p-y">
         <h4 className="py-3 mb-4">
-          <span className="text-muted fw-light">Academy/</span> My Courses
+          <span className="text-muted fw-light">UserName/</span> Events
         </h4>
 
         <div className="app-academy">
           <div className="card mb-4">
             <div className="card-header d-flex flex-wrap justify-content-between gap-3">
               <div className="card-title mb-0 me-1">
-                <h5 className="mb-1">My Courses</h5>
-                <p className="text-muted mb-0">
-                  Total {events.length} courses you have purchased
-                </p>
+                <h5 className="mb-1">My Events</h5>
+                <p className="text-muted mb-0">Total {events.length} events</p>
               </div>
               <div className="d-flex justify-content-md-end align-items-center gap-3 flex-wrap">
                 <div className="position-relative">
@@ -107,16 +130,20 @@ function EventsList() {
                     id="select2_course_select"
                     className="select2 form-select select2-hidden-accessible"
                     data-placeholder="All Courses"
+                    onChange={handleStatusChange}
                     tabIndex="-1"
                     aria-hidden="true"
                   >
-                    <option value="">All Courses</option>
-                    <option value="all courses">All Courses</option>
-                    <option value="ui/ux">UI/UX</option>
-                    <option value="seo">SEO</option>
-                    <option value="web">Web</option>
-                    <option value="music">Music</option>
-                    <option value="painting">Painting</option>
+                    <option
+                      className="select2-results__option"
+                      id="select2-select2_course_select-result-1rbs-seo"
+                      value=""
+                    >
+                      All Events
+                    </option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Done">Done</option>
                   </select>
                   <span
                     className="select2 select2-container select2-container--default"
@@ -149,7 +176,6 @@ function EventsList() {
                   </span>
                 </div>
 
-                {/* Add Event Button */}
                 <button className="btn btn-primary" onClick={toggleCreateEvent}>
                   Add Event
                 </button>
@@ -195,19 +221,11 @@ function EventsList() {
                 {loading ? (
                   <p>Loading courses...</p>
                 ) : (
-                  events.map((event) => (
+                  currentEvents.map((event) => (
                     <div className="col-sm-6 col-lg-4" key={event._id}>
                       <div className="card p-2 h-100 shadow-none border">
-                        <div className="rounded-2 text-center mb-0">
-                          <a href="app-academy-course-details.html">
-                            <img
-                              className="img-fluid"
-                              src={event.imageUrl}
-                              alt={event.tutorName}
-                            />
-                          </a>
-                        </div>
-                        <div className="card-body p-3 pt-2">
+                        <div className="rounded-2 text-center mb-0"></div>
+                        <div className="card-body p-3 pt-3">
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span
                               className={
@@ -244,34 +262,81 @@ function EventsList() {
                               days
                             </p>
                           </div>
-                          {/* 
-      <div className="progress mb-4" style={{ height: "8px" }}>
-        <div
-          className="progress-bar"
-          role="progressbar"
-          style={{ width: `${event.progress}%` }}
-          aria-valuenow={event.progress}
-          aria-valuemin="0"
-          aria-valuemax="100"
-        ></div>
-      </div> */}
                         </div>
                         <div className="d-flex flex-column flex-md-row gap-2 text-nowrap pe-xl-3 pe-xxl-0 mt-1 mb-3 justify-content-center align-items-end">
                           <button
-                            className="app-academy-md-50 btn btn-label-secondary me-md-2 d-flex align-items-center"
+                            className="app-academy-md-50 btn btn-label-secondary me-md-0 d-flex align-items-center"
                             onClick={() => deleteEvent(event._id)}
                           >
                             <i className="bx bxs-trash me-2"></i>Delete
                           </button>
-                          <button className="app-academy-md-50 btn btn-primary d-flex align-items-center">
-                            <i className="bx bx-continue me-2"></i>Continue
-                          </button>
+                          <a
+                            className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
+                            href="app-academy-course-details.html"
+                          >
+                            <span className="me-0">Continue</span>
+                            <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>
+                          </a>
                         </div>
                       </div>
                     </div>
                   ))
                 )}
               </div>
+              {/* Pagination */}
+              <nav className="mt-4" aria-label="...">
+                <ul className="pagination">
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => paginate(currentPage - 1)}
+                      tabIndex="-1"
+                      aria-disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                  </li>
+                  {Array.from(
+                    {
+                      length: Math.ceil(filteredEvents.length / eventsPerPage),
+                    },
+                    (_, index) => (
+                      <li
+                        key={index}
+                        className={`page-item ${
+                          currentPage === index + 1 ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => paginate(index + 1)}
+                        >
+                          {index + 1}
+                        </button>
+                      </li>
+                    )
+                  )}
+                  <li
+                    className={`page-item ${
+                      currentPage ===
+                      Math.ceil(filteredEvents.length / eventsPerPage)
+                        ? "disabled"
+                        : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => paginate(currentPage + 1)}
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
