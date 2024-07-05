@@ -2,8 +2,8 @@ FROM node:17-alpine
 WORKDIR /app
 EXPOSE 8000
 
-COPY backend/package.json backend/package-lock.json ./backend/
-COPY frontend/package.json frontend/package-lock.json ./frontend/
+COPY backend/package.json backend/package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 
 RUN npm install
 
