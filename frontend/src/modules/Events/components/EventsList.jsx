@@ -3,7 +3,7 @@ import axios from "axios";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 
-function EventsList() {
+function EventsList({ onAddEventClick }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
@@ -54,10 +54,7 @@ function EventsList() {
   const createEvent = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:6001/events/create",
-        newEvent
-      );
+      const response = await axios.post("/events/add", newEvent);
       setEvents([...events, response.data]);
       setShowCreateEvent(false);
       setNewEvent({ name: "", description: "" });
@@ -73,7 +70,13 @@ function EventsList() {
     const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
     return Math.round(durationInDays);
   };
-
+  const formatDate = (passedDate) => {
+    const dateObj = new Date(passedDate);
+    const day = dateObj.getUTCDate().toString().padStart(2, "0");
+    const month = (dateObj.getUTCMonth() + 1).toString().padStart(2, "0");
+    const year = dateObj.getUTCFullYear().toString();
+    return `${day}/${month}/${year}`;
+  };
   const getEventStatus = (startDate, endDate) => {
     const currentDate = new Date();
     const start = new Date(startDate);
@@ -176,7 +179,7 @@ function EventsList() {
                   </span>
                 </div>
 
-                <button className="btn btn-primary" onClick={toggleCreateEvent}>
+                <button className="btn btn-primary" onClick={onAddEventClick}>
                   Add Event
                 </button>
               </div>
@@ -246,20 +249,36 @@ function EventsList() {
                             href="app-academy-course-details.html"
                             className="h5"
                           >
-                            {event.Name}
+                            {event.name}
                           </a>
-                          <p className="mt-2">{event.Description}</p>
-                          <div className="d-flex align-items-center">
-                            <i className="bx bx-time-five me-2"></i>
+                          <p className="mt-2">{event.description}</p>
+                          <div className="d-flex align-items-center mb-1">
                             <p className="d-flex align-items-center text mb-0">
                               Duration :
                             </p>
+                            <i className="bx bx-time-five ms-2"></i>
                             <p className="d-flex align-items-center mb-0 ms-1">
                               {calculateDurationInDays(
                                 event.startDate,
                                 event.endDate
                               )}{" "}
                               days
+                            </p>
+                          </div>
+                          <div className="d-flex align-items-center mb-1">
+                            <p className="d-flex align-items-center text mb-0">
+                              Starts :
+                            </p>
+                            <p className="d-flex align-items-center mb-0 ms-1">
+                              {formatDate(event.startDate)}
+                            </p>
+                          </div>
+                          <div className="d-flex align-items-center">
+                            <p className="d-flex align-items-center text mb-0">
+                              Ends :
+                            </p>
+                            <p className="d-flex align-items-center mb-0 ms-1">
+                              {formatDate(event.endDate)}
                             </p>
                           </div>
                         </div>
