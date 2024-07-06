@@ -42,35 +42,31 @@ function EventModal({
             <form onSubmit={onSubmit}>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label htmlFor="name" className="form-label">
+                  <label htmlFor="price" className="form-label">
                     Price
                   </label>
                   <input
                     type="text"
-                    id="name"
+                    id="price"
                     className="form-control"
-                    placeholder="Enter Name"
-                    value={newEvent.name}
+                    placeholder="Enter Price"
+                    value={newEvent.price || ''}
                     onChange={handleInputChange}
                   />
                 </div>
-                 {/* Dynamically generate input fields based on newEvent.data */}
-                 {Object.keys(newEvent.data).map((key) => (
+                {/* Dynamically generate input fields based on newEvent.data */}
+                {Object.keys(newEvent.data || {}).map((key) => (
                   <div className="mb-3" key={key}>
                     <label htmlFor={key} className="form-label">
                       {key}
                     </label>
                     <input
                       type="text"
-                      id={key}
+                      id={`data.${key}`}
                       className="form-control"
                       placeholder={`Enter ${key}`}
-                      value={newEvent.data[key]}
-                      onChange={(e) =>
-                        handleInputChange({
-                          target: { id: `data.${key}`, value: e.target.value },
-                        })
-                      }
+                      value={newEvent.data[key] || ''}
+                      onChange={handleInputChange}
                     />
                   </div>
                 ))}

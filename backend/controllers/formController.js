@@ -86,22 +86,30 @@ const getFormsByEventId = async (req,res) => {
 // Update a form by ID
 const updateFormById = async (req, res) => {
     const { formId } = req.params;
-    const { price, date } = req.body;
+    const { price, data } = req.body;
+
+    console.log('Received data for update:', { price, data }); // Log received data
+
     try {
         const updatedForm = await Form.findByIdAndUpdate(
             formId,
-            { price, date },
+            { $set: { price, data } }, // Use $set to update the nested data map
             { new: true }
         );
+
         if (!updatedForm) {
             return res.status(404).json({ error: "Form not found" });
         }
+
+        console.log('Updated form:', updatedForm); // Log the updated form
         res.json(updatedForm); // Respond with the updated form
     } catch (error) {
         console.error('Error updating form:', error.message);
         res.status(500).json({ error: "Internal Server Error" }); // Handle any errors
     }
 };
+
+
 
 
 

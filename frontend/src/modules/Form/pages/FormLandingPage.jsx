@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import BaseLayout from '../pages/base'; // Adjust the import path based on your project structure
-import EventModal from '../components/popUp'; // Adjust the import path based on your project structure
+import BaseLayout from '../pages/base';
+import EventModal from '../components/popUp';
 
 const FormLandingPage = () => {
     const { eventId } = useParams();
     const [forms, setForms] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal open/close
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentForm, setCurrentForm] = useState({
         price: '',
         data: {}
     });
-    const [fieldNames, setFieldNames] = useState([]); // State to manage field names
 
     useEffect(() => {
         fetchFormsByEventId();
@@ -21,17 +20,7 @@ const FormLandingPage = () => {
     const fetchFormsByEventId = async () => {
         try {
             const response = await axios.get(`http://localhost:5000/form/${eventId}`);
-            const formsData = response.data;
-            setForms(formsData);
-
-            // Extract unique field names from the forms data
-            const allFieldNames = new Set();
-            formsData.forEach(form => {
-                Object.keys(form.data).forEach(fieldName => {
-                    allFieldNames.add(fieldName);
-                });
-            });
-            setFieldNames(Array.from(allFieldNames));
+            setForms(response.data);
         } catch (error) {
             console.error('Error fetching forms:', error);
         }
@@ -44,10 +33,15 @@ const FormLandingPage = () => {
 
     const handleUpdateForm = async (formId, updatedData) => {
         try {
+            console.log('Sending data for update:', updatedData);  // Log data being sent
+
             const response = await axios.put(`http://localhost:5000/form/update/${formId}`, updatedData);
+
+            console.log('Received response from update:', response.data);  // Log response data
+
             const updatedForms = forms.map(form => {
                 if (form._id === formId) {
-                    return { ...form, ...updatedData };
+                    return { ...form, ...response.data };
                 }
                 return form;
             });
@@ -75,22 +69,21 @@ const FormLandingPage = () => {
     const handleInputChange = (e) => {
         const { id, value } = e.target;
         if (id.startsWith('data.')) {
-          const field = id.split('.')[1];
-          setCurrentForm(prevState => ({
-            ...prevState,
-            data: {
-              ...prevState.data,
-              [field]: value
-            }
-          }));
+            const field = id.split('.')[1];
+            setCurrentForm(prevState => ({
+                ...prevState,
+                data: {
+                    ...prevState.data,
+                    [field]: value
+                }
+            }));
         } else {
-          setCurrentForm(prevState => ({
-            ...prevState,
-            [id]: value
-          }));
+            setCurrentForm(prevState => ({
+                ...prevState,
+                [id]: value
+            }));
         }
-      };
-      
+    };
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
@@ -107,8 +100,8 @@ const FormLandingPage = () => {
                         <thead>
                             <tr>
                                 <th scope="col">Price</th>
-                                {fieldNames.map((fieldName) => (
-                                    <th scope="col" key={fieldName}>{fieldName}</th>
+                                {forms.length > 0 && Object.keys(forms[0].data).map((field) => (
+                                    <th scope="col" key={field}>{field}</th>
                                 ))}
                                 <th scope="col">Actions</th>
                             </tr>
@@ -117,8 +110,8 @@ const FormLandingPage = () => {
                             {forms.map((form) => (
                                 <tr key={form._id}>
                                     <td>{form.price}</td>
-                                    {fieldNames.map((fieldName) => (
-                                        <td key={fieldName}>{form.data[fieldName]}</td>
+                                    {Object.keys(form.data).map((field) => (
+                                        <td key={field}>{form.data[field]}</td>
                                     ))}
                                     <td>
                                         <div className="dropdown">
@@ -135,7 +128,7 @@ const FormLandingPage = () => {
                             ))}
                             {forms.length === 0 && (
                                 <tr>
-                                    <td colSpan={fieldNames.length + 2} className="text-center">No forms available</td>
+                                    <td colSpan="3" className="text-center">No forms available</td>
                                 </tr>
                             )}
                         </tbody>
