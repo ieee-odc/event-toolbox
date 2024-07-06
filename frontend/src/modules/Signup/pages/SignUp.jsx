@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../../core/components/Button/Button';
+import GoogleLoginButton from '../../../core/components/GoogleAuthButton/GoogleLoginButton';
 import axiosRequest from '../../../utils/AxiosConfig';
 import './SignUp.css';
 
@@ -41,6 +42,20 @@ function SignUp() {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
     }
+  };
+  const onGoogleSuccess = async (response) => {
+    try {
+      const res = await axiosRequest.post('/auth/google-auth', { tokenId: response.tokenId });
+      localStorage.setItem('token', res.data.token);
+      navigate('/success');
+    } catch (err) {
+      console.error(err.response.data);
+      setErrors({ server: err.response.data.msg });
+    }
+  };
+
+  const onGoogleFailure = (response) => {
+    setErrors({ server: 'Google signup failed' });
   };
 
   const toggleObscureText = () => {
@@ -91,6 +106,9 @@ function SignUp() {
                 <div className="mb-2">
                   <Button onClick={onSubmit} color={"primary"} label="Sign up" />
                 </div>
+                <div className="mb-3">
+                <GoogleLoginButton onSuccess={onGoogleSuccess} onFailure={onGoogleFailure} />
+              </div>
               </form>
               <p className="text-center move-down">
                 <span className="space-right">Already have an account?</span>

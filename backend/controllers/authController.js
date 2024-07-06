@@ -5,7 +5,11 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const User = require('../models/OrganizerModel');
 const Counter = require('../models/CounterModel');
+const admin = require('firebase-admin');
 
+admin.initializeApp({
+  credential: admin.credential.cert(require('../event-tool-box-1720171944535-firebase-adminsdk-f6w3g-c723d5d88c.json'))
+});
 
 
 const Register = async (req, res) => {
@@ -132,6 +136,34 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const googleAuth = async (req, res) => {
+  const { tokenId } = req.body;
+  try {
+      const decodedToken = await admin.auth().verifyIdToken(tokenId);
+      const { email, name, uid: googleId } = decodedToken;
+
+      let user = await User.findOne({ email });
+      if (!user) {
+          const counter = await Counter.findOneAndUpdate(
+              { id: "autovalOrganizer" },
+              { $inc: { seq: 1 } },
+              { new: true, upsert: true }
+          );
+
+          user = new User({ id: counter.seq, username: name, email, googleId });
+          await user.save();
+      }
+
+      const payload = { id: user.id };
+      const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+
+      res.status(200).json({ token, user });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ msg: 'Server error' });
+  }
+};
+
 
 
 
@@ -139,5 +171,6 @@ module.exports = {
     SignIn,
     Register,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    googleAuth
   };

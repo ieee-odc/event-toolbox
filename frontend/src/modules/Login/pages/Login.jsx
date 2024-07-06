@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../../core/components/Button/Button';
+import GoogleLoginButton from '../../../core/components/GoogleAuthButton/GoogleLoginButton';
 import './Login.css';
 import axiosRequest from '../../../utils/AxiosConfig';
 import { useNavigate } from 'react-router-dom';
@@ -32,13 +33,27 @@ function Login() {
     }
     try {
       const res = await axiosRequest.post('/auth/login', formData);
-      console.log(res.data);
       localStorage.setItem('token', res.data.token);
       navigate('/success');
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
     }
+  };
+
+  const onGoogleSuccess = async (response) => {
+    try {
+      const res = await axiosRequest.post('/auth/google-auth', { tokenId: response.user.accessToken});
+      localStorage.setItem('token', res.data.token);
+      navigate('/success');
+    } catch (err) {
+      console.error(err.response.data);
+      setErrors({ server: err.response.data.msg });
+    }
+  };
+
+  const onGoogleFailure = (response) => {
+    setErrors({ server: 'Google login failed' });
   };
 
   const [obscureText, setObscureText] = useState(true);
@@ -88,6 +103,9 @@ function Login() {
                   <Button color={"primary"} label="Sign in" onClick={onSubmit} />
                 </div>
               </form>
+              <div className="mb-3">
+                <GoogleLoginButton onSuccess={onGoogleSuccess} onFailure={onGoogleFailure} buttonText="Sign in with google"/>
+              </div>
 
               <p className="text-center move-down">
                 <span className="space-right">New on our platform?</span>
