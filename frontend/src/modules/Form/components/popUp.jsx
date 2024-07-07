@@ -51,6 +51,19 @@ function EventModal({
                   </div>
                 )}
                 <div className="mb-3">
+                  <label htmlFor="description" className="form-label">
+                    Description
+                  </label>
+                  <input
+                    type="text"
+                    id="description"
+                    className="form-control"
+                    placeholder="Enter Event Descrition"
+                    value={newEvent.description || ''}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="mb-3">
                   <label htmlFor="price" className="form-label">
                     Price
                   </label>

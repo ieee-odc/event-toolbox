@@ -13,6 +13,10 @@ const FormSchema= new Schema (
         type: Number,
         default: 0
     },
+    description :{
+        type:String,
+        required: true,
+    },
 
     data: {
         type: Map,

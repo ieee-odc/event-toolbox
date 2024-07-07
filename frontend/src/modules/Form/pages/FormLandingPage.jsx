@@ -11,6 +11,7 @@ const FormLandingPage = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentForm, setCurrentForm] = useState({
         eventId: eventId,
+        description:'',
         price: '',
         data: {}
     });
@@ -31,6 +32,7 @@ const FormLandingPage = () => {
     const handleCreateForm = () => {
         setCurrentForm({
             eventId: eventId,
+            description:'',
             price: '',
             data: {}
         });
@@ -131,7 +133,7 @@ const FormLandingPage = () => {
 
     return (
         <BaseLayout>
-            <div className="container mt-4">
+            <div className="container-fluid mt-4">
                 <h4 className="py-3 mb-4">
                     <span className="text-muted fw-light">DataTables /</span> Forms
                 </h4>
@@ -142,6 +144,7 @@ const FormLandingPage = () => {
                     <table className="table table-striped">
                         <thead>
                             <tr>
+                                <th scope="col">Description</th>
                                 <th scope="col">Price</th>
                                 {forms.length > 0 && Object.keys(forms[0].data).map((field) => (
                                     <th scope="col" key={field}>{field}</th>
@@ -152,24 +155,21 @@ const FormLandingPage = () => {
                         <tbody>
                             {forms.map((form) => (
                                 <tr key={form._id}>
+                                    <td>{form.description}</td>
                                     <td>{form.price}</td>
                                     {Object.keys(form.data).map((field) => (
                                         <td key={field}>{form.data[field]}</td>
                                     ))}
-                                    <td>
-                                        <div className="dropdown">
-                                            <button type="button" className="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                <i className="bx bx-dots-vertical-rounded"></i>
-                                            </button>
-                                            <div className="dropdown-menu">
-                                                <button className="dropdown-item" onClick={() => handleEditForm(form)}>
-                                                    <i className="bx bx-edit-alt me-1"></i> Edit
-                                                </button>
-                                                <button className="dropdown-item" onClick={() => handleDeleteForm(form._id)}>
-                                                    <i className="bx bx-trash me-1"></i> Delete
-                                                </button>
-                                            </div>
-                                        </div>
+                                    <td> {/* Updated Actions column */}
+                                        <button className="btn btn-link p-0 me-2" onClick={() => handleEditForm(form)}>
+                                            <i className="bx bx-edit-alt"></i>
+                                        </button>
+                                        <button className="btn btn-link p-0" onClick={() => handleDeleteForm(form._id)}>
+                                            <i className="bx bx-trash"></i>
+                                        </button>
+                                        <button className="btn btn-link p-0"> {/* Add share icon */}
+                                            <i className="bx bx-share"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

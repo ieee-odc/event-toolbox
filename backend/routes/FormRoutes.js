@@ -6,9 +6,9 @@ const router = express.Router();
 // router.post("/createform",formController.createForm);
 // Create a new form
 router.post('/createform', async (req, res) => {
-    const { eventId, price, data } = req.body;
+    const { eventId, description,price, data } = req.body;
     try {
-        const newForm = await formController.createForm(eventId, price, data);
+        const newForm = await formController.createForm(eventId, description,price, data);
         res.status(201).json(newForm);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -28,25 +28,10 @@ router.get('/:eventId', formController.getFormsByEventId);
 });*/
 // Update a form by ID
 router.put('/update/:formId', formController.updateFormById);
-
-// router.put('update/:formId', async (req, res) => {
-//     const { formId } = req.params;
-//     const { price, data } = req.body;
-//     try {
-//         const updatedForm = await formController.updateFormById(formId, price, data);
-//         res.json(updatedForm);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// });
-
 // Delete a form by ID
 router.delete('/delete/:formId', formController.deleteFormById);
 
 
 //router.get("/getform/:id",getFormById);
 
-
-
-//export default router;
 module.exports = router;

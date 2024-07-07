@@ -25,7 +25,7 @@ const Event= require('../models/EventModel');
      }
     } */
 // Create a new Form
- const createForm = async (eventId, price, data) => {
+ const createForm = async (eventId,description, price, data) => {
     try{
         // Check if the event exists
         const event = await Event.findById(eventId);
@@ -35,6 +35,7 @@ const Event= require('../models/EventModel');
         //create Form 
         const newForm =new Form({
             eventId,
+            description,
             price,
             data
         });
@@ -86,14 +87,14 @@ const getFormsByEventId = async (req,res) => {
 // Update a form by ID
 const updateFormById = async (req, res) => {
     const { formId } = req.params;
-    const { price, data } = req.body;
+    const { description,price, data } = req.body;
 
-    console.log('Received data for update:', { price, data }); // Log received data
+    console.log('Received data for update:', { description,price, data }); // Log received data
 
     try {
         const updatedForm = await Form.findByIdAndUpdate(
             formId,
-            { $set: { price, data } }, // Use $set to update the nested data map
+            { $set: { description,price, data } }, // Use $set to update the nested data map
             { new: true }
         );
 
@@ -109,26 +110,6 @@ const updateFormById = async (req, res) => {
     }
 };
 
-
-
-
-
-// const updateFormById =async (formId, price, date) =>{
-//     try{
-//         const updateForm =await Form.findByIdAndUpdate(
-//             formId,
-//             {price,date},
-//             {new : true}
-//         );
-//         if(!updateForm){
-//             return res.status(400).json({error: "Form not found"});
-//         }
-
-//     }catch(error){
-//         console.log("Error in the updateForm controller")
-//         res.status(500).json({error:"Internal Server Error"})
-//     }
-// };
 
 const deleteFormById = async (req, res) => {
     const { formId } = req.params;
