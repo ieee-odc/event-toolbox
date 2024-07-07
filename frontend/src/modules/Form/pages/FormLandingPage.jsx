@@ -8,7 +8,9 @@ const FormLandingPage = () => {
     const { eventId } = useParams();
     const [forms, setForms] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [currentForm, setCurrentForm] = useState({
+        eventId: eventId,
         price: '',
         data: {}
     });
@@ -26,19 +28,25 @@ const FormLandingPage = () => {
         }
     };
 
+    const handleCreateForm = () => {
+        setCurrentForm({
+            eventId: eventId,
+            price: '',
+            data: {}
+        });
+        setIsEditMode(false);
+        setIsModalOpen(true);
+    };
+
     const handleEditForm = (form) => {
         setCurrentForm(form);
+        setIsEditMode(true);
         setIsModalOpen(true);
     };
 
     const handleUpdateForm = async (formId, updatedData) => {
         try {
-            console.log('Sending data for update:', updatedData);  // Log data being sent
-
             const response = await axios.put(`http://localhost:5000/form/update/${formId}`, updatedData);
-
-            console.log('Received response from update:', response.data);  // Log response data
-
             const updatedForms = forms.map(form => {
                 if (form._id === formId) {
                     return { ...form, ...response.data };
@@ -48,6 +56,15 @@ const FormLandingPage = () => {
             setForms(updatedForms);
         } catch (error) {
             console.error('Error updating form:', error);
+        }
+    };
+
+    const handleCreateNewForm = async (newData) => {
+        try {
+            const response = await axios.post(`http://localhost:5000/form/createform`, newData);
+            setForms([...forms, response.data]);
+        } catch (error) {
+            console.error('Error creating form:', error);
         }
     };
 
@@ -62,7 +79,11 @@ const FormLandingPage = () => {
     };
 
     const handleSubmit = () => {
-        handleUpdateForm(currentForm._id, currentForm);
+        if (isEditMode) {
+            handleUpdateForm(currentForm._id, currentForm);
+        } else {
+            handleCreateNewForm(currentForm);
+        }
         setIsModalOpen(false);
     };
 
@@ -85,6 +106,25 @@ const FormLandingPage = () => {
         }
     };
 
+    const addField = () => {
+        const newField = `field${Object.keys(currentForm.data).length + 1}`;
+        setCurrentForm(prevState => ({
+            ...prevState,
+            data: {
+                ...prevState.data,
+                [newField]: ''
+            }
+        }));
+    };
+
+    const removeField = (fieldName) => {
+        const { [fieldName]: _, ...newData } = currentForm.data;
+        setCurrentForm(prevState => ({
+            ...prevState,
+            data: newData
+        }));
+    };
+
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -95,6 +135,9 @@ const FormLandingPage = () => {
                 <h4 className="py-3 mb-4">
                     <span className="text-muted fw-light">DataTables /</span> Forms
                 </h4>
+                <button className="btn btn-primary mb-4" onClick={handleCreateForm}>
+                    Create Form
+                </button>
                 <div className="table-responsive">
                     <table className="table table-striped">
                         <thead>
@@ -119,18 +162,17 @@ const FormLandingPage = () => {
                                                 <i className="bx bx-dots-vertical-rounded"></i>
                                             </button>
                                             <div className="dropdown-menu">
-                                                <a className="dropdown-item" href="javascript:void(0);" onClick={() => handleEditForm(form)}><i className="bx bx-edit-alt me-2"></i>Edit</a>
-                                                <a className="dropdown-item" href="javascript:void(0);" onClick={() => handleDeleteForm(form._id)}><i className="bx bx-trash me-2"></i>Delete</a>
+                                                <button className="dropdown-item" onClick={() => handleEditForm(form)}>
+                                                    <i className="bx bx-edit-alt me-1"></i> Edit
+                                                </button>
+                                                <button className="dropdown-item" onClick={() => handleDeleteForm(form._id)}>
+                                                    <i className="bx bx-trash me-1"></i> Delete
+                                                </button>
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
-                            {forms.length === 0 && (
-                                <tr>
-                                    <td colSpan="3" className="text-center">No forms available</td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
                 </div>
@@ -141,6 +183,9 @@ const FormLandingPage = () => {
                 handleSubmit={handleSubmit}
                 newEvent={currentForm}
                 handleInputChange={handleInputChange}
+                isEditMode={isEditMode}
+                addField={addField}
+                removeField={removeField}
             />
         </BaseLayout>
     );
