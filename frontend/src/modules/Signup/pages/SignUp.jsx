@@ -45,7 +45,7 @@ function SignUp() {
   };
   const onGoogleSuccess = async (response) => {
     try {
-      const res = await axiosRequest.post('/auth/google-auth', { tokenId: response.tokenId });
+      const res = await axiosRequest.post('/auth/signupwithgoogle', { tokenId: response.user.accessToken });
       localStorage.setItem('token', res.data.token);
       navigate('/success');
     } catch (err) {
@@ -53,6 +53,7 @@ function SignUp() {
       setErrors({ server: err.response.data.msg });
     }
   };
+  
 
   const onGoogleFailure = (response) => {
     setErrors({ server: 'Google signup failed' });
@@ -74,12 +75,12 @@ function SignUp() {
               <form id="formAuthentication" className="mb-3" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
                 <div className="mb-2 form-email-toggle">
                   <label htmlFor="username" className="col-auto col-form-label">Username</label>
-                  <input type="text" className="form-control" id="username" name="username" value={username} onChange={onChange} placeholder="Enter your username" autoFocus />
+                  <input type="text" className="form-control" id="username" name="username" autoComplete="username" value={username} onChange={onChange} placeholder="Enter your username" autoFocus />
                   {errors.username && <div className="text-danger">{errors.username}</div>}
                 </div>
                 <div className="mb-2 form-email-toggle">
                   <label htmlFor="email" className="col-auto col-form-label">Email</label>
-                  <input type="email" className="form-control" id="email" name="email" value={email} onChange={onChange} placeholder="Enter your email" />
+                  <input type="email" className="form-control" id="email" name="email" autoComplete="email" value={email} onChange={onChange} placeholder="Enter your email" />
                   {errors.email && <div className="text-danger">{errors.email}</div>}
                 </div>
                 <div className="mb-2 form-password-toggle">
@@ -87,7 +88,7 @@ function SignUp() {
                     <label className="form-label" htmlFor="password">Password</label>
                   </div>
                   <div className="input-group input-group-merge">
-                    <input type={obscureText ? "password" : "text"} id="password" className="form-control" name="password" value={password} onChange={onChange} placeholder="············" aria-describedby="password" />
+                  <input type={obscureText ? "password" : "text"} id="password" className="form-control" name="password" autoComplete="new-password" value={password} onChange={onChange} placeholder="············" aria-describedby="password" />
                     <span className="input-group-text cursor-pointer" onClick={toggleObscureText}>
                       <i className={`bx ${obscureText ? 'bx-hide' : 'bx-show'}`}></i>
                     </span>
@@ -106,11 +107,16 @@ function SignUp() {
                 <div className="mb-2">
                   <Button onClick={onSubmit} color={"primary"} label="Sign up" />
                 </div>
-                <div className="mb-3">
-                <GoogleLoginButton onSuccess={onGoogleSuccess} onFailure={onGoogleFailure} />
+                <div className="google-login-container">
+                <GoogleLoginButton 
+                  buttonText="Sign up with Google" 
+                  onSuccess={onGoogleSuccess} 
+                  onFailure={onGoogleFailure} 
+                  action={(data) => axiosRequest.post('/auth/signupwithgoogle', data)}
+                />
               </div>
               </form>
-              <p className="text-center move-down">
+              <p className="text-center text-place ">
                 <span className="space-right">Already have an account?</span>
                 <Link to="/Login">
                   <span>Sign in instead</span>

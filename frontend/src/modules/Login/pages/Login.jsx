@@ -43,17 +43,23 @@ function Login() {
 
   const onGoogleSuccess = async (response) => {
     try {
-      const res = await axiosRequest.post('/auth/google-auth', { tokenId: response.user.accessToken});
+      const tokenId = response.user.accessToken;
+      const res = await axiosRequest.post('/auth/loginwithgoogle', { tokenId });
       localStorage.setItem('token', res.data.token);
       navigate('/success');
     } catch (err) {
-      console.error(err.response.data);
-      setErrors({ server: err.response.data.msg });
+      console.error('Login error:', err.response ? err.response.data : err.message);
+      if (err.response && err.response.status === 400) {
+        console.log('Server message:', err.response.data.msg);
+        setErrors({ server: err.response.data.msg });
+      } else {
+        setErrors({ server: 'Login failed. Please try again.' });
+      }
     }
   };
 
-  const onGoogleFailure = (response) => {
-    setErrors({ server: 'Google login failed' });
+  const onGoogleFailure = (err) => {
+    setErrors({ server: err.response.data.msg });
   };
 
   const [obscureText, setObscureText] = useState(true);
@@ -73,7 +79,7 @@ function Login() {
               <form id="formAuthentication" className="mb-3" onSubmit={onSubmit}>
                 <div className="mb-3 form-email-toggle">
                   <label htmlFor="email" className="col-auto col-form-label">Email or Username</label>
-                  <input type="text" className="form-control" id="email" name="email" placeholder="Enter your email or username" autoFocus value={email} onChange={onChange} />
+                  <input type="text" className="form-control" id="email" name="email" autoComplete="username" placeholder="Enter your email or username" autoFocus value={email} onChange={onChange} />
                   {errors.email && <div className="text-danger">{errors.email}</div>}
                 </div>
 
@@ -85,7 +91,7 @@ function Login() {
                     </a>
                   </div>
                   <div className="input-group input-group-merge">
-                    <input type={obscureText ? "password" : "text"} id="password" className="form-control" name="password" placeholder="············" aria-describedby="password" value={password} onChange={onChange} />
+                    <input type={obscureText ? "password" : "text"} id="password" className="form-control" name="password" autoComplete="current-password" placeholder="············" aria-describedby="password" value={password} onChange={onChange} />
                     <span className="input-group-text cursor-pointer" onClick={toggleObscureText}><i className={`bx ${obscureText ? 'bx-hide' : 'bx-show'}`}></i></span>
                   </div>
                   {errors.password && <div className="text-danger">{errors.password}</div>}
@@ -103,14 +109,19 @@ function Login() {
                   <Button color={"primary"} label="Sign in" onClick={onSubmit} />
                 </div>
               </form>
-              <div className="mb-3">
-                <GoogleLoginButton onSuccess={onGoogleSuccess} onFailure={onGoogleFailure} buttonText="Sign in with google"/>
+              <div className="google-login-container">
+                <GoogleLoginButton 
+                  className="google-login-button"
+                  buttonText="Sign in with Google" 
+                  onSuccess={onGoogleSuccess} 
+                  onFailure={onGoogleFailure} 
+                  action={(data) => axiosRequest.post('/auth/loginwithgoogle', data)}
+                />
               </div>
-
               <p className="text-center move-down">
                 <span className="space-right">New on our platform?</span>
                 <a href="/SignUp">
-                  <span>Create an account</span>
+                  <span className="link">Create an account</span>
                 </a>
               </p>
             </div>

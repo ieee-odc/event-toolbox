@@ -8,7 +8,7 @@ const Counter = require('../models/CounterModel');
 const admin = require('firebase-admin');
 
 admin.initializeApp({
-  credential: admin.credential.cert(require('../event-tool-box-1720171944535-firebase-adminsdk-f6w3g-c723d5d88c.json'))
+  credential: admin.credential.cert(require('../event-tool-box-1720171944535-firebase-adminsdk-f6w3g-c723d5d88c.js'))
 });
 
 
@@ -136,33 +136,77 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const googleAuth = async (req, res) => {
+const signupWithGoogle = async (req, res) => {
   const { tokenId } = req.body;
   try {
-      const decodedToken = await admin.auth().verifyIdToken(tokenId);
-      const { email, name, uid: googleId } = decodedToken;
+    const decodedToken = await admin.auth().verifyIdToken(tokenId);
+    const { email, name, uid: googleId } = decodedToken;
 
-      let user = await User.findOne({ email });
-      if (!user) {
-          const counter = await Counter.findOneAndUpdate(
-              { id: "autovalOrganizer" },
-              { $inc: { seq: 1 } },
-              { new: true, upsert: true }
-          );
-
-          user = new User({ id: counter.seq, username: name, email, googleId });
-          await user.save();
-      }
-
+    let user = await User.findOne({ email });
+    if (user) {
+      // User already exists, log them in
       const payload = { id: user.id };
       const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
 
-      res.status(200).json({ token, user });
+      return res.status(200).json({ token, user });
+    }
+
+    // Create a new user if not found
+    const counter = await Counter.findOneAndUpdate(
+      { id: "autovalOrganizer" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const dummyPassword = 'GoogleAuthDummyPassword123!'; // Dummy password for Google sign-up
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(dummyPassword, salt);
+
+    user = new User({
+      id: counter.seq,
+      username: name,
+      email,
+      password: hashedPassword,
+      googleId
+    });
+    await user.save();
+
+    const payload = { id: user.id };
+    const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+
+    res.status(201).json({ token, user });
   } catch (err) {
-      console.error(err);
-      res.status(500).json({ msg: 'Server error' });
+    console.error('Server error:', err.message);
+    res.status(500).json({ msg: 'Server error' });
   }
 };
+
+
+
+
+const loginWithGoogle = async (req, res) => {
+  const { tokenId } = req.body;
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(tokenId);
+    console.log("Decoded token:", decodedToken); // Log decoded token
+    const { email } = decodedToken;
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      console.log("User not found"); // Log if user not found
+      return res.status(404).json({ msg: 'User does not exist' });
+    }
+
+    const payload = { id: user.id };
+    const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+
+    res.status(200).json({ token, user });
+  } catch (err) {
+    console.error('Server error:', err.message); // Log server error
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
 
 
 
@@ -172,5 +216,6 @@ module.exports = {
     Register,
     forgotPassword,
     resetPassword,
-    googleAuth
+    signupWithGoogle,
+    loginWithGoogle
   };

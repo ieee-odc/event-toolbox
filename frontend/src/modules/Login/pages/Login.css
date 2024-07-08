@@ -6,7 +6,7 @@
 }
 .move-down{
     position: relative;
-    top: 10px;
+    top: 30px;
 }
 
 .space-right{
@@ -20,4 +20,16 @@
     flex-direction: column;
     justify-content: start;
     align-items: start;
+}
+.text-center {
+    text-align: center;
+    margin-top: 5px;
+    margin-left: 20px;
+}
+.google-login-container{
+    margin-top: 35px;
+    margin-left: 18px;
+}
+.link{
+    margin-left: -10px;
 }

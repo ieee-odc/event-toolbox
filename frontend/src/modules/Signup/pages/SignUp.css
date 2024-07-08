@@ -1,13 +1,14 @@
 .container-xxl {
     max-width: 100%;
     padding: 0 15px;
+
   }
   
   .authentication-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    
   }
   
   .authentication-inner {
@@ -46,11 +47,10 @@
   
   .text-center {
     text-align: center;
+    margin-top: -20px;
   }
   
-  .move-down {
-    margin-top: 1rem;
-  }
+  
   
   .space-right {
     margin-right: 0.5rem;
@@ -64,4 +64,13 @@
   a:hover {
     text-decoration: underline;
   }
-  
+  .btn{
+    margin-top: 5px;
+  }
+  .google-login-container{
+    margin-top: 35px;
+    margin-left: 18px;
+}
+.text-place{
+  margin-top: 8px;
+}
