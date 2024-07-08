@@ -1,20 +1,39 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
-import Flatpickr from "react-flatpickr";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops }) {
-  const [eventId, setEventId] = useState("1"); // set the first event id after fetching it
-
-  const [name, setName] = useState(""); // set the first event id after fetching it
-  const [description, setDescription] = useState(""); // set the first event id after fetching it
+import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
+function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops,data }) {
+  const [eventId, setEventId] = useState("1");
+  const [spaceId, setSpaceId] = useState("1");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [date, setDate] = useState("");
+const [isEditMode,setIsEditMode] = useState(false);
+  const startDate = data.startTime ? new Date(data.startTime) : null;
+  
+  useEffect(()=>{
+    if(data.eventId){
+      console.log("edit mode")
+      setIsEditMode(true)
+    }
+setEventId(data.eventId ||"1");
+    setSpaceId(data.spaceId || "1");
+    setName(data.name || "");
+    setDescription(data.description || "");
 
+    setStartTime(formatTime(data.startTime));
+    setEndTime(formatTime(data.endTime));
+    let formattedDate = startDate? `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}` : "";
+    setDate(formattedDate);
+    console.log(formattedDate)
 
+  },[data])
+  
   const handleChangeStartTime = (e) => {
     handleChangeTime(e, startTime, setStartTime);
   };
@@ -93,23 +112,81 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops }) {
   };
 
   const handleAddWorkshop = () => {
+    // Combine date, startTime, and endTime into a single Date object
+    const startDate = new Date(date);
+    const [hours, minutes] = startTime.split(':');
+    startDate.setHours(parseInt(hours, 10));
+    startDate.setMinutes(parseInt(minutes, 10));
+  
+    const endDate = new Date(date);
+    const [endHours, endMinutes] = endTime.split(':');
+    endDate.setHours(parseInt(endHours, 10));
+    endDate.setMinutes(parseInt(endMinutes, 10));
+  
+    // Create the request body
     const reqBody = {
-      email,
-      fullName,
+      name,
+      description,
+      startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
+      endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
       eventId,
+      spaceId
     };
+  
+    // Make the API request
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
-        console.log(res.data);
         setIsModalOpen(false);
-        setWorkshops((workshops) => [...workshops, res.data.workshop]);
+        setWorkshops((workshops) => [...workshops, {
+          ...res.data.workshop,
+          capacity:50
+        }]);
       })
       .catch((err) => {
         toast.error("Failed to add workshop");
       });
   };
+  
+
+  const handleEditWorkshop=()=>{
+    const startDate = new Date(date);
+    const [hours, minutes] = startTime.split(':');
+    startDate.setHours(parseInt(hours, 10));
+    startDate.setMinutes(parseInt(minutes, 10));
+  
+    const endDate = new Date(date);
+    const [endHours, endMinutes] = endTime.split(':');
+    endDate.setHours(parseInt(endHours, 10));
+    endDate.setMinutes(parseInt(endMinutes, 10));
+  
+    // Create the request body
+    const reqBody = {
+      name,
+      description,
+      startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
+      endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
+      eventId,
+      spaceId
+    };
+  
+    // Make the API request
+    axiosRequest
+      .post(`/workshop/edit/${data.id}`, reqBody)
+      .then((res) => {
+        toast.success("Successfully Edited!");
+        setIsModalOpen(false);
+        setWorkshops((workshops) => {
+          const index = workshops.findIndex((workshop) => workshop.id === data.id);
+          workshops[index] = {...res.data.workshop, capacity:50 };
+          return [...workshops];
+        });
+      })
+      .catch((err) => {
+        toast.error("Failed to add workshop");
+      });
+  }
 
   return (
     isModalOpen && (
@@ -182,8 +259,8 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops }) {
                     data-select2-id="select2Basic"
                     tabIndex={-1}
                     aria-hidden="true"
-                    value={eventId}
-                    onChange={(e) => setEventId(e.target.value)}
+                    value={spaceId}
+                    onChange={(e) => setSpaceId(e.target.value)}
                   >
                     <option value="1" data-select2-id={2}>
                       Room 1
@@ -282,9 +359,9 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops }) {
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={handleAddWorkshop}
+                onClick={isEditMode?handleEditWorkshop:handleAddWorkshop}
               >
-                Save changes
+                {isEditMode ?"Save Changes": "Create Workshop"}
               </button>
             </div>
           </div>
