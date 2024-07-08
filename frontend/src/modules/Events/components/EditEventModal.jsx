@@ -48,9 +48,9 @@ function EditEventModal({
               .toISOString()
               .split("T")[0],
           });
-          setLoading(false);
         } catch (error) {
           console.error("Error fetching event data:", error);
+        } finally {
           setLoading(false);
         }
       };
@@ -89,10 +89,11 @@ function EditEventModal({
           formattedEventData
         );
         window.location.reload();
-        setLoading(false);
+
         toggleModal();
       } catch (error) {
         console.error("Error updating event:", error);
+      } finally {
         setLoading(false);
       }
     } else {

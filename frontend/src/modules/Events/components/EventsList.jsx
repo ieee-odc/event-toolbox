@@ -6,11 +6,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 function EventsList({ onAddEventClick, onEditEventClick }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateEvent, setShowCreateEvent] = useState(false);
-  const [newEvent, setNewEvent] = useState({
-    name: "",
-    description: "",
-  });
+
   const [filterStatus, setFilterStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [eventsPerPage] = useState(6); // Number of events per page
@@ -23,9 +19,9 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
     try {
       const response = await axiosRequest.get("/events");
       setEvents(response.data);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching events:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -39,29 +35,6 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
     }
   };
 
-  const toggleCreateEvent = () => {
-    setShowCreateEvent(!showCreateEvent);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewEvent({
-      ...newEvent,
-      [name]: value,
-    });
-  };
-
-  const createEvent = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post("/events/add", newEvent);
-      setEvents([...events, response.data]);
-      setShowCreateEvent(false);
-      setNewEvent({ name: "", description: "", location: "" });
-    } catch (error) {
-      console.error("Error creating event:", error);
-    }
-  };
   const handleEditClick = (eventId) => {
     onEditEventClick(eventId);
   };
