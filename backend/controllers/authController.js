@@ -188,12 +188,10 @@ const loginWithGoogle = async (req, res) => {
   const { tokenId } = req.body;
   try {
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
-    console.log("Decoded token:", decodedToken); // Log decoded token
     const { email } = decodedToken;
 
     let user = await User.findOne({ email });
     if (!user) {
-      console.log("User not found"); // Log if user not found
       return res.status(404).json({ msg: 'User does not exist' });
     }
 
