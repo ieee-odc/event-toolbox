@@ -34,8 +34,8 @@ function App() {
       {/* <Route path="/showform" element={<Form/>} /> */}
       <Route path="/formlandingpage/:eventId" element={<FormLandingPage />} />
       <Route path="/table" element={<Table/>} />
-      <Route path="/aaa" element={<Page/>} /> 
-      <Route path="/base" element={<Base/>} /> 
+      {/* <Route path="/aaa" element={<Page/>} />  */}
+      {/* <Route path="/base" element={<Base/>} />  */}
 
 
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import BaseLayout from '../pages/base';
 import EventModal from '../components/popUp';
+import axiosRequest from '../../../utils/AxiosConfig';
 
 const FormLandingPage = () => {
     const { eventId } = useParams();
@@ -22,7 +23,7 @@ const FormLandingPage = () => {
 
     const fetchFormsByEventId = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/form/${eventId}`);
+            const response = await axiosRequest.get(`http://localhost:6001/form/${eventId}`);
             setForms(response.data);
         } catch (error) {
             console.error('Error fetching forms:', error);
@@ -48,7 +49,7 @@ const FormLandingPage = () => {
 
     const handleUpdateForm = async (formId, updatedData) => {
         try {
-            const response = await axios.put(`http://localhost:5000/form/update/${formId}`, updatedData);
+            const response = await axios.put(`http://localhost:6001/form/update/${formId}`, updatedData);
             const updatedForms = forms.map(form => {
                 if (form._id === formId) {
                     return { ...form, ...response.data };
@@ -63,7 +64,7 @@ const FormLandingPage = () => {
 
     const handleCreateNewForm = async (newData) => {
         try {
-            const response = await axios.post(`http://localhost:5000/form/createform`, newData);
+            const response = await axiosRequest.post(`http://localhost:6001/form/createform`, newData);
             setForms([...forms, response.data]);
         } catch (error) {
             console.error('Error creating form:', error);
@@ -72,7 +73,7 @@ const FormLandingPage = () => {
 
     const handleDeleteForm = async (formId) => {
         try {
-            const response = await axios.delete(`http://localhost:5000/form/delete/${formId}`);
+            const response = await axiosRequest.delete(`http://localhost:6001/form/delete/${formId}`);
             const updatedForms = forms.filter(form => form._id !== formId);
             setForms(updatedForms);
         } catch (error) {

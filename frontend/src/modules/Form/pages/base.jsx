@@ -3,6 +3,8 @@ import Table from "../../../core/components/Table/Table";
 import axiosRequest from "../../../utils/AxiosConfig";
 import CustomSideBar from "../../../core/components/sidebar/sidebar";
 // import ParticipantsCard from "../components/ParticipantsCard";
+import '../pages/base.css'; // Import the CSS file
+
 
   
   
@@ -301,103 +303,169 @@ import CustomSideBar from "../../../core/components/sidebar/sidebar";
                 </ul>
               </li>
               {/* / Style Switcher*/}
-              {/* Notification */}
-              <li className="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+             {/* Notification */}
+  <li className="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+    <a
+      className="nav-link dropdown-toggle hide-arrow"
+      href="javascript:void(0);"
+      data-bs-toggle="dropdown"
+      data-bs-auto-close="outside"
+      aria-expanded="false"
+    >
+      <i className="bx bx-bell bx-sm" />
+      <span className="badge bg-danger rounded-pill badge-notifications">5</span>
+    </a>
+    <ul className="dropdown-menu dropdown-menu-end py-0">
+      <li className="dropdown-menu-header border-bottom">
+        <div className="dropdown-header d-flex align-items-center py-3">
+          <h5 className="text-body mb-0 me-auto">Notification</h5>
+          <a
+            href="javascript:void(0)"
+            className="dropdown-notifications-all text-body"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            aria-label="Mark all as read"
+            data-bs-original-title="Mark all as read"
+          >
+            <i className="bx fs-4 bx-envelope-open" />
+          </a>
+        </div>
+      </li>
+      <li className="dropdown-notifications-list scrollable-container ps">
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item list-group-item-action dropdown-notifications-item">
+            <div className="d-flex">
+              <div className="flex-shrink-0 me-3">
+                <div className="avatar">
+                  <img
+                    src="../../assets/img/avatars/1.png"
+                    alt=""
+                    className="w-px-40 h-auto rounded-circle"
+                  />
+                </div>
+              </div>
+              <div className="flex-grow-1">
+                <h6 className="mb-1">Congratulation Lettie 🎉</h6>
+                <p className="mb-0">
+                  Won the monthly best seller gold badge
+                </p>
+                <small className="text-muted">1h ago</small>
+              </div>
+              <div className="flex-shrink-0 dropdown-notifications-actions">
                 <a
-                  className="nav-link dropdown-toggle hide-arrow"
-                  href="javascript:void(0);"
-                  data-bs-toggle="dropdown"
-                  data-bs-auto-close="outside"
-                  aria-expanded="false"
+                  href="javascript:void(0)"
+                  className="dropdown-notifications-read"
                 >
-                  <i className="bx bx-bell bx-sm" />
-                  <span className="badge bg-danger rounded-pill badge-notifications">
-                    5
-                  </span>
+                  <span className="badge badge-dot" />
                 </a>
-                <ul className="dropdown-menu dropdown-menu-end py-0">
-                  <li className="dropdown-menu-header border-bottom">
-                    <div className="dropdown-header d-flex align-items-center py-3">
-                      <h5 className="text-body mb-0 me-auto">Notification</h5>
-                      <a
-                        href="javascript:void(0)"
-                        className="dropdown-notifications-all text-body"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        aria-label="Mark all as read"
-                        data-bs-original-title="Mark all as read"
-                      >
-                        <i className="bx fs-4 bx-envelope-open" />
-                      </a>
-                    </div>
-                  </li>
-                  <li className="dropdown-notifications-list scrollable-container ps">
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <img
-                                src="../../assets/img/avatars/1.png"
-                                alt=""
-                                className="w-px-40 h-auto rounded-circle"
-                              />
+                <a
+                  href="javascript:void(0)"
+                  className="dropdown-notifications-archive"
+                >
+                  <span className="bx bx-x" />
+                </a>
+              </div>
+            </div>
+          </li>
+          <li className="list-group-item list-group-item-action dropdown-notifications-item">
+                          <div className="d-flex">
+                            <div className="flex-shrink-0 me-3">
+                              <div className="avatar">
+                                <span className="avatar-initial rounded-circle bg-label-danger">
+                                  CF
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex-grow-1">
+                              <h6 className="mb-1">Charles Franklin</h6>
+                              <p className="mb-0">Accepted your connection</p>
+                              <small className="text-muted">12hr ago</small>
+                            </div>
+                            <div className="flex-shrink-0 dropdown-notifications-actions">
+                              <a
+                                href="javascript:void(0)"
+                                className="dropdown-notifications-read"
+                              >
+                                <span className="badge badge-dot" />
+                              </a>
+                              <a
+                                href="javascript:void(0)"
+                                className="dropdown-notifications-archive"
+                              >
+                                <span className="bx bx-x" />
+                              </a>
                             </div>
                           </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">Congratulation Lettie 🎉</h6>
-                            <p className="mb-0">
-                              Won the monthly best seller gold badge
-                            </p>
-                            <small className="text-muted">1h ago</small>
-                          </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <span className="avatar-initial rounded-circle bg-label-danger">
-                                CF
-                              </span>
+                        </li>
+                        <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                          <div className="d-flex">
+                            <div className="flex-shrink-0 me-3">
+                              <div className="avatar">
+                                <img
+                                  src="../../assets/img/avatars/2.png"
+                                  alt=""
+                                  className="w-px-40 h-auto rounded-circle"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex-grow-1">
+                              <h6 className="mb-1">New Message ✉️</h6>
+                              <p className="mb-0">
+                                You have new message from Natalie
+                              </p>
+                              <small className="text-muted">1h ago</small>
+                            </div>
+                            <div className="flex-shrink-0 dropdown-notifications-actions">
+                              <a
+                                href="javascript:void(0)"
+                                className="dropdown-notifications-read"
+                              >
+                                <span className="badge badge-dot" />
+                              </a>
+                              <a
+                                href="javascript:void(0)"
+                                className="dropdown-notifications-archive"
+                              >
+                                <span className="bx bx-x" />
+                              </a>
                             </div>
                           </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">Charles Franklin</h6>
-                            <p className="mb-0">Accepted your connection</p>
-                            <small className="text-muted">12hr ago</small>
+                        </li>
+                        <li className="list-group-item list-group-item-action dropdown-notifications-item">
+                          <div className="d-flex">
+                            <div className="flex-shrink-0 me-3">
+                              <div className="avatar">
+                                <span className="avatar-initial rounded-circle bg-label-success">
+                                  <i className="bx bx-cart" />
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex-grow-1">
+                              <h6 className="mb-1">
+                                Whoo! You have new order 🛒{" "}
+                              </h6>
+                              <p className="mb-0">
+                                ACME Inc. made new order $1,154
+                              </p>
+                              <small className="text-muted">1 day ago</small>
+                            </div>
+                            <div className="flex-shrink-0 dropdown-notifications-actions">
+                              <a
+                                href="javascript:void(0)"
+                                className="dropdown-notifications-read"
+                              >
+                                <span className="badge badge-dot" />
+                              </a>
+                              <a
+                                href="javascript:void(0)"
+                                className="dropdown-notifications-archive"
+                              >
+                                <span className="bx bx-x" />
+                              </a>
+                            </div>
                           </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
+                        </li>
+                        <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
                         <div className="d-flex">
                           <div className="flex-shrink-0 me-3">
                             <div className="avatar">
@@ -465,176 +533,7 @@ import CustomSideBar from "../../../core/components/sidebar/sidebar";
                           </div>
                         </div>
                       </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <img
-                                src="../../assets/img/avatars/9.png"
-                                alt=""
-                                className="w-px-40 h-auto rounded-circle"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">
-                              Application has been approved 🚀{" "}
-                            </h6>
-                            <p className="mb-0">
-                              Your ABC project application has been approved.
-                            </p>
-                            <small className="text-muted">2 days ago</small>
-                          </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <span className="avatar-initial rounded-circle bg-label-success">
-                                <i className="bx bx-pie-chart-alt" />
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">
-                              Monthly report is generated
-                            </h6>
-                            <p className="mb-0">
-                              July monthly financial report is generated{" "}
-                            </p>
-                            <small className="text-muted">3 days ago</small>
-                          </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <img
-                                src="../../assets/img/avatars/5.png"
-                                alt=""
-                                className="w-px-40 h-auto rounded-circle"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">Send connection request</h6>
-                            <p className="mb-0">
-                              Peter sent you connection request
-                            </p>
-                            <small className="text-muted">4 days ago</small>
-                          </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <img
-                                src="../../assets/img/avatars/6.png"
-                                alt=""
-                                className="w-px-40 h-auto rounded-circle"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">New message from Jane</h6>
-                            <p className="mb-0">
-                              Your have new message from Jane
-                            </p>
-                            <small className="text-muted">5 days ago</small>
-                          </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
-                      <li className="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                        <div className="d-flex">
-                          <div className="flex-shrink-0 me-3">
-                            <div className="avatar">
-                              <span className="avatar-initial rounded-circle bg-label-warning">
-                                <i className="bx bx-error" />
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex-grow-1">
-                            <h6 className="mb-1">CPU is running high</h6>
-                            <p className="mb-0">
-                              CPU Utilization Percent is currently at 88.63%,
-                            </p>
-                            <small className="text-muted">5 days ago</small>
-                          </div>
-                          <div className="flex-shrink-0 dropdown-notifications-actions">
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-read"
-                            >
-                              <span className="badge badge-dot" />
-                            </a>
-                            <a
-                              href="javascript:void(0)"
-                              className="dropdown-notifications-archive"
-                            >
-                              <span className="bx bx-x" />
-                            </a>
-                          </div>
-                        </div>
-                      </li>
+                      {/* Additional notification items here */}
                     </ul>
                     <div className="ps__rail-x" style={{ left: 0, bottom: 0 }}>
                       <div
@@ -659,6 +558,7 @@ import CustomSideBar from "../../../core/components/sidebar/sidebar";
                 </ul>
               </li>
               {/*/ Notification */}
+
               {/* User */}
               <li className="nav-item navbar-dropdown dropdown-user dropdown">
                 <a
