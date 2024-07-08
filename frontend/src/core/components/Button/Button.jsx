@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Button({variant,color,style}) {
+function Button({variant,color,style,label,onClick}) {
 
     const getVariant=()=>{
         if(!variant){
@@ -10,7 +10,7 @@ function Button({variant,color,style}) {
     }
 
   return (
-    <button type="button" class={`btn btn${getVariant()}-${color}`} style={style}>Primary</button>
+    <button type="button" className={`btn btn${getVariant()}-${color}`} onClick={onClick} style={style}>{label}</button>
   )
 }
 

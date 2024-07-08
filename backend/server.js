@@ -3,14 +3,26 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require('cors');
 const dotenv = require("dotenv");
-const path  = require('path')
+const path  = require('path');
+const helmet = require('helmet');
 
 dotenv.config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type, Authorization'
+}));
+app.use(helmet());
 
+app.use((req, res, next) => {
+  res.header("Cross-Origin-Opener-Policy", "same-origin; allow-popups");
+  res.header("Cross-Origin-Embedder-Policy", "require-corp");
+  next();
+});
 
 
 mongoose.connect(process.env.DBURI);
@@ -27,6 +39,8 @@ db.once('open', () => {
 
 const ParticipantRouter = require("./routes/ParticipantRoutes")
 app.use("/participant", ParticipantRouter)
+const authRouter = require('./routes/authRoutes')
+app.use('/auth', authRouter);
 
 
 const server = app.listen(process.env.PORT, () => {
