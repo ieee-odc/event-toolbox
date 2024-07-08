@@ -3,23 +3,15 @@ const Workshop = require("../models/WorkshopModel");
 
 const addWorkshop = async (req, res) => {
   try {
-    const { startTime, endTime, ...rest } = req.body;
+    let { startTime, endTime, ...rest } = req.body;
 
-    const today = new Date();
-    const startTimeDate = new Date(today);
-    const endTimeDate = new Date(today);
-
-    // Assuming startTime and endTime are provided in 'HH:mm' format
-    const [startHours, startMinutes] = startTime.split(':').map(Number);
-    const [endHours, endMinutes] = endTime.split(':').map(Number);
-
-    startTimeDate.setHours(startHours, startMinutes, 0, 0);
-    endTimeDate.setHours(endHours, endMinutes, 0, 0);
-
-    // Adjust for local time zone offset
-    const timeZoneOffset = today.getTimezoneOffset() * 60000; // offset in milliseconds
-    startTimeDate.setTime(startTimeDate.getTime() - timeZoneOffset);
-    endTimeDate.setTime(endTimeDate.getTime() - timeZoneOffset);
+    // Check if startTime and endTime are not already Date objects
+    if (!(startTime instanceof Date)) {
+      startTime = new Date(startTime); // Assuming startTime is in ISO date string format
+    }
+    if (!(endTime instanceof Date)) {
+      endTime = new Date(endTime); // Assuming endTime is in ISO date string format
+    }
 
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalWorkshop" },
@@ -30,8 +22,8 @@ const addWorkshop = async (req, res) => {
     const workshop = new Workshop({
       id: counter.seq,
       status: "Pending",
-      startTime: startTimeDate,
-      endTime: endTimeDate,
+      startTime,
+      endTime,
       ...rest,
     });
 
@@ -40,7 +32,7 @@ const addWorkshop = async (req, res) => {
     res.status(201).json({
       status: "success",
       message: "Added Workshop",
-      workshop: workshop,
+      workshop,
     });
   } catch (error) {
     console.error(error);
@@ -49,6 +41,8 @@ const addWorkshop = async (req, res) => {
     });
   }
 };
+
+
 
 
 const editWorkshop = async (req, res) => {
