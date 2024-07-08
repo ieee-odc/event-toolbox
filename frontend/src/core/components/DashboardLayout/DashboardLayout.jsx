@@ -1,15 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CustomNavBar from '../NavBar/CustomNavBar';
 import CustomSideBar from '../Sidebar/CustomSideBar';
 
-function DashboardLayout({children,openSideBar,setOpenSideBar,isModalOpen,toggleSideBar}) {
+function DashboardLayout({children,activeTab,isModalOpen}) {
 
+  const [openSideBar, setOpenSideBar] = useState(true);
+
+  const toggleSideBar = () => {
+    setOpenSideBar((prev) => !prev);
+  };
   return (
     <div class="layout-container">
     <CustomSideBar
       openSideBar={openSideBar}
       toggleSideBar={toggleSideBar}
-      activeTab="/participants"
+      activeTab={activeTab}
     />
     <div
       className="layout-page"
