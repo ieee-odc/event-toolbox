@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import EventsList from "../components/EventsList";
 import AddEventModal from "../components/AddEventModal";
 import EditEventModal from "../components/EditEventModal";
-
+import axiosRequest from "../../../utils/AxiosConfig";
 function EventsContainer() {
   const [openSideBar, setOpenSideBar] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newEvent, setNewEvent] = useState({
     name: "",
     description: "",
+    location: "",
     startDate: "",
     endDate: "",
   });
@@ -37,6 +38,7 @@ function EventsContainer() {
       setNewEvent({
         name: "",
         description: "",
+        location: "",
         startDate: "",
         endDate: "",
       });

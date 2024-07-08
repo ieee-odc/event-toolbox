@@ -57,7 +57,7 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
       const response = await axios.post("/events/add", newEvent);
       setEvents([...events, response.data]);
       setShowCreateEvent(false);
-      setNewEvent({ name: "", description: "" });
+      setNewEvent({ name: "", description: "", location: "" });
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -186,41 +186,6 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
               </div>
             </div>
             <div className="card-body">
-              {showCreateEvent && (
-                <form onSubmit={createEvent}>
-                  <div className="mb-3">
-                    <label className="form-label">Event Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      name="name"
-                      value={newEvent.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Event Description</label>
-                    <textarea
-                      className="form-control"
-                      name="description"
-                      value={newEvent.description}
-                      onChange={handleInputChange}
-                      required
-                    ></textarea>
-                  </div>
-                  <button type="submit" className="btn btn-success">
-                    Create Event
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={toggleCreateEvent}
-                  >
-                    Cancel
-                  </button>
-                </form>
-              )}
               <div className="row gy-4 mb-4">
                 {loading ? (
                   <p>Loading courses...</p>
@@ -253,6 +218,15 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                             {event.name}
                           </a>
                           <p className="mt-2">{event.description}</p>
+                          <div className="d-flex align-items-center mb-1">
+                            <p className="d-flex align-items-center text mb-0">
+                              Location :
+                            </p>
+                            <p className="d-flex align-items-center mb-0 ms-1">
+                              {event.location}
+                            </p>
+                          </div>
+
                           <div className="d-flex align-items-center mb-1">
                             <p className="d-flex align-items-center text mb-0">
                               Duration :

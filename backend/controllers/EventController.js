@@ -8,11 +8,12 @@ const getEvents = async (req, res) => {
   res.status(200).json(events);
 };
 const createEvent = async (req, res) => {
-  const { name, description, startDate, endDate } = req.body;
+  const { name, description, location, startDate, endDate } = req.body;
   try {
     const newEvent = await event.create({
       name,
       description,
+      location,
       startDate,
       endDate,
     });
@@ -22,58 +23,6 @@ const createEvent = async (req, res) => {
   }
 };
 
-// const updateEvent = async (req, res) => {
-//   try {
-//     const { name, startDate, endDate, description } = req.body;
-//     const { id } = req.params;
-//     let file;
-//     // if (req.file) {
-//     //   const oldEvent = await Event.findOne({ _id: id });
-//     //   if (oldEvent && oldEvent.noteImage) {
-//     //     fs.unlinkSync(oldEvent.noteImage);
-//     //   }
-//     //   file = req.file.path;
-//     // }
-//     // Constructing the updatedData object with the fields to update
-//     const updatedData = {
-//       name,
-//       startDate,
-//       endDate,
-//       description,
-//     };
-
-//     // If no event was found to update, return an error response
-//     if (!updatedEvent) {
-//       return res.status(404).json({ message: "Event not found" });
-//     }
-//     // const updatedData = {};
-//     // if (name) updatedData.name = name;
-//     // if (startDate) updatedData.startDate = startDate;
-//     // if (endDate) updatedData.endDate = endDate;
-//     // if (description) updatedData.description = description;
-//     // if (file) {
-//     //   updatedData.noteImage = file;
-//     // }
-//     const updatedEvent = await Event.findOneAndUpdate(
-//       { _id: id },
-//       updatedData,
-//       { new: true }
-//     );
-//     if (!updatedEvent) {
-//       return res.status(404).json({ message: "Event not found" });
-//     }
-//     res.status(200).json({
-//       status: "success",
-//       message: "Event updated",
-//       note: updatedEvent,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       message: "Server Error!",
-//     });
-//   }
-// };
 const updateEvent = async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {

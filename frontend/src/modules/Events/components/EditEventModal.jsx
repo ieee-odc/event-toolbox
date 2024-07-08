@@ -12,6 +12,7 @@ function EditEventModal({
   const [eventData, setEventData] = useState({
     name: "",
     description: "",
+    location: "",
     startDate: "",
     endDate: "",
   });
@@ -28,6 +29,7 @@ function EditEventModal({
           setEventData({
             name: response.data.name,
             description: response.data.description,
+            location: response.data.location,
             startDate: new Date(response.data.startDate)
               .toISOString()
               .split("T")[0],
@@ -38,6 +40,7 @@ function EditEventModal({
           setInitialEventData({
             name: response.data.name,
             description: response.data.description,
+            location: response.data.location,
             startDate: new Date(response.data.startDate)
               .toISOString()
               .split("T")[0],
@@ -61,6 +64,7 @@ function EditEventModal({
       const changes =
         eventData.name !== initialEventData.name ||
         eventData.description !== initialEventData.description ||
+        eventData.location !== initialEventData.location ||
         eventData.startDate !== initialEventData.startDate ||
         eventData.endDate !== initialEventData.endDate;
       setChangesMade(changes);
@@ -157,6 +161,18 @@ function EditEventModal({
                         className="form-control"
                         placeholder="Enter Description"
                         value={eventData.description}
+                        onChange={handleChange}
+                      ></textarea>
+                    </div>
+                    <div className="mb-3">
+                      <label htmlFor="location" className="form-label">
+                        Location
+                      </label>
+                      <textarea
+                        id="location"
+                        className="form-control"
+                        placeholder="Enter location"
+                        value={eventData.location}
                         onChange={handleChange}
                       ></textarea>
                     </div>

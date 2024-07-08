@@ -66,6 +66,18 @@ function AddEventModal({
                     onChange={handleInputChange}
                   ></textarea>
                 </div>
+                <div className="mb-3">
+                  <label htmlFor="location" className="form-label">
+                    Location
+                  </label>
+                  <textarea
+                    id="location"
+                    className="form-control"
+                    placeholder="Enter Location"
+                    value={newEvent.location}
+                    onChange={handleInputChange}
+                  ></textarea>
+                </div>
                 <div className="row g-2">
                   <div className="col">
                     <label htmlFor="startDate" className="form-label">
