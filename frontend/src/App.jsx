@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Button from './core/components/Button/Button'
 import Login from './modules/Login/pages/Login'
 import SignUp from './modules/Signup/pages/SignUp'
@@ -24,7 +24,8 @@ function App() {
 <Participants />
 </PrivateRoute>}  />  */}
 <Routes >
-          <Route path= "/signup" element ={<SignUp/>}  />
+<Route path="/" element={<Navigate to="/login" />} />
+        <Route path= "/signup" element ={<SignUp/>}  />
         <Route path= "/login" element ={<Login/>}  />
         <Route path= "/forgetpassword" element ={<ForgetPassword/>}  />
         <Route path= "/resetpassword" element ={<ResetPassword/>}  />

@@ -6,9 +6,10 @@ const nodemailer = require('nodemailer');
 const User = require('../models/OrganizerModel');
 const Counter = require('../models/CounterModel');
 const admin = require('firebase-admin');
+const generatePassword = require('generate-password');
 
 admin.initializeApp({
-  credential: admin.credential.cert(require('../event-tool-box-1720171944535-firebase-adminsdk-f6w3g-c723d5d88c.js'))
+  credential: admin.credential.cert(require('../firebaseSDK.js'))
 });
 
 
@@ -24,7 +25,8 @@ const Register = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newUser = new User({ id:counter.seq,username, email, password });
+    const newUser = new User({ id:counter.seq
+      ,...req.body });
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(password, salt);
 
@@ -72,16 +74,16 @@ const forgotPassword = async (req, res) => {
     }
 
     const resetToken = jwt.sign({ id: user._id.toString() }, 'secret', { expiresIn: '15m' });
-    const resetURL = `http://localhost:5173/resetpassword?token=${resetToken}`;
+    const resetURL =`${ process.env.FRONTEND_URL}/resetpassword?token=${resetToken}`;
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: 'boualiamino0123@gmail.com',
-        pass: 'kshn mwrg cjyt uzgo',
+        user: process.env.GOOGLE_NODEMAILER,
+        pass: process.env.GOOGLE_NODEMAILER_key,
       },
     });
     const mailOptions = {
-      from: 'boualiamino0123@gmail.com',
+      from: process.env.GOOGLE_NODEMAILER,
       to: email,
       subject: 'Password Reset',
       text: `You requested a password reset. Use the following token to reset your password: ${resetToken}`,
@@ -138,6 +140,17 @@ const resetPassword = async (req, res) => {
 
 const signupWithGoogle = async (req, res) => {
   const { tokenId } = req.body;
+
+  const generateStrongPassword = () => {
+    return generatePassword.generate({
+      length: 16,
+      numbers: true,
+      symbols: true,
+      uppercase: true,
+      lowercase: true,
+      excludeSimilarCharacters: true
+    });
+  };
   try {
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
     const { email, name, uid: googleId } = decodedToken;
@@ -158,9 +171,9 @@ const signupWithGoogle = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const dummyPassword = 'GoogleAuthDummyPassword123!'; // Dummy password for Google sign-up
+    const strongPassword = generateStrongPassword();
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(dummyPassword, salt);
+    const hashedPassword = await bcrypt.hash(strongPassword, salt);
 
     user = new User({
       id: counter.seq,
