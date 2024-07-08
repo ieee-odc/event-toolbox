@@ -12,6 +12,6 @@ router.get("/", getEvents);
 router.post("/add", createEvent);
 router.get("/:id", getEvent);
 router.delete("/delete/:id", deleteEvent);
-router.patch("/edit/:id", updateEvent);
+router.put("/edit/:id", updateEvent);
 
 module.exports = router;
