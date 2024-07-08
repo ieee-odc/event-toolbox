@@ -47,9 +47,6 @@ db.once("open", () => {
 
 const ParticipantRouter = require("./routes/ParticipantRoutes");
 app.use("/participant", ParticipantRouter);
-
-const ParticipantRouter = require("./routes/ParticipantRoutes");
-app.use("/participant", ParticipantRouter);
 const EventRouter = require("./routes/EventsRoutes");
 app.use("/events", EventRouter);
 const authRouter = require("./routes/authRoutes");
