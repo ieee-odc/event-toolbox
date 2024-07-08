@@ -72,18 +72,18 @@ function SignUp() {
               <h4 className="mb-2">Sign Up 🚀</h4>
               <p className="mb-4">Create your account to get started!</p>
               {errors.server && <div className="alert alert-danger">{errors.server}</div>}
-              <form id="formAuthentication" className="mb-3" onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
-                <div className="mb-2 form-email-toggle">
+              <form id="formAuthentication" className="mb-3" style={{display:"flex",flexDirection:"column",alignItems:"center"}} onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
+                <div className="mb-2 form-email-toggle w-100">
                   <label htmlFor="username" className="col-auto col-form-label">Username</label>
                   <input type="text" className="form-control" id="username" name="username" autoComplete="username" value={username} onChange={onChange} placeholder="Enter your username" autoFocus />
                   {errors.username && <div className="text-danger">{errors.username}</div>}
                 </div>
-                <div className="mb-2 form-email-toggle">
+                <div className="mb-2 form-email-toggle w-100">
                   <label htmlFor="email" className="col-auto col-form-label">Email</label>
                   <input type="email" className="form-control" id="email" name="email" autoComplete="email" value={email} onChange={onChange} placeholder="Enter your email" />
                   {errors.email && <div className="text-danger">{errors.email}</div>}
                 </div>
-                <div className="mb-2 form-password-toggle">
+                <div className="mb-2 form-password-toggle w-100">
                   <div className="d-flex justify-content-between">
                     <label className="form-label" htmlFor="password">Password</label>
                   </div>
@@ -95,7 +95,7 @@ function SignUp() {
                   </div>
                   {errors.password && <div className="text-danger">{errors.password}</div>}
                 </div>
-                <div className="mb-2">
+                <div className="mb-2" style={{alignSelf:"start"}}>
                   <div className="form-check" style={{ display: "flex", gap: "10px" }}>
                     <input className="form-check-input" type="checkbox" id="terms-conditions" name="terms" />
                     <label className="form-check-label" htmlFor="terms-conditions">

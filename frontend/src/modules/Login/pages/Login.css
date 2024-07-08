@@ -10,7 +10,7 @@
 }
 
 .space-right{
-    margin-right: 10px;
+    margin-right: 5px;
 }
 .form-control {
     width: 100%; /* Makes the input full-width */
@@ -21,15 +21,5 @@
     justify-content: start;
     align-items: start;
 }
-.text-center {
-    text-align: center;
-    margin-top: 5px;
-    margin-left: 20px;
-}
-.google-login-container{
-    margin-top: 35px;
-    margin-left: 18px;
-}
-.link{
-    margin-left: -10px;
-}
+
+

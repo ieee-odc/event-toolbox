@@ -45,16 +45,9 @@
     color: #dc3545 !important;
   }
   
-  .text-center {
-    text-align: center;
-    margin-top: -20px;
-  }
+
   
-  
-  
-  .space-right {
-    margin-right: 0.5rem;
-  }
+
   
   a {
     color: #007bff;
@@ -64,13 +57,4 @@
   a:hover {
     text-decoration: underline;
   }
-  .btn{
-    margin-top: 5px;
-  }
-  .google-login-container{
-    margin-top: 35px;
-    margin-left: 18px;
-}
-.text-place{
-  margin-top: 8px;
-}
+
