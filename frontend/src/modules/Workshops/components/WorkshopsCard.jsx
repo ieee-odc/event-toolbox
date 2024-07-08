@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
-
 import { toast } from "react-hot-toast";
 import WorkshopTableHeader from "./WorkshopTableHeader";
 import WorkshopModal from "./WorkshopModal";
@@ -36,8 +35,6 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
     }
   };
 
- 
-
   const handleSearchChange = (event) => {
     const filtered = workshops.filter(
       (workshop) =>
@@ -67,6 +64,7 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
   const handleNext = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
+
   const handleDeleteWorkshop = (workshopId) => {
     axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
       setWorkshops(workshops.filter((workshop) => workshop.id !== workshopId));
@@ -90,6 +88,8 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
 
     // Calculate difference in days
     const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+    console.log(differenceInTime)
+    console.log(differenceInDays)
     if (differenceInDays === 0) {
       return <span className="badge bg-label-info ms-auto">Today</span>;
     } else if (differenceInDays < 0) {
@@ -101,24 +101,6 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
     }
   };
 
-
-  useEffect(() => {
-    setFilteredWorkshops(workshops);
-    initializeDropdownStates(workshops);
-  }, [workshops]);
-
-  useEffect(() => {
-    // Change this when we add events
-    axiosRequest.get("/workshop/get-event/1").then((res) => {
-      setWorkshops(res.data.workshops);
-      setFilteredWorkshops(res.data.workshops);
-    });
-  }, []);
-
-  useEffect(() => {
-    setFilteredWorkshops(workshops);
-  }, [workshops]);
-
   const initializeDropdownStates = (workshops) => {
     const initialStates = workshops.reduce((acc, workshop) => {
       acc[workshop.id] = false;
@@ -126,6 +108,32 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
     }, {});
     setDropdownStates(initialStates);
   };
+
+  useEffect(() => {
+    // Fetch workshops or initialize data
+    axiosRequest.get("/workshop/get-event/1").then((res) => {
+      setWorkshops(res.data.workshops);
+      setFilteredWorkshops(res.data.workshops);
+      initializeDropdownStates(res.data.workshops);
+    });
+  }, []);
+
+  const toggleDropdown = (workshopId) => {
+    setDropdownStates({
+      ...dropdownStates,
+      [workshopId]: !dropdownStates[workshopId],
+    });
+  };
+  const handleEditWorkshop = (workshop) => {
+    setData(workshop);
+    setIsModalOpen(true);
+    // Close the dropdown for this workshop
+    setDropdownStates({
+      ...dropdownStates,
+      [workshop.id]: false,
+    });
+  };
+
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">

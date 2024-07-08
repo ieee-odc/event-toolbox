@@ -5,35 +5,42 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
-function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops,data }) {
+function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
   const [eventId, setEventId] = useState("1");
   const [spaceId, setSpaceId] = useState("1");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [date, setDate] = useState("");
-const [isEditMode,setIsEditMode] = useState(false);
+  const [date, setDate] = useState(null); // Initialize with null or a valid Date object
+  const [isEditMode, setIsEditMode] = useState(false);
   const startDate = data.startTime ? new Date(data.startTime) : null;
-  
-  useEffect(()=>{
-    if(data.eventId){
-      console.log("edit mode")
-      setIsEditMode(true)
+
+  useEffect(() => {
+    if (data.eventId) {
+      console.log("edit mode");
+      setIsEditMode(true);
     }
-setEventId(data.eventId ||"1");
+    setEventId(data.eventId || "1");
     setSpaceId(data.spaceId || "1");
     setName(data.name || "");
     setDescription(data.description || "");
+    try {
+      setStartTime(formatTime(data.startTime));
+      setEndTime(formatTime(data.endTime));
+      let formattedDate = startDate
+        ? `${startDate.getDate()}/${
+            startDate.getMonth() + 1
+          }/${startDate.getFullYear()}`
+        : "";
+      setDate(startDate);
 
-    setStartTime(formatTime(data.startTime));
-    setEndTime(formatTime(data.endTime));
-    let formattedDate = startDate? `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}` : "";
-    setDate(formattedDate);
-    console.log(formattedDate)
 
-  },[data])
-  
+    } catch (e) {
+      console.log(e);
+    }
+  }, [data]);
+
   const handleChangeStartTime = (e) => {
     handleChangeTime(e, startTime, setStartTime);
   };
@@ -114,15 +121,15 @@ setEventId(data.eventId ||"1");
   const handleAddWorkshop = () => {
     // Combine date, startTime, and endTime into a single Date object
     const startDate = new Date(date);
-    const [hours, minutes] = startTime.split(':');
+    const [hours, minutes] = startTime.split(":");
     startDate.setHours(parseInt(hours, 10));
     startDate.setMinutes(parseInt(minutes, 10));
-  
+
     const endDate = new Date(date);
-    const [endHours, endMinutes] = endTime.split(':');
+    const [endHours, endMinutes] = endTime.split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
-  
+
     // Create the request body
     const reqBody = {
       name,
@@ -130,37 +137,39 @@ setEventId(data.eventId ||"1");
       startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
       endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
       eventId,
-      spaceId
+      spaceId,
     };
-  
+
     // Make the API request
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
         setIsModalOpen(false);
-        setWorkshops((workshops) => [...workshops, {
-          ...res.data.workshop,
-          capacity:50
-        }]);
+        setWorkshops((workshops) => [
+          ...workshops,
+          {
+            ...res.data.workshop,
+            capacity: 50,
+          },
+        ]);
       })
       .catch((err) => {
         toast.error("Failed to add workshop");
       });
   };
-  
 
-  const handleEditWorkshop=()=>{
+  const handleEditWorkshop = () => {
     const startDate = new Date(date);
-    const [hours, minutes] = startTime.split(':');
+    const [hours, minutes] = startTime.split(":");
     startDate.setHours(parseInt(hours, 10));
     startDate.setMinutes(parseInt(minutes, 10));
-  
+
     const endDate = new Date(date);
-    const [endHours, endMinutes] = endTime.split(':');
+    const [endHours, endMinutes] = endTime.split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
-  
+
     // Create the request body
     const reqBody = {
       name,
@@ -168,9 +177,9 @@ setEventId(data.eventId ||"1");
       startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
       endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
       eventId,
-      spaceId
+      spaceId,
     };
-  
+
     // Make the API request
     axiosRequest
       .post(`/workshop/edit/${data.id}`, reqBody)
@@ -178,15 +187,17 @@ setEventId(data.eventId ||"1");
         toast.success("Successfully Edited!");
         setIsModalOpen(false);
         setWorkshops((workshops) => {
-          const index = workshops.findIndex((workshop) => workshop.id === data.id);
-          workshops[index] = {...res.data.workshop, capacity:50 };
+          const index = workshops.findIndex(
+            (workshop) => workshop.id === data.id
+          );
+          workshops[index] = { ...res.data.workshop, capacity: 50 };
           return [...workshops];
         });
       })
       .catch((err) => {
         toast.error("Failed to add workshop");
       });
-  }
+  };
 
   return (
     isModalOpen && (
@@ -328,12 +339,15 @@ setEventId(data.eventId ||"1");
                 </div>
               </div>
               <div className="row">
-                <div className="col mb-3" style={{display:"flex",flexDirection:"column"}}>
+                <div
+                  className="col mb-3"
+                  style={{ display: "flex", flexDirection: "column" }}
+                >
                   <label htmlFor="nameWithTitle" className="form-label">
                     Date
                   </label>
                   <DatePicker
-                    selected={date}
+                    selected={date || new Date()}
                     onChange={(date) => setDate(date)}
                     dateFormat="dd/MM/yyyy"
                     locale="en"
@@ -359,9 +373,9 @@ setEventId(data.eventId ||"1");
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={isEditMode?handleEditWorkshop:handleAddWorkshop}
+                onClick={isEditMode ? handleEditWorkshop : handleAddWorkshop}
               >
-                {isEditMode ?"Save Changes": "Create Workshop"}
+                {isEditMode ? "Save Changes" : "Create Workshop"}
               </button>
             </div>
           </div>
