@@ -11,12 +11,16 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const { email, password } = formData;
 
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  const onRememberMeChange = (e) => {
+    setRememberMe(e.target.checked);
+  };
 
   const validateForm = () => {
     const errors = {};
@@ -34,7 +38,11 @@ function Login() {
     }
     try {
       const res = await axiosRequest.post("/auth/login", formData);
-      localStorage.setItem("token", res.data.token);
+      if (rememberMe) {
+        localStorage.setItem("token", res.data.token);
+      } else {
+        sessionStorage.setItem("token", res.data.token);
+      }
       navigate("/success");
     } catch (err) {
       console.error(err.response.data);
@@ -46,7 +54,11 @@ function Login() {
     try {
       const tokenId = response.user.accessToken;
       const res = await axiosRequest.post("/auth/loginwithgoogle", { tokenId });
-      localStorage.setItem("token", res.data.token);
+      if (rememberMe) {
+        localStorage.setItem("token", res.data.token);
+      } else {
+        sessionStorage.setItem("token", res.data.token);
+      }
       navigate("/success");
     } catch (err) {
       console.error(
@@ -160,6 +172,8 @@ function Login() {
                       className="form-check-input"
                       type="checkbox"
                       id="remember-me"
+                      checked={rememberMe}
+                      onChange={onRememberMeChange}
                     />
                     <label className="form-check-label" htmlFor="remember-me">
                       Remember Me
