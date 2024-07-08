@@ -50,7 +50,7 @@ const FormLandingPage = () => {
 
     const handleUpdateForm = async (formId, updatedData) => {
         try {
-            const response = await axios.put(`/form/update/${formId}`, updatedData);
+            const response = await axiosRequest.put(`/form/update/${formId}`, updatedData);
             const updatedForms = forms.map(form => {
                 if (form._id === formId) {
                     return { ...form, ...response.data };
