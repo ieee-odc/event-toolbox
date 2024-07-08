@@ -89,7 +89,10 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
 
   return (
     <div className="content-wrapper">
-      <div className="container-xxl flex-grow-1 container-p-y">
+      <div
+        className="container-xxl flex-grow-1 container-p-y"
+        id="eventsContainer"
+      >
         <h4 className="py-3 mb-4">
           <span className="text-muted fw-light">UserName/</span> Events
         </h4>
@@ -167,7 +170,7 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                     <div className="col-sm-6 col-lg-4" key={event._id}>
                       <div className="card p-2 h-100 shadow-none border">
                         <div className="rounded-2 text-center mb-0"></div>
-                        <div className="card-body p-3 pt-3">
+                        <div className="card-body p-3 pt-3" id="eventCardBody">
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span
                               className={
@@ -230,14 +233,19 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                             </p>
                           </div>
                         </div>
-                        <div className="d-flex flex-column flex-md-row gap-2 text-nowrap pe-xl-3 pe-xxl-0 mt-1 mb-3 justify-content-center align-items-end">
+                        <div
+                          id="button-container"
+                          className="d-flex flex-column flex-md-row gap-2 text-nowrap pe-xl-3 pe-xxl-0 mt-1 mb-3 justify-content-center align-items-end"
+                        >
                           <button
+                            id="deleteButton"
                             className="app-academy-md-50 btn btn-label-secondary me-md-0 d-flex align-items-center"
                             onClick={() => deleteEvent(event._id)}
                           >
                             <i className="bx bxs-trash me-2"></i>Delete
                           </button>
                           <button
+                            id="editButton"
                             className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
                             onClick={() => handleEditClick(event._id)}
                           >
