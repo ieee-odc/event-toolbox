@@ -110,7 +110,6 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
   useEffect(() => {
     // Change this when we add events
     axiosRequest.get("/workshop/get-event/1").then((res) => {
-      console.log(res.data)
       setWorkshops(res.data.workshops);
       setFilteredWorkshops(res.data.workshops);
     });
