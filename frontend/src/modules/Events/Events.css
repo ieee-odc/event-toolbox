@@ -150,3 +150,8 @@ body {
 .layout-navbar.navbar-detached.container-xxl {
   z-index: 1;
 }
+
+/* .container-xxl {
+  display: flex;
+  flex-direction: column;
+} */

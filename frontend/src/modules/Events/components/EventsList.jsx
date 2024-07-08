@@ -247,7 +247,16 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                           <button
                             id="editButton"
                             className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
-                            onClick={() => handleEditClick(event._id)}
+                            onClick={() =>
+                              handleEditClick({
+                                id: event._id,
+                                name: event.name,
+                                description: event.description,
+                                location: event.location,
+                                startDate: event.startDate,
+                                endDate: event.endDate,
+                              })
+                            }
                           >
                             Edit
                             <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>

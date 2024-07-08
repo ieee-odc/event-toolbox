@@ -13,13 +13,12 @@ function EventsContainer() {
     startDate: "",
     endDate: "",
   });
-  const [selectedEventId, setSelectedEventId] = useState(null);
-
-  const toggleSideBar = () => {
-    setOpenSideBar((prev) => !prev);
-  };
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const toggleModal = () => {
+    if (selectedEvent) {
+      setSelectedEvent(null);
+    }
     setIsModalOpen(!isModalOpen);
   };
 
@@ -52,9 +51,8 @@ function EventsContainer() {
     toggleModal();
   };
 
-  const handleEditEventClick = (eventId) => {
-    console.log("Edit event clicked with ID:", eventId);
-    setSelectedEventId(eventId);
+  const handleEditEventClick = (event) => {
+    setSelectedEvent(event);
     toggleModal();
   };
   return (
@@ -64,18 +62,18 @@ function EventsContainer() {
         onEditEventClick={handleEditEventClick}
       />
       <AddEventModal
-        isOpen={isModalOpen && !selectedEventId}
+        isOpen={isModalOpen && !selectedEvent}
         toggleModal={toggleModal}
         handleSubmit={handleSubmit}
         newEvent={newEvent}
         handleInputChange={handleInputChange}
       />
-      {selectedEventId && (
+      {selectedEvent && (
         <EditEventModal
           isOpen={isModalOpen}
           toggleModal={toggleModal}
           handleSubmit={handleSubmit}
-          eventId={selectedEventId}
+          event={selectedEvent}
           handleInputChange={handleInputChange}
         />
       )}

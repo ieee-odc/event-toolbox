@@ -101,6 +101,7 @@ function AddEventModal({
                       className="form-control"
                       value={newEvent.endDate}
                       onChange={handleInputChange}
+                      min={newEvent.startDate}
                     />
                   </div>
                 </div>

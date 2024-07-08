@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 
 function EditEventModal({
   isOpen,
   toggleModal,
   handleSubmit,
-  eventId,
+  event,
   handleInputChange,
 }) {
   const [eventData, setEventData] = useState({
@@ -21,43 +20,23 @@ function EditEventModal({
   const [changesMade, setChangesMade] = useState(false);
 
   useEffect(() => {
-    if (isOpen && eventId) {
-      setLoading(true);
-      const fetchEvent = async () => {
-        try {
-          const response = await axiosRequest.get(`/events/${eventId}`);
-          setEventData({
-            name: response.data.name,
-            description: response.data.description,
-            location: response.data.location,
-            startDate: new Date(response.data.startDate)
-              .toISOString()
-              .split("T")[0],
-            endDate: new Date(response.data.endDate)
-              .toISOString()
-              .split("T")[0],
-          });
-          setInitialEventData({
-            name: response.data.name,
-            description: response.data.description,
-            location: response.data.location,
-            startDate: new Date(response.data.startDate)
-              .toISOString()
-              .split("T")[0],
-            endDate: new Date(response.data.endDate)
-              .toISOString()
-              .split("T")[0],
-          });
-        } catch (error) {
-          console.error("Error fetching event data:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchEvent();
+    if (isOpen && event) {
+      setEventData({
+        name: event.name,
+        description: event.description,
+        location: event.location,
+        startDate: new Date(event.startDate).toISOString().split("T")[0],
+        endDate: new Date(event.endDate).toISOString().split("T")[0],
+      });
+      setInitialEventData({
+        name: event.name,
+        description: event.description,
+        location: event.location,
+        startDate: new Date(event.startDate).toISOString().split("T")[0],
+        endDate: new Date(event.endDate).toISOString().split("T")[0],
+      });
     }
-  }, [isOpen, eventId]);
+  }, [isOpen, event]);
 
   useEffect(() => {
     if (initialEventData) {
@@ -85,7 +64,7 @@ function EditEventModal({
 
         setLoading(true);
         const response = await axiosRequest.put(
-          `/events/edit/${eventId}`,
+          `/events/edit/${event.id}`, // Assuming 'event' has an 'id' property
           formattedEventData
         );
         window.location.reload();
