@@ -18,7 +18,6 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
 
   useEffect(() => {
     if (data.eventId) {
-      console.log("edit mode");
       setIsEditMode(true);
     }
     setEventId(data.eventId || "1");
@@ -28,14 +27,7 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
     try {
       setStartTime(formatTime(data.startTime));
       setEndTime(formatTime(data.endTime));
-      let formattedDate = startDate
-        ? `${startDate.getDate()}/${
-            startDate.getMonth() + 1
-          }/${startDate.getFullYear()}`
-        : "";
       setDate(startDate);
-
-
     } catch (e) {
       console.log(e);
     }

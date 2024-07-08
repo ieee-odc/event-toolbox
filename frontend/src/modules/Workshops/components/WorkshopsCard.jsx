@@ -7,11 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 
-const WorkshopStatus = Object.freeze({
-  PAID: "Paid",
-  PENDING: "Pending",
-  CANCELED: "Canceled",
-});
 
 const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
   const [workshops, setWorkshops] = useState([]);
@@ -22,26 +17,12 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
   const [data, setData] = useState({});
   const navigate = useNavigate();
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case WorkshopStatus.PAID:
-        return <span className="badge bg-label-success">Paid</span>;
-      case WorkshopStatus.PENDING:
-        return <span className="badge bg-label-warning">Pending</span>;
-      case WorkshopStatus.CANCELED:
-        return <span className="badge bg-label-danger">Canceled</span>;
-      default:
-        return <i className="bx bx-info-circle text-info"></i>;
-    }
-  };
-
   const handleSearchChange = (event) => {
     const filtered = workshops.filter(
       (workshop) =>
-        workshop.fullName
+        workshop.name
           .toLowerCase()
-          .includes(event.target.value.toLowerCase()) ||
-        workshop.email.toLowerCase().includes(event.target.value.toLowerCase())
+          .includes(event.target.value.toLowerCase()) 
     );
     setFilteredWorkshops(filtered);
     setCurrentPage(1);
@@ -88,8 +69,6 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
 
     // Calculate difference in days
     const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-    console.log(differenceInTime)
-    console.log(differenceInDays)
     if (differenceInDays === 0) {
       return <span className="badge bg-label-info ms-auto">Today</span>;
     } else if (differenceInDays < 0) {
