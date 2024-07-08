@@ -1,14 +1,13 @@
 const express=require("express")
 const router=express.Router();
-const { addParticipant, deleteParticipant, editParticipant, getUserParticipant } = require("../controllers/ParticipantController");
+const { addParticipant, deleteParticipant, editParticipant, getEventParticipants } = require("../controllers/ParticipantController");
 
 
 
-
-router.post("/",getUserParticipant)
+router.get("/get-event/:eventId",getEventParticipants)
 router.post("/add",  addParticipant);
-router.post("/delete",deleteParticipant);
-router.post("/edit",editParticipant)
+router.post("/edit/:participantId",editParticipant)
+router.post("/delete/:participantId",deleteParticipant);
 
 
 

@@ -10,12 +10,15 @@ import ForgetPassword from './modules/ForgetPass/pages/ForgetPassword'
 import Success from './modules/TestAuth/pages/Success';
 import ResetPassword from'./modules/ForgetPass/pages/ResetPassword'
 
+import { Toaster } from 'react-hot-toast';
+
 
 function App() {
 
   return (
 
     <div className="App">
+      <Toaster/>
    {/* for private routes use Private Route like this
    <Route path= "/participants" element ={<PrivateRoute allowedRoles={['organizer']}>
 <Participants />

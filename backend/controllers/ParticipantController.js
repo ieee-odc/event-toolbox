@@ -1,15 +1,8 @@
 const Counter = require("../models/CounterModel");
 const Participant = require("../models/ParticipantModel");
-const fs = require("fs");
 
 const addParticipant = async (req, res) => {
   try {
-    const { noteTitle, noteDescription,noteType,userId } = req.body;
-    const file = req.file;
-
-    if (!file) {
-      return res.status(400).json({message:"No file uploaded!"});
-      }
 
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
@@ -17,22 +10,18 @@ const addParticipant = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const note = new Participant({
+    const participant = new Participant({
       id: counter.seq,
-      userId,
-      noteTitle,
-      noteDescription,
-      noteType,
-      noteImage: file.path,
-      noteStatus: "Active",
+      status:"Pending",
+      ...req.body,
     });
 
-    await note.save();
+    await participant.save();
 
     res.status(201).json({
       status: "success",
       message: "Added Participant",
-      note: note,
+      participant: participant,
     });
   } catch (error) {
     console.error(error);
@@ -44,31 +33,11 @@ const addParticipant = async (req, res) => {
 
 const editParticipant = async (req, res) => {
   try {
-    const { noteId, noteTitle, noteType, noteDescription, noteStatus } = req.body;
-    let file;
-
-    if (req.file) {
-      const oldParticipant = await Participant.findOne({ id: noteId });
-      if (oldParticipant && oldParticipant.noteImage) {
-        fs.unlinkSync(oldParticipant.noteImage);
-      }
-      file = req.file.path;
-    }
-
-    const updatedData = {
-      noteTitle,
-      noteType,
-      noteDescription,
-      noteStatus,
-    };
-
-    if (file) {
-      updatedData.noteImage = file;
-    }
+    const participantId = req.params.participantId;
 
     const updatedParticipant = await Participant.findOneAndUpdate(
-      { id: noteId },
-      updatedData,
+      { id: participantId },
+      req.body,
       { new: true }
     );
 
@@ -79,7 +48,7 @@ const editParticipant = async (req, res) => {
     res.status(200).json({
       status: "success",
       message: "Participant updated",
-      note: updatedParticipant,
+      participant: updatedParticipant,
     });
   } catch (error) {
     console.error(error);
@@ -89,27 +58,22 @@ const editParticipant = async (req, res) => {
   }
 };
 
-
 const deleteParticipant = async (req, res) => {
   try {
-    const noteId = req.body.noteId;
+    const participantId = req.params.participantId;
 
     const deletedParticipant = await Participant.findOneAndDelete({
-      id: noteId,
+      id: participantId,
     });
 
     if (!deletedParticipant) {
       return res.status(404).json({ message: "Participant not found" });
     }
 
-    if (deletedParticipant.noteImage) {
-      fs.unlinkSync(deletedParticipant.noteImage);
-    }
-
     res.status(200).json({
       status: "success",
       message: "Participant deleted",
-      note: deletedParticipant,
+      participant: deletedParticipant,
     });
   } catch (error) {
     console.error(error);
@@ -119,18 +83,17 @@ const deleteParticipant = async (req, res) => {
   }
 };
 
-const getUserParticipant = async (req, res) => {
+const getEventParticipants = async (req, res) => {
   try {
-
-    const {userId} = req.body;
-    const note = await Participant.find({
-      userId
+    const eventId = req.params.eventId;
+    const participants = await Participant.find({
+      eventId,
     });
 
     return res.status(200).json({
       status: "success",
       message: "Participant retrieved",
-      note: note,
+      participants: participants,
     });
   } catch (e) {
     console.error(e);
@@ -144,5 +107,5 @@ module.exports = {
   addParticipant,
   deleteParticipant,
   editParticipant,
-  getUserParticipant,
+  getEventParticipants,
 };
