@@ -3,7 +3,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
 import { toast } from "react-hot-toast";
-import { formatDate } from "../../../utils/helpers/FormatDate";
+import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -11,12 +11,11 @@ const ParticipationStatus = Object.freeze({
   CANCELED: "Canceled",
 });
 
-const ParticipantsCard = ({setIsModalOpen,isModalOpen}) => {
+const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
   const [participants, setParticipants] = useState([]);
   const [filteredParticipants, setFilteredParticipants] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -230,22 +229,24 @@ const ParticipantsCard = ({setIsModalOpen,isModalOpen}) => {
                         </div>
                       </div>
                     </td>
+
                     <td className="">
-                      <span className="d-none"></span>{formatDate(participant.createdAt)}
+                      <span className="d-none"></span>
+                      {formatDateWithShort(participant.createdAt)}
                     </td>
                     <td>{getStatusIcon(participant.status)}</td>
                     <td>
                       <div className="d-flex align-items-center">
-                      <a
-  href={`mailto:${participant.email}`}
-  data-bs-toggle="tooltip"
-  className="text-body"
-  data-bs-placement="top"
-  aria-label="Send Mail"
-  data-bs-original-title="Send Mail"
->
-  <i className="bx bx-send mx-1" />
-</a>
+                        <a
+                          href={`mailto:${participant.email}`}
+                          data-bs-toggle="tooltip"
+                          className="text-body"
+                          data-bs-placement="top"
+                          aria-label="Send Mail"
+                          data-bs-original-title="Send Mail"
+                        >
+                          <i className="bx bx-send mx-1" />
+                        </a>
                         <a
                           data-bs-toggle="tooltip"
                           className="text-body"
@@ -281,7 +282,7 @@ const ParticipantsCard = ({setIsModalOpen,isModalOpen}) => {
                               onClick={() => {
                                 handleDeleteParticipant(participant.id);
                               }}
-                              style={{cursor: 'pointer'}}
+                              style={{ cursor: "pointer" }}
                               className="dropdown-item delete-record text-danger"
                             >
                               Delete
@@ -379,10 +380,8 @@ const ParticipantsCard = ({setIsModalOpen,isModalOpen}) => {
             setIsModalOpen={setIsModalOpen}
             setParticipants={setParticipants}
           />
-
+        </div>
       </div>
-      </div>
-      
     </div>
   );
 };

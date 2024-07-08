@@ -1,20 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import CustomNavBar from "../NavBar/CustomNavBar";
 import CustomSideBar from "../Sidebar/CustomSideBar";
 
-function DashboardLayout({
-  children,
-  openSideBar,
-  setOpenSideBar,
-  isModalOpen,
-  toggleSideBar,
-}) {
+function DashboardLayout({ children, activeTab, isModalOpen }) {
+  const [openSideBar, setOpenSideBar] = useState(true);
+
+  const toggleSideBar = () => {
+    setOpenSideBar((prev) => !prev);
+  };
   return (
-    <div className="layout-container">
+    <div class="layout-container">
       <CustomSideBar
         openSideBar={openSideBar}
         toggleSideBar={toggleSideBar}
-        activeTab="/participants"
+        activeTab={activeTab}
       />
       <div
         className="layout-page"
@@ -69,14 +68,14 @@ function DashboardLayout({
         {/* Content wrapper */}
         {openSideBar && (
           <div
-            className="layout-overlay layout-menu-toggle"
+            class="layout-overlay layout-menu-toggle"
             style={{ display: "block" }}
           ></div>
         )}
 
         {isModalOpen && (
           <div
-            className="content-backdrop fade"
+            class="content-backdrop fade"
             style={{ zIndex: "999", opacity: "0.3" }}
           >
             azdazd
