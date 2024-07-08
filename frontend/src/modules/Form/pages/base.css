@@ -1,0 +1,7 @@
+/* src/base.css */
+.scrollable-container {
+    max-height: 400px; /* Set a maximum height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+  }
+    

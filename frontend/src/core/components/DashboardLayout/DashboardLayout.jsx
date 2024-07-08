@@ -74,7 +74,7 @@ function DashboardLayout({children,openSideBar,setOpenSideBar,isModalOpen,toggle
           class="content-backdrop fade"
           style={{ zIndex: "999", opacity: "0.3" }}
         >
-          azdazd
+          
         </div>
       )}
     </div>

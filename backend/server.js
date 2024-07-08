@@ -28,6 +28,8 @@ db.once('open', () => {
 const ParticipantRouter = require("./routes/ParticipantRoutes")
 app.use("/participant", ParticipantRouter)
 
+const FormRouter = require("./routes/FormRoutes")
+app.use("/form", FormRouter)
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`server started on port ${process.env.PORT}`);

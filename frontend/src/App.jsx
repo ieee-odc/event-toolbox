@@ -5,6 +5,8 @@ import { Route, Routes } from 'react-router-dom';
 import PrivateRoute from './utils/PrivateRoute';
 
 import { Toaster } from 'react-hot-toast';
+import Table from './core/components/Table/Table';
+import FormLandingPage from './modules/Form/pages/FormLandingPage';
 
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
   <Route path= "/" element ={<Homepage/>}  /> */}
   <Route path= "/participants" element ={
 <Participants />}  />
+<Route path="/formlandingpage/:eventId" element={<FormLandingPage />} />
+<Route path="/table" element={<Table/>} />
 </Routes>
     
     </div>
