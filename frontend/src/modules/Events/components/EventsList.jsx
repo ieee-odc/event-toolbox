@@ -105,7 +105,6 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
       )
     : events;
 
-  // Logic for pagination
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = filteredEvents.slice(

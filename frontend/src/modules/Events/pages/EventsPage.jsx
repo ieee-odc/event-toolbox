@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import CustomSideBar from "../../../core/components/Sidebar/CustomSideBar";
 import EventsList from "../components/EventsList";
 import AddEventModal from "../components/AddEventModal";
-import EditEventModal from "../components/EditEventModal"; // Import EditEventModal
+import EditEventModal from "../components/EditEventModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 
 function Events() {
@@ -14,7 +14,7 @@ function Events() {
     startDate: "",
     endDate: "",
   });
-  const [selectedEventId, setSelectedEventId] = useState(null); // State for selected event ID
+  const [selectedEventId, setSelectedEventId] = useState(null);
 
   const toggleSideBar = () => {
     setOpenSideBar((prev) => !prev);
@@ -35,8 +35,6 @@ function Events() {
   const handleSubmit = async () => {
     try {
       const response = await axiosRequest.post("/events/add", newEvent);
-      console.log("Event submitted:", response.data);
-      // Close the modal and reset form
       toggleModal();
       setNewEvent({
         name: "",
@@ -44,7 +42,7 @@ function Events() {
         startDate: "",
         endDate: "",
       });
-      // You may want to update events list state here if needed
+      window.location.reload();
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -56,8 +54,8 @@ function Events() {
 
   const handleEditEventClick = (eventId) => {
     console.log("Edit event clicked with ID:", eventId);
-    setSelectedEventId(eventId); // Set selected event ID
-    toggleModal(); // Open the edit modal
+    setSelectedEventId(eventId);
+    toggleModal();
   };
 
   return (
@@ -72,13 +70,13 @@ function Events() {
         onEditEventClick={handleEditEventClick}
       />
       <AddEventModal
-        isOpen={isModalOpen && !selectedEventId} // Ensure modal is not open if editing an event
+        isOpen={isModalOpen && !selectedEventId}
         toggleModal={toggleModal}
         handleSubmit={handleSubmit}
         newEvent={newEvent}
         handleInputChange={handleInputChange}
       />
-      {selectedEventId && ( // Render EditEventModal only if selectedEventId is truthy
+      {selectedEventId && (
         <EditEventModal
           isOpen={isModalOpen}
           toggleModal={toggleModal}

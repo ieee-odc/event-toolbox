@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../Events.css";
-import axiosRequest from "../../../utils/AxiosConfig"; // Import Axios instance
+import axiosRequest from "../../../utils/AxiosConfig";
 
 function EditEventModal({
   isOpen,
@@ -15,14 +15,13 @@ function EditEventModal({
     startDate: "",
     endDate: "",
   });
-  const [initialEventData, setInitialEventData] = useState(null); // To store initial data for comparison
+  const [initialEventData, setInitialEventData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [changesMade, setChangesMade] = useState(false); // State to track if changes have been made
+  const [changesMade, setChangesMade] = useState(false);
 
   useEffect(() => {
     if (isOpen && eventId) {
-      setLoading(true); // Set loading state
-      // Fetch event data from the API
+      setLoading(true);
       const fetchEvent = async () => {
         try {
           const response = await axiosRequest.get(`/events/${eventId}`);
@@ -46,10 +45,10 @@ function EditEventModal({
               .toISOString()
               .split("T")[0],
           });
-          setLoading(false); // Clear loading state
+          setLoading(false);
         } catch (error) {
           console.error("Error fetching event data:", error);
-          setLoading(false); // Clear loading state on error
+          setLoading(false);
         }
       };
 
@@ -58,7 +57,6 @@ function EditEventModal({
   }, [isOpen, eventId]);
 
   useEffect(() => {
-    // Check if changes have been made to eventData compared to initialEventData
     if (initialEventData) {
       const changes =
         eventData.name !== initialEventData.name ||
@@ -75,14 +73,20 @@ function EditEventModal({
     e.preventDefault();
     if (changesMade) {
       try {
+        const formattedEventData = {
+          ...eventData,
+          startDate: new Date(eventData.startDate).toISOString(),
+          endDate: new Date(eventData.endDate).toISOString(),
+        };
+
         setLoading(true);
-        const response = await axiosRequest.patch(
+        const response = await axiosRequest.put(
           `/events/edit/${eventId}`,
-          eventData
+          formattedEventData
         );
-        console.log("Event updated successfully:", response.data);
+        window.location.reload();
         setLoading(false);
-        toggleModal(); // Close modal after successful update
+        toggleModal();
       } catch (error) {
         console.error("Error updating event:", error);
         setLoading(false);
@@ -98,7 +102,7 @@ function EditEventModal({
       ...prevData,
       [id]: value,
     }));
-    handleInputChange(e); // Notify parent component of input change if necessary
+    handleInputChange(e);
   };
 
   return (
@@ -196,7 +200,7 @@ function EditEventModal({
                 <button
                   type="submit"
                   className="btn btn-primary"
-                  disabled={!changesMade} // Disable save button if no changes made
+                  disabled={!changesMade}
                 >
                   Save Changes
                 </button>
