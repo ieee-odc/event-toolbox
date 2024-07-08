@@ -31,7 +31,8 @@ const Event= require('../models/EventModel');
         const event = await Event.findById(eventId);
         if (!event) {
             throw new Error('Event not found');
-        }
+            res.status(400).json({message:"No event found"})
+            }
         //create Form 
         const newForm =new Form({
             eventId,
