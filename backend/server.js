@@ -3,19 +3,32 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require('cors');
 const dotenv = require("dotenv");
-const path  = require('path')
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
+const path  = require('path');
+const helmet = require('helmet');
 
 dotenv.config();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type, Authorization'
+}));
+app.use(helmet());
 
 const _dirname = path.dirname("")
 const buildPath = path.join(_dirname  , "../frontend/dist");
+
+app.use((req, res, next) => {
+  res.header("Cross-Origin-Opener-Policy", "same-origin; allow-popups");
+  res.header("Cross-Origin-Embedder-Policy", "require-corp");
+  next();
+});
 
 app.use(express.static(buildPath))
 
@@ -33,6 +46,8 @@ db.once('open', () => {
 
 const ParticipantRouter = require("./routes/ParticipantRoutes")
 app.use("/participant", ParticipantRouter)
+const authRouter = require('./routes/authRoutes')
+app.use('/auth', authRouter);
 
 const WorkshopRouter = require("./routes/WorkshopRoutes")
 app.use("/workshop", WorkshopRouter)
