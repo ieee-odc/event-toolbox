@@ -1,0 +1,60 @@
+.container-xxl {
+    max-width: 100%;
+    padding: 0 15px;
+
+  }
+  
+  .authentication-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+  }
+  
+  .authentication-inner {
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .card {
+    box-shadow: 0 0.15rem 1.75rem 0 rgb(58 59 69 / 15%);
+    border: 0;
+    border-radius: 0.375rem;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+.form-email-toggle .col-form-label {
+     margin-bottom: 0rem;
+}
+  
+
+  
+  .input-group-merge .form-control {
+    border-right: 0;
+  }
+  
+  .input-group-merge .input-group-text {
+    background-color: transparent;
+    border-left: 0;
+    cursor: pointer;
+  }
+  
+  .text-danger {
+    color: #dc3545 !important;
+  }
+  
+
+  
+
+  
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+
