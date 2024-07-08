@@ -11,12 +11,14 @@ import Base from './modules/Form/pages/base';
 
 
 
+import { Toaster } from 'react-hot-toast';
 
 
 function App() {
 
   return (
     <div className="App">
+      <Toaster/>
    {/* for private routes use Private Route like this
    <Route path= "/participants" element ={<PrivateRoute allowedRoles={['organizer']}>
 <Participants />

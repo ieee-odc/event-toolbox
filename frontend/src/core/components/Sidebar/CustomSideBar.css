@@ -1,0 +1,14 @@
+.menu-item.open:not(.menu-item-closing)>.menu-toggle::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    display: block;
+    width: .42em;
+    height: .42em;
+    border: 1px solid;
+    border-bottom: 0;
+    border-left: 0;
+    transform: translateY(-50%) rotate(135deg); /* Rotate the arrow */
+    transition-duration: .3s;
+  }
+  
