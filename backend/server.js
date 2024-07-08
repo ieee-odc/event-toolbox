@@ -30,6 +30,13 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+
+const ParticipantRouter = require("./routes/ParticipantRoutes")
+app.use("/participant", ParticipantRouter)
+
+const WorkshopRouter = require("./routes/WorkshopRoutes")
+app.use("/workshop", WorkshopRouter)
+
 app.get("/*", function(req, res){
   res.sendFile(
       path.join(__dirname, "../frontend/dist/index.html"),
@@ -43,11 +50,6 @@ app.get("/*", function(req, res){
 
 })
 
-const ParticipantRouter = require("./routes/ParticipantRoutes")
-app.use("/participant", ParticipantRouter)
-
-const WorkshopRouter = require("./routes/WorkshopRoutes")
-app.use("/workshop", WorkshopRouter)
 
 
 const server = app.listen(process.env.PORT, () => {
