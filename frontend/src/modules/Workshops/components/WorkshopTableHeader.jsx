@@ -1,6 +1,6 @@
 import React from 'react'
 
-function WorkshopTableHeader({handleSearchChange,setIsModalOpen}) {
+function WorkshopTableHeader({handleSearchChange,setIsModalOpen,setData}) {
   return (
     <div className="row mx-1">
     <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -26,6 +26,7 @@ function WorkshopTableHeader({handleSearchChange,setIsModalOpen}) {
             aria-controls="DataTables_Table_0"
             type="button"
             onClick={()=>{
+              setData({})
               setIsModalOpen(true)
             }}
           >
