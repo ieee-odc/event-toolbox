@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import "../Form.css";
 import toast from "react-hot-toast";
 import Flatpickr from "react-flatpickr";
-import axios from "axios"; // Import axios for HTTP requests
 import "./DatePicker.css";
+import axiosRequest from "../../../utils/AxiosConfig";
 
 function EventModal({
   isOpen,
@@ -14,7 +14,7 @@ function EventModal({
   isEditMode,
   addField,
   removeField,
-  eventId, // assuming eventId is passed from parent component
+  eventId,
 }) {
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   const [eventDates, setEventDates] = useState({
@@ -24,19 +24,18 @@ function EventModal({
 
   useEffect(() => {
     if (eventId) {
-      fetchEventDates(eventId); // Fetch dates only if eventId is available
+      fetchEventDates(eventId);
     }
   }, [eventId]);
 
   const fetchEventDates = async (eventId) => {
     try {
-      const response = await axios.get(`/events/${eventId}`);
+      const response = await axiosRequest.get(`/events/${eventId}`);
       if (response.data && response.data.startDate && response.data.endDate) {
         setEventDates({
           startDate: new Date(response.data.startDate),
           endDate: new Date(response.data.endDate),
         });
-        console.log(startDate), console.log(endDate);
       } else {
         throw new Error("Invalid response data");
       }
@@ -69,7 +68,7 @@ function EventModal({
     handleInputChange({
       target: {
         id: "deadline",
-        value: dates[0].toISOString(), // Set ISO string format for the date value
+        value: dates[0].toISOString(),
       },
     });
   };
@@ -135,14 +134,23 @@ function EventModal({
                     options={{
                       enableTime: true,
                       dateFormat: "Y-m-d H:i",
-                      minDate: eventDates.startDate, // Set minDate dynamically
-                      maxDate: eventDates.endDate, // Set maxDate dynamically
+                      minDate: eventDates.startDate,
+                      maxDate: eventDates.endDate
+                        ? new Date(
+                            eventDates.endDate.getFullYear(),
+                            eventDates.endDate.getMonth(),
+                            eventDates.endDate.getDate(),
+                            23,
+                            59,
+                            59,
+                            999
+                          )
+                        : null,
                     }}
                     className="form-control"
                   />
                 </div>
 
-                {/* Dynamically generate input fields based on newEvent.data */}
                 {Object.keys(newEvent.data || {}).map((key) => (
                   <div className="mb-3" key={key}>
                     <label htmlFor={key} className="form-label">

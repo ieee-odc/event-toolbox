@@ -10,6 +10,8 @@ import ForgetPassword from "./modules/ForgetPass/pages/ForgetPassword";
 import Success from "./modules/TestAuth/pages/Success";
 import ResetPassword from "./modules/ForgetPass/pages/ResetPassword";
 import EventsPage from "./modules/Events/pages/EventsPage";
+import FormLandingPage from "./modules/Form/pages/FormLandingPage";
+
 import { Toaster } from "react-hot-toast";
 import Workshops from "./modules/Workshops/pages/Workshops";
 
@@ -24,7 +26,7 @@ function App() {
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
         <Route path="/success" element={<Success />} />
-
+        <Route path="/forms/" element={<FormLandingPage />} />
         <Route path="/participants" element={<Participants />} />
         <Route path="/workshops" element={<Workshops />} />
         <Route path="/events" element={<EventsPage />} />
