@@ -1,21 +1,24 @@
 const Counter = require("../models/CounterModel");
-const event = require("../models/EventModel");
-const fs = require("fs");
-const mongoose = require("mongoose");
+const Event = require("../models/EventModel");
+const User = require("../models/OrganizerModel");
+
 
 const getEvents = async (req, res) => {
-  const events = await event.find({}).sort({ createdAt: -1 });
+  const events = await Event.find({}).sort({ createdAt: -1 });
   res.status(200).json(events);
 };
+
+
 const createEvent = async (req, res) => {
-  const { name, description, location, startDate, endDate } = req.body;
   try {
-    const newEvent = await event.create({
-      name,
-      description,
-      location,
-      startDate,
-      endDate,
+    const counter = await Counter.findOneAndUpdate(
+      { id: "autovalEvents" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    const newEvent = await Event.create({
+      id: counter.seq,
+      ...req.body
     });
     res.status(200).json(newEvent);
   } catch (error) {
@@ -24,12 +27,10 @@ const createEvent = async (req, res) => {
 };
 
 const updateEvent = async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid event ID format" });
-  }
-  const updatedEvent = await event.findOneAndUpdate(
-    { _id: id },
+  const { eventId } = req.params;
+
+  const updatedEvent = await Event.findOneAndUpdate(
+    { id:eventId },
     {
       ...req.body,
     }
@@ -42,11 +43,8 @@ const updateEvent = async (req, res) => {
 };
 const deleteEvent = async (req, res) => {
   try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid event ID format" });
-    }
-    const deletedEvent = await event.findOneAndDelete({ _id: id });
+    const { eventId } = req.params;
+    const deletedEvent = await Event.findOneAndDelete({ id:eventId });
     if (!deletedEvent) {
       return res.status(400).json({ error: "No such item" });
     }
@@ -61,15 +59,37 @@ const deleteEvent = async (req, res) => {
 
 const getEvent = async (req, res) => {
   try {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid event ID format" });
-    }
-    const searchedEvent = await event.findById(id);
+    const { eventId } = req.params;
+    const searchedEvent = await Event.findOne({ id:eventId });
     if (!searchedEvent) {
-      return res.status(404).json({ error: "No such event" });
+      return res.status(404).json({ error: "No such Event" });
     }
     res.status(200).json(searchedEvent);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
+const getOrganizerEvents = async (req, res) => {
+  try {
+    const { organizerId } = req.params;
+
+    const organizer = await User.findOne({id:organizerId});
+    if(!organizer){
+      res.status(400).json({
+        message: "Organizer doesn't exist!",
+      });
+    }
+    const events = await Event.find({ organizerId });
+
+    res.status(200).json({
+      status: "success",
+      message: "Events retrieved successfully",
+      events
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json({
@@ -84,4 +104,5 @@ module.exports = {
   updateEvent,
   getEvents,
   getEvent,
+  getOrganizerEvents,
 };
