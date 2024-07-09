@@ -9,6 +9,7 @@ import Participants from './modules/Participants/pages/Participants';
 import ForgetPassword from './modules/ForgetPass/pages/ForgetPassword'
 import Success from './modules/TestAuth/pages/Success';
 import ResetPassword from'./modules/ForgetPass/pages/ResetPassword'
+import ParticipantsForm from './modules/RegistartionForm/pages/RegistartionForm'
 
 import { Toaster } from 'react-hot-toast';
 
@@ -30,6 +31,8 @@ function App() {
         <Route path= "/forgetpassword" element ={<ForgetPassword/>}  />
         <Route path= "/resetpassword" element ={<ResetPassword/>}  />
         <Route path="/success" element={<Success />} />
+        <Route path="/participantsForm" element={<ParticipantsForm />} />
+
 
   <Route path= "/participants" element ={
 <Participants />}  />
