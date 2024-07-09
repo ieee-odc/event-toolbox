@@ -40,7 +40,6 @@ jobs:
       - name: Verify Docker Containers
         run: |
           docker ps -a
-          docker logs <container_name>  # Replace <container_name> with the actual container name to check logs
 
       - name: Tear down
         if: always()
