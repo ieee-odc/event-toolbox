@@ -2,42 +2,42 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
+import { UserData } from "./../../../utils/UserData";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  filterEvents,
+  initializeEvents,
+  deleteEvent,
+  toggleEventsIsLoading,
+  toggleEventModal,
+  selectEvent,
+} from "../../../core/Features/Events";
 
-function EventsList({ onAddEventClick, onEditEventClick }) {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+function EventsList() {
+  const dispatch = useDispatch();
+  const { events, filteredEvents, isLoading, filterStatus } = useSelector(
+    (store) => store.eventsStore
+  );
 
-  const [filterStatus, setFilterStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage] = useState(6); // Number of events per page
+  const [eventsPerPage] = useState(6);
+  const userData = UserData();
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const response = await axiosRequest.get("/events");
-      setEvents(response.data);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteEvent = async (eventId) => {
+  const handleDeleteEvent = async (eventId) => {
     try {
       await axiosRequest.delete(`/events/delete/${eventId}`);
-      setEvents(events.filter((event) => event._id !== eventId));
+      dispatch(deleteEvent(eventId));
     } catch (error) {
       console.error("Error deleting event:", error);
     }
   };
 
-  const handleEditClick = (eventId) => {
-    onEditEventClick(eventId);
-  };
+  const handleEditClick=(event)=>{
+    dispatch(selectEvent(event))
+    console.log(event)
+    dispatch(toggleEventModal())
+  }
+
   const calculateDurationInDays = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -67,25 +67,32 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
   };
 
   const handleStatusChange = (e) => {
-    setFilterStatus(e.target.value);
-    setCurrentPage(1); // Reset current page when filter changes
+    dispatch(filterEvents(e.target.value));
   };
 
-  const filteredEvents = filterStatus
-    ? events.filter(
-        (event) =>
-          getEventStatus(event.startDate, event.endDate).status === filterStatus
-      )
-    : events;
 
-  const indexOfLastEvent = currentPage * eventsPerPage;
-  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = filteredEvents.slice(
-    indexOfFirstEvent,
-    indexOfLastEvent
-  );
+const onAddEventClick=()=>{
+  dispatch(toggleEventModal())
+}
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axiosRequest.get(
+          `/events/get-organizer/${userData.id}`
+        );
+        dispatch(initializeEvents(response.data.events));
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        dispatch(toggleEventsIsLoading());
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
 
   return (
     <div className="content-wrapper">
@@ -94,7 +101,8 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
         id="eventsContainer"
       >
         <h4 className="py-3 mb-4">
-          <span className="text-muted fw-light">UserName/</span> Events
+          <span className="text-muted fw-light">{userData.username}/</span>{" "}
+          Events
         </h4>
 
         <div className="app-academy">
@@ -163,10 +171,11 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
             </div>
             <div className="card-body">
               <div className="row gy-4 mb-4">
-                {loading ? (
-                  <p>Loading courses...</p>
+                {isLoading ? (
+                  <p>Loading events...</p>
                 ) : (
-                  currentEvents.map((event) => (
+                  filteredEvents &&
+                  filteredEvents.map((event) => (
                     <div className="col-sm-6 col-lg-4" key={event._id}>
                       <div className="card p-2 h-100 shadow-none border">
                         <div className="rounded-2 text-center mb-0"></div>
@@ -245,23 +254,16 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                           <button
                             id="deleteButton"
                             className="app-academy-md-50 btn btn-label-secondary me-md-0 d-flex align-items-center"
-                            onClick={() => deleteEvent(event._id)}
+                            onClick={() => handleDeleteEvent(event.id)}
                           >
                             <i className="bx bxs-trash me-2"></i>Delete
                           </button>
                           <button
                             id="editButton"
                             className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
-                            onClick={() =>
-                              handleEditClick({
-                                id: event._id,
-                                name: event.name,
-                                description: event.description,
-                                location: event.location,
-                                startDate: event.startDate,
-                                endDate: event.endDate,
-                              })
-                            }
+                            onClick={()=>{
+                              handleEditClick(event)
+                            }}
                           >
                             Edit
                             <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>

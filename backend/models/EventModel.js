@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const EventSchema = mongoose.Schema(
   {
+    id:{
+      type:Number,
+      required:true,
+    },
     name: {
       type: String,
       required: true,
@@ -26,6 +30,10 @@ const EventSchema = mongoose.Schema(
       type: Number,
       required: false,
     },
+    organizerId:{
+      type: Number,
+      required: true,
+    }
   },
   { timestamps: true }
 );
