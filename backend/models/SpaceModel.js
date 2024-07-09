@@ -3,7 +3,7 @@ const Schema= mongoose.Schema;
 const SpaceSchema= new Schema (
     {
     orgId: {
-        type: Number,
+        type: String,
         required: true,
     },
 
@@ -15,10 +15,7 @@ const SpaceSchema= new Schema (
         type:String,
         required: true,
     },
-    attitudes :{
-        type:String,
-        required: true,
-    },
+   
 },
     { timestamps: true }
 

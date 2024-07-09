@@ -1,24 +1,23 @@
 const express =require ('express');
 const mongoose =require('mongoose');
 const Space= require('../models/SpaceModel');
-const Counter = require("../models/CounterModel");
-
-// const Event= require('../models/EventModel');
+// const Counter = require("../models/CounterModel");
+const Organizer = require('../models/OrganizerModel');
 
 // Create a new Space
 const createSpace = async (req, res) => {
     const {orgId} = req.params;
-    const { capacity, name, attitudes } = req.body;
+    const { capacity, name } = req.body;
 
     try {
         // Ensure the orgId is valid if necessary
-         const Organizer = await user.findById(orgId);
-         if (!Organizer) {
+         const organizer = await Organizer.findById(orgId);
+         if (!organizer) {
             //  throw new Error('Organizer not found');
              res.status(400).json({message:"Organizer not found"});
          }
 
-        const newSpace = new Space({ orgId, capacity, name, attitudes });
+        const newSpace = new Space({ orgId, capacity, name });
         await newSpace.save();
         res.status(201).json(newSpace);
     } catch (error) {
@@ -27,22 +26,8 @@ const createSpace = async (req, res) => {
     }
 };;
  
-// // get space By Id
-// const getSpaceById = async (req,res) =>{
-//     const {spaceId} = req.params;
-//     try{
-//         const space = await Space.findById(spaceId);
-//         if (!space) {
-//             return res.status(404).json({ error: 'Space not found' });
-//         }
-//         res.status(200).json(space)
-//     }catch(error){
-//         console.error('Error in getSpaceById controller:', error.message);
-//         res.status(500).json({ error: 'Internal server error' });
-//     }
-// }
 
-// get space By Id
+// get space By Organizer Id
 const getSpaceByOrgId = async (req,res) =>{
     const {orgId} = req.params;
     try{
@@ -59,11 +44,11 @@ const getSpaceByOrgId = async (req,res) =>{
 // Update a Space by ID
 const updateSpaceById = async (req, res) => {
     const { spaceId } = req.params;
-    const { capacity, name, attitudes } = req.body;
+    const { capacity, name } = req.body;
     try {
         const updatedSpace = await Space.findByIdAndUpdate(
             spaceId,
-            { capacity, name, attitudes },
+            { capacity, name },
             { new: true }
         );
         if (!updatedSpace) {
@@ -91,26 +76,31 @@ const deleteSpaceById = async (req, res) => {
     }
 };
 
+// Filter spaces by organizer ID
+const filterByOrgId = async (req, res) => {
+    const { orgId } = req.params;
+    const filter = req.query; // Additional filters can be passed as query parameters
 
-// // Get Form By Event 
-// const getFormsByEventId = async (req,res) => {
-//     const {eventId} = req.params;
-//     try{
-//         const forms = await Form.find({ eventId });
-//         res.json(forms);
-//     }catch(error){
-//         console.error('Error in getFormsByEventId controller:', error.message);
-//         res.status(500).json({ error: 'Internal server error' });    }
-// }
+    try {
+        const spaces = await Space.find({ orgId, ...filter });
+        if (!spaces.length) {
+            return res.status(404).json({ error: 'No spaces found matching the criteria' });
+        }
+        res.status(200).json(spaces);
+    } catch (error) {
+        console.error('Error in filterByOrgId controller:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
 
 module.exports={
     createSpace,
-    // getSpaceById,
     getSpaceByOrgId,
     updateSpaceById,
     deleteSpaceById,
+    filterByOrgId
 }
 
 

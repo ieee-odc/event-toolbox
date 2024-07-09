@@ -2,19 +2,19 @@ const express = require('express');
 const router = express.Router();
 const SpaceController = require('../controllers/spaceController');
 
-//create Space 
-router.post('/create', SpaceController.createSpace);
+// Route to create a new space for an organizer
+router.post('/create/:orgId', SpaceController.createSpace);
 
-//get Post by Id
-// router.get("/:spaceId",SpaceController.getSpaceById);
-
-//get space By Organizer Id
-router.get("/:orgId",SpaceController.getSpaceByOrgId);
+// Route to get spaces by organizer ID
+router.get('/:orgId', SpaceController.getSpaceByOrgId);
 
 // Route to update a space by ID
-router.put('update/:spaceId', SpaceController.updateSpaceById);
+router.put('/update/:spaceId', SpaceController.updateSpaceById);
 
 // Route to delete a space by ID
-router.delete('delete/:spaceId', SpaceController.deleteSpaceById);
+router.delete('/delete/:spaceId', SpaceController.deleteSpaceById);
+
+// Route to filter By Organizer Id
+router.get('/filter/:orgId',SpaceController.filterByOrgId);
 
 module.exports = router;
