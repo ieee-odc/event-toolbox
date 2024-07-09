@@ -60,83 +60,6 @@ const SignIn = async (req, res) => {
   }
 };
 
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ msg: 'Email is required' });
-  }
-
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: 'User not found' });
-    }
-
-    const resetToken = jwt.sign({ id: user._id.toString() }, 'secret', { expiresIn: '15m' });
-    const resetURL =`${ process.env.FRONTEND_URL}/resetpassword?token=${resetToken}`;
-    const transporter = nodemailer.createTransport({
-      service: 'Gmail',
-      auth: {
-        user: process.env.GOOGLE_NODEMAILER,
-        pass: process.env.GOOGLE_NODEMAILER_key,
-      },
-    });
-    const mailOptions = {
-      from: process.env.GOOGLE_NODEMAILER,
-      to: email,
-      subject: 'Password Reset',
-      text: `You requested a password reset. Use the following token to reset your password: ${resetToken}`,
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p>
-                <a href="${resetURL}">${resetURL}</a>`,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error('Error sending email:', error.message);
-        return res.status(500).json({ msg: 'Error sending email' });
-      }
-      console.log('Email sent:', info.response);
-      res.json({ msg: 'Password reset token generated and email sent', resetToken });
-    });
-  } catch (err) {
-    console.error('Server error:', err.message);
-    res.status(500).send('Server error');
-  }
-};
-
-
-const resetPassword = async (req, res) => {
-  const { token } = req.query;
-  const { newPassword } = req.body;
-
-  try {
-    const decoded = jwt.verify(token, 'secret');
-    if (!decoded || !decoded.id) {
-      return res.status(400).json({ msg: 'Invalid or expired token' });
-    }
-
-    // Convert the ID from the token to a MongoDB ObjectId using the `new` keyword
-    const userId = new mongoose.Types.ObjectId(decoded.id);
-
-    let user = await User.findById(userId);
-    if (!user) {
-      return res.status(400).json({ msg: 'User not found' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-    await user.save();
-
-    res.json({ msg: 'Password reset successfully' });
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(400).json({ msg: 'Token has expired. Please request a new password reset.' });
-    }
-    console.error('Server error:', err.message);
-    res.status(500).send('Server error');
-  }
-};
 
 const signupWithGoogle = async (req, res) => {
   const { tokenId } = req.body;
@@ -225,8 +148,6 @@ const loginWithGoogle = async (req, res) => {
 module.exports = {
     SignIn,
     Register,
-    forgotPassword,
-    resetPassword,
     signupWithGoogle,
     loginWithGoogle
   };
