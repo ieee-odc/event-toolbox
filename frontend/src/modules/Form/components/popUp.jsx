@@ -1,5 +1,9 @@
-import React from "react";
-import "../components/Event.css";
+import React, { useState, useEffect } from "react";
+import "../Form.css";
+import toast from "react-hot-toast";
+import Flatpickr from "react-flatpickr";
+import axios from "axios"; // Import axios for HTTP requests
+import "./DatePicker.css";
 
 function EventModal({
   isOpen,
@@ -9,13 +13,65 @@ function EventModal({
   handleInputChange,
   isEditMode,
   addField,
-  removeField
+  removeField,
+  eventId, // assuming eventId is passed from parent component
 }) {
+  const [selectedDateTime, setSelectedDateTime] = useState(new Date());
+  const [eventDates, setEventDates] = useState({
+    startDate: null,
+    endDate: null,
+  });
+
+  useEffect(() => {
+    if (eventId) {
+      fetchEventDates(eventId); // Fetch dates only if eventId is available
+    }
+  }, [eventId]);
+
+  const fetchEventDates = async (eventId) => {
+    try {
+      const response = await axios.get(`/events/${eventId}`);
+      if (response.data && response.data.startDate && response.data.endDate) {
+        setEventDates({
+          startDate: new Date(response.data.startDate),
+          endDate: new Date(response.data.endDate),
+        });
+        console.log(startDate), console.log(endDate);
+      } else {
+        throw new Error("Invalid response data");
+      }
+    } catch (error) {
+      console.error("Error fetching event data:", error);
+      toast.error("Failed to fetch event dates");
+    }
+  };
+
   const modalClassName = isOpen ? "modal fade show" : "modal fade";
+
+  const validateFields = () => {
+    const { name, description, data } = newEvent;
+    if (!name || !description || !data) {
+      toast.error("Please fill in all fields.");
+      return false;
+    }
+    return true;
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    handleSubmit();
+    if (validateFields()) {
+      handleSubmit();
+    }
+  };
+
+  const handleDateTimeChange = (dates) => {
+    setSelectedDateTime(dates[0]);
+    handleInputChange({
+      target: {
+        id: "deadline",
+        value: dates[0].toISOString(), // Set ISO string format for the date value
+      },
+    });
   };
 
   return (
@@ -25,8 +81,7 @@ function EventModal({
         className={modalClassName}
         id="basicModal"
         tabIndex="-1"
-      
-        style={{ display: isOpen ? "block" : "none",zIndex:99999 }}
+        style={{ display: isOpen ? "block" : "none", zIndex: 99999 }}
         aria-modal="true"
         role="dialog"
       >
@@ -45,38 +100,48 @@ function EventModal({
             </div>
             <form onSubmit={onSubmit}>
               <div className="modal-body">
-                {!isEditMode && (
-                  <div className="mb-3">
-                    
-                    
-                  </div>
-                )}
+                {!isEditMode && <div className="mb-3"></div>}
+                <div className="mb-3">
+                  <label htmlFor="description" className="form-label">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    className="form-control"
+                    placeholder="Enter Form Name"
+                    value={newEvent.name || ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
                 <div className="mb-3">
                   <label htmlFor="description" className="form-label">
                     Description
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     id="description"
                     className="form-control"
-                    placeholder="Enter Event Descrition"
-                    value={newEvent.description || ''}
+                    placeholder="Enter Form Description"
+                    value={newEvent.description || ""}
                     onChange={handleInputChange}
-                  />
+                  ></textarea>
                 </div>
+
                 <div className="mb-3">
-                  <label htmlFor="price" className="form-label">
-                    Price
-                  </label>
-                  <input
-                    type="text"
-                    id="price"
+                  <label className="form-label">Deadline</label>
+                  <Flatpickr
+                    value={selectedDateTime}
+                    onChange={handleDateTimeChange}
+                    options={{
+                      enableTime: true,
+                      dateFormat: "Y-m-d H:i",
+                      minDate: eventDates.startDate, // Set minDate dynamically
+                      maxDate: eventDates.endDate, // Set maxDate dynamically
+                    }}
                     className="form-control"
-                    placeholder="Enter Price"
-                    value={newEvent.price || ''}
-                    onChange={handleInputChange}
                   />
                 </div>
+
                 {/* Dynamically generate input fields based on newEvent.data */}
                 {Object.keys(newEvent.data || {}).map((key) => (
                   <div className="mb-3" key={key}>
@@ -89,7 +154,7 @@ function EventModal({
                         id={`data.${key}`}
                         className="form-control"
                         placeholder={`Enter ${key}`}
-                        value={newEvent.data[key] || ''}
+                        value={newEvent.data[key] || ""}
                         onChange={handleInputChange}
                       />
                       <button

@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import './App.css'
-import Participants from './modules/Participants/pages/Participants';
-import { Route, Routes } from 'react-router-dom';
-import PrivateRoute from './utils/PrivateRoute';
-
-import { Toaster } from 'react-hot-toast';
-import Table from './core/components/Table/Table';
-import FormLandingPage from './modules/Form/pages/FormLandingPage';
-
+import { useState } from "react";
+import "./App.css";
+import Participants from "./modules/Participants/pages/Participants";
+import { Route, Routes } from "react-router-dom";
+import PrivateRoute from "./utils/PrivateRoute";
+import DatePicker from "./modules/Form/components/test";
+import { Toaster } from "react-hot-toast";
+import Table from "./core/components/Table/Table";
+import FormLandingPage from "./modules/Form/pages/FormLandingPage";
 
 function App() {
-
   return (
     <div className="App">
-      <Toaster/>
-   {/* for private routes use Private Route like this
+      <Toaster />
+      {/* for private routes use Private Route like this
    <Route path= "/participants" element ={<PrivateRoute allowedRoles={['organizer']}>
 <Participants />
 </PrivateRoute>}  />  */}
-<Routes >
-  {/* <Route path= "/login" element ={<Login/>}  />
+      <Routes>
+        {/* <Route path= "/login" element ={<Login/>}  />
   <Route path= "/signup" element ={<Signup/>}  />
   <Route path= "/" element ={<Homepage/>}  /> */}
-  <Route path= "/participants" element ={
-<Participants />}  />
-<Route path="/formlandingpage/:eventId" element={<FormLandingPage />} />
-<Route path="/table" element={<Table/>} />
-</Routes>
-    
+        <Route path="/participants" element={<Participants />} />
+        <Route path="/forms/:eventId" element={<FormLandingPage />} />
+        <Route path="/table" element={<Table />} />
+        <Route path="/test" element={<DatePicker />} />
+      </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
