@@ -27,19 +27,31 @@ const createEvent = async (req, res) => {
 };
 
 const updateEvent = async (req, res) => {
-  const { eventId } = req.params;
+  try{
+    const { eventId } = req.params;
 
   const updatedEvent = await Event.findOneAndUpdate(
     { id:eventId },
     {
       ...req.body,
-    }
+    },
+    { new: true }
+
   );
   if (!updatedEvent) {
     return res.status(404).json({ message: "Event not found" });
   }
 
-  res.status(200).json(updatedEvent);
+  res.status(200).json({
+    message:"Event successfully updated",
+    event:updatedEvent
+  });
+  }catch(e){
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
 };
 const deleteEvent = async (req, res) => {
   try {

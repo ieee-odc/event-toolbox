@@ -12,9 +12,9 @@ const {
 router.get("/", getEvents);
 router.post("/add", createEvent);
 router.get("/:eventId", getEvent);
-router.get("/get-event/:organizerId", getOrganizerEvents);
+router.get("/get-organizer/:organizerId", getOrganizerEvents);
 
 router.delete("/delete/:eventId", deleteEvent);
-router.put("/edit/:eventId", updateEvent);
+router.post("/edit/:eventId", updateEvent);
 
 module.exports = router;

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../../core/components/Button/Button";
 import GoogleLoginButton from "../../../core/components/GoogleAuthButton/GoogleLoginButton";
 import "./Login.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { useNavigate } from "react-router-dom";
+import { UserData } from "../../../utils/UserData";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -54,12 +55,13 @@ function Login() {
     try {
       const tokenId = response.user.accessToken;
       const res = await axiosRequest.post("/auth/loginwithgoogle", { tokenId });
-      if (rememberMe) {
-        localStorage.setItem("token", res.data.token);
-      } else {
-        sessionStorage.setItem("token", res.data.token);
-      }
-      navigate("/success");
+      localStorage.setItem("token", res.data.token);
+      // if (rememberMe) {
+      //   localStorage.setItem("token", res.data.token);
+      // } else {
+      //   sessionStorage.setItem("token", res.data.token);
+      // }
+      navigate("/events");
     } catch (err) {
       console.error(
         "Login error:",
@@ -82,9 +84,18 @@ function Login() {
   const toggleObscureText = () => {
     setObscureText((prev) => !prev);
   };
+  const userData = UserData();
+  useEffect(() => {
+    if (userData) {
+      navigate("/events");
+    }
+  });
 
   return (
-    <div className="container-xxl"  style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+    <div
+      className="container-xxl"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <div className="authentication-wrapper authentication-basic container-p-y">
         <div className="authentication-inner">
           <div className="card">
@@ -106,7 +117,11 @@ function Login() {
               <form
                 id="formAuthentication"
                 onSubmit={onSubmit}
-                style={{display:"flex",flexDirection:"column",alignItems:"center"}}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
               >
                 <div className="mb-3 form-email-toggle w-100">
                   <label htmlFor="email" className="col-auto col-form-label">
@@ -187,9 +202,11 @@ function Login() {
                     onClick={onSubmit}
                   />
                 </div>
-                
               </form>
-              <div className="google-login-container" style={{display:"flex",justifyContent:"center"}}>
+              <div
+                className="google-login-container"
+                style={{ display: "flex", justifyContent: "center" }}
+              >
                 <GoogleLoginButton
                   className="google-login-button"
                   buttonText="Sign in with Google"
