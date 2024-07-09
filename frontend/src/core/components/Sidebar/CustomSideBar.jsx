@@ -26,7 +26,7 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
         {
           name: "Forms",
           icon: "bx bx-file",
-          route: "/forms",
+          route: "/formlandingpage/:id",
           isActive: activeTab === "/forms",
         },
       ],

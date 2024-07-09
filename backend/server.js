@@ -31,6 +31,9 @@ app.use("/participant", ParticipantRouter)
 const FormRouter = require("./routes/FormRoutes")
 app.use("/form", FormRouter)
 
+const SpaceRouter = require("./routes/SpaceRoutes")
+app.use("/space", SpaceRouter)
+
 const server = app.listen(process.env.PORT, () => {
   console.log(`server started on port ${process.env.PORT}`);
 })

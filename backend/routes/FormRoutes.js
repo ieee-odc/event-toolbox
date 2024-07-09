@@ -28,6 +28,7 @@ router.get('/:eventId', formController.getFormsByEventId);
 });*/
 // Update a form by ID
 router.put('/update/:formId', formController.updateFormById);
+
 // Delete a form by ID
 router.delete('/delete/:formId', formController.deleteFormById);
 
