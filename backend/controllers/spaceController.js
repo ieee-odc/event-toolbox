@@ -93,8 +93,6 @@ const filterByOrgId = async (req, res) => {
     }
 };
 
-
-
 module.exports={
     createSpace,
     getSpaceByOrgId,

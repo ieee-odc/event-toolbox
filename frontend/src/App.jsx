@@ -7,6 +7,7 @@ import PrivateRoute from './utils/PrivateRoute';
 import { Toaster } from 'react-hot-toast';
 import Table from './core/components/Table/Table';
 import FormLandingPage from './modules/Form/pages/FormLandingPage';
+import Space from './modules/Space/page/space'
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
 <Participants />}  />
 <Route path="/formlandingpage/:eventId" element={<FormLandingPage />} />
 <Route path="/table" element={<Table/>} />
+<Route path="/space" element={<Space/>} />
 </Routes>
     
     </div>
