@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_container
+    environment:
+      - MONGO_URI=mongodb+srv://admin:xEvRqDb4uiWtASj0@event-box-cluster.i7qgzec.mongodb.net/?retryWrites=true&w=majority&appName=event-box-cluster
+    ports:
+      - '6001:6001'
+    volumes:
+      - /app/backend
+      - /app/backend/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_container
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+    volumes:
+      - /app/frontend
+      - /frontend/node_modules
+
