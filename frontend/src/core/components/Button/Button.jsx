@@ -1,17 +1,23 @@
-import React from 'react'
+import React from "react";
 
-function Button({variant,color,style}) {
-
-    const getVariant=()=>{
-        if(!variant){
-            return ""
-        }
-        return `-${variant}`
+function Button({ variant, color, style, label, onClick }) {
+  const getVariant = () => {
+    if (!variant) {
+      return "";
     }
+    return `-${variant}`;
+  };
 
   return (
-    <button type="button" class={`btn btn${getVariant()}-${color}`} style={style}>Primary</button>
-  )
+    <button
+      type="button"
+      className={`btn btn${getVariant()}-${color}`}
+      onClick={onClick}
+      style={style}
+    >
+      {label}
+    </button>
+  );
 }
 
-export default Button
+export default Button;
