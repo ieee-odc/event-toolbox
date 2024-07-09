@@ -69,6 +69,9 @@ app.get("/*", function (req, res) {
   );
 });
 
+const SpaceRouter = require("./routes/SpaceRoutes")
+app.use("/space", SpaceRouter)
+
 const server = app.listen(process.env.PORT, () => {
   console.log(`server started on port ${process.env.PORT}`);
 });
