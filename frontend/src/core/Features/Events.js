@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserData } from "../../utils/UserData";
 
 const EventsSlice = createSlice({
   name: "Events",
@@ -11,7 +10,7 @@ const EventsSlice = createSlice({
     isModalOpen: false,
     filterStatus: "",
     selectedEvent: {
-      organizerId: UserData().id, // Initially empty, can be set when user data is available
+    organizerId:"",
       name: "",
       description: "",
       location: "",
@@ -40,8 +39,6 @@ const EventsSlice = createSlice({
       const updatedEvents = state.events.map((event) =>
         event.id === action.payload.id ? action.payload : event
       );
-      console.log("new events")
-      console.log(updatedEvents)
       state.events = updatedEvents;
       state.filteredEvents = updatedEvents;
     },
@@ -77,9 +74,9 @@ const EventsSlice = createSlice({
         state.selectedEvent.endDate = "";
       }
     },
-    resetEventModal:(state,action)=>{
+    resetEventModal:(state)=>{
         state.selectedEvent={
-          organizerId: UserData().id,
+          organizerId: "",
           name: "",
           description: "",
           location: "",
