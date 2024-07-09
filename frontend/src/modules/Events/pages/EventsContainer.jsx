@@ -3,6 +3,7 @@ import EventsList from "../components/EventsList";
 import AddEventModal from "../components/AddEventModal";
 import EditEventModal from "../components/EditEventModal";
 import axiosRequest from "../../../utils/AxiosConfig";
+
 function EventsContainer() {
   const [openSideBar, setOpenSideBar] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,13 +21,25 @@ function EventsContainer() {
       setSelectedEvent(null);
     }
     setIsModalOpen(!isModalOpen);
+    if (!isModalOpen) {
+      setNewEvent({
+        name: "",
+        description: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+      });
+    }
   };
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setNewEvent({
-      ...newEvent,
-      [id]: value,
+    setNewEvent((prevData) => {
+      const newData = { ...prevData, [id]: value };
+      if (id === "startDate") {
+        newData.endDate = "";
+      }
+      return newData;
     });
   };
 
@@ -55,6 +68,7 @@ function EventsContainer() {
     setSelectedEvent(event);
     toggleModal();
   };
+
   return (
     <>
       <EventsList

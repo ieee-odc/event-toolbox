@@ -34,8 +34,6 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
           }/${startDate.getFullYear()}`
         : "";
       setDate(startDate);
-
-
     } catch (e) {
       console.log(e);
     }
@@ -244,16 +242,16 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   <label htmlFor="nameWithTitle" className="form-label">
                     Description
                   </label>
-                  <div class="input-group input-group-merge form-send-message">
+                  <div className="input-group input-group-merge form-send-message">
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      class="form-control message-input"
+                      className="form-control message-input"
                       placeholder="Enter Description"
                       rows="2"
                     ></textarea>
-                    <span class="message-actions input-group-text">
-                      <i class="bx bx-bot cursor-pointer speech-to-text"></i>
+                    <span className="message-actions input-group-text">
+                      <i className="bx bx-bot cursor-pointer speech-to-text"></i>
                     </span>
                   </div>
                 </div>

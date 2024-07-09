@@ -9,7 +9,7 @@ function DashboardLayout({ children, activeTab, isModalOpen }) {
     setOpenSideBar((prev) => !prev);
   };
   return (
-    <div class="layout-container">
+    <div className="layout-container">
       <CustomSideBar
         openSideBar={openSideBar}
         toggleSideBar={toggleSideBar}
@@ -68,14 +68,14 @@ function DashboardLayout({ children, activeTab, isModalOpen }) {
         {/* Content wrapper */}
         {openSideBar && (
           <div
-            class="layout-overlay layout-menu-toggle"
+            className="layout-overlay layout-menu-toggle"
             style={{ display: "block" }}
           ></div>
         )}
 
         {isModalOpen && (
           <div
-            class="content-backdrop fade"
+            className="content-backdrop fade"
             style={{ zIndex: "999", opacity: "0.3" }}
           >
             azdazd

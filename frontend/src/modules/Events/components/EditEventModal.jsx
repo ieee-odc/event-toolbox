@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
+import toast from "react-hot-toast";
 
 function EditEventModal({
   isOpen,
@@ -52,9 +53,21 @@ function EditEventModal({
 
   const modalClassName = isOpen ? "modal fade show" : "modal fade";
 
+  const validateFields = () => {
+    const { name, description, location, startDate, endDate } = eventData;
+    if (!name || !description || !location || !startDate || !endDate) {
+      toast.error("Please fill in all fields.");
+      return false;
+    }
+    return true;
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     if (changesMade) {
+      if (!validateFields()) {
+        return;
+      }
       try {
         const formattedEventData = {
           ...eventData,
@@ -64,14 +77,14 @@ function EditEventModal({
 
         setLoading(true);
         const response = await axiosRequest.put(
-          `/events/edit/${event.id}`, // Assuming 'event' has an 'id' property
+          `/events/edit/${event.id}`,
           formattedEventData
         );
         window.location.reload();
 
         toggleModal();
       } catch (error) {
-        console.error("Error updating event:", error);
+        toast.error("Error updating event.");
       } finally {
         setLoading(false);
       }
@@ -82,10 +95,13 @@ function EditEventModal({
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setEventData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
+    setEventData((prevData) => {
+      const newData = { ...prevData, [id]: value };
+      if (id === "startDate") {
+        newData.endDate = "";
+      }
+      return newData;
+    });
     handleInputChange(e);
   };
 
@@ -179,6 +195,7 @@ function EditEventModal({
                           className="form-control"
                           value={eventData.endDate}
                           onChange={handleChange}
+                          min={eventData.startDate}
                         />
                       </div>
                     </div>

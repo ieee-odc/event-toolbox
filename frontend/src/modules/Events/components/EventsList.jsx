@@ -170,6 +170,15 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                     <div className="col-sm-6 col-lg-4" key={event._id}>
                       <div className="card p-2 h-100 shadow-none border">
                         <div className="rounded-2 text-center mb-0"></div>
+                        {/* <div className="rounded-2 text-center mb-3">
+                          <a href="">
+                            <img
+                              className="img-fluid"
+                              src={tutorImage}
+                              alt="tutor image 1"
+                            />
+                          </a>
+                        </div> */}
                         <div className="card-body p-3 pt-3" id="eventCardBody">
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span
@@ -182,17 +191,13 @@ function EventsList({ onAddEventClick, onEditEventClick }) {
                                 getEventStatus(event.startDate, event.endDate)
                                   .status
                               }
-                            </span>{" "}
-                            <h6 className="d-flex align-items-center justify-content-center gap-1 mb-0">
+                            </span>
+                            {/* Number of participants  */}
+                            {/* <h6 className="d-flex align-items-center justify-content-center gap-1 mb-0">
                               <span className="text-muted"> (34)</span>
-                            </h6>
+                            </h6> */}
                           </div>
-                          <a
-                            href="app-academy-course-details.html"
-                            className="h5"
-                          >
-                            {event.name}
-                          </a>
+                          <p className="h5">{event.name}</p>
                           <p className="mt-2">{event.description}</p>
                           <div className="d-flex align-items-center mb-1">
                             <p className="d-flex align-items-center text mb-0">

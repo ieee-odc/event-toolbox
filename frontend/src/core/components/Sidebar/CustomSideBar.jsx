@@ -38,11 +38,13 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
       ],
     },
   ]);
-  
+
   useEffect(() => {
     let isAnyChildActive = false;
     const updatedRoutes = routes.map((route) => {
-      const anyChildActive = route.childRoutes.some((childRoute) => childRoute.isActive);
+      const anyChildActive = route.childRoutes.some(
+        (childRoute) => childRoute.isActive
+      );
       if (anyChildActive) {
         isAnyChildActive = true;
         return { ...route, isSubMenuOpen: true };
@@ -200,7 +202,10 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
               }}
             >
               {route.childRoutes.map((childRoute, childIndex) => (
-                <li key={childIndex} className={`menu-item ${childRoute.isActive ? "active" : ""}`}>
+                <li
+                  key={childIndex}
+                  className={`menu-item ${childRoute.isActive ? "active" : ""}`}
+                >
                   <a
                     href={childRoute.route}
                     className={`menu-link ${

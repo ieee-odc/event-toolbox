@@ -1,5 +1,6 @@
 import React from "react";
 import "../Events.css";
+import toast from "react-hot-toast";
 
 function AddEventModal({
   isOpen,
@@ -9,10 +10,19 @@ function AddEventModal({
   handleInputChange,
 }) {
   const modalClassName = isOpen ? "modal fade show" : "modal fade";
-
+  const validateFields = () => {
+    const { name, description, location, startDate, endDate } = newEvent;
+    if (!name || !description || !location || !startDate || !endDate) {
+      toast.error("Please fill in all fields.");
+      return false;
+    }
+    return true;
+  };
   const onSubmit = (e) => {
     e.preventDefault();
-    handleSubmit();
+    if (validateFields()) {
+      handleSubmit();
+    }
   };
 
   return (
