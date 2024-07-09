@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CustomSideBar.css";
 function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
@@ -29,9 +29,33 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
           route: "/forms",
           isActive: activeTab === "/forms",
         },
+        {
+          name: "Workshops",
+          icon: "bx bx-hard-hat",
+          route: "/workshops",
+          isActive: activeTab === "/workshops",
+        },
       ],
     },
   ]);
+
+  useEffect(() => {
+    let isAnyChildActive = false;
+    const updatedRoutes = routes.map((route) => {
+      const anyChildActive = route.childRoutes.some(
+        (childRoute) => childRoute.isActive
+      );
+      if (anyChildActive) {
+        isAnyChildActive = true;
+        return { ...route, isSubMenuOpen: true };
+      } else {
+        return { ...route, isSubMenuOpen: false };
+      }
+    });
+    if (isAnyChildActive) {
+      setRoutes(updatedRoutes);
+    }
+  }, [activeTab]);
 
   const toggleSubMenu = (index) => {
     const updatedRoutes = [...routes];
@@ -178,7 +202,10 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
               }}
             >
               {route.childRoutes.map((childRoute, childIndex) => (
-                <li key={childIndex} className="menu-item">
+                <li
+                  key={childIndex}
+                  className={`menu-item ${childRoute.isActive ? "active" : ""}`}
+                >
                   <a
                     href={childRoute.route}
                     className={`menu-link ${

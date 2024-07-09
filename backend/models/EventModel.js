@@ -2,7 +2,15 @@ const mongoose = require("mongoose");
 
 const EventSchema = mongoose.Schema(
   {
-    Name: {
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
+    },
+    location: {
       type: String,
       required: true,
     },
@@ -12,10 +20,6 @@ const EventSchema = mongoose.Schema(
     },
     endDate: {
       type: Date,
-      required: true,
-    },
-    Description: {
-      type: String,
       required: true,
     },
     currentParticipants: {

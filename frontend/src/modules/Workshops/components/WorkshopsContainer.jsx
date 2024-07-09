@@ -1,12 +1,13 @@
-import React from 'react'
-import ParticipantsCard from '../components/ParticipantsCard'
+import React, { useState } from 'react'
+import WorkshopsCard from './WorkshopsCard'
 
-function ParticipantsContainer({isModalOpen,setIsModalOpen}) {
+function WorkshopsContainer() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
           <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">Workshops /</span>{" "}
-            Participants
+            <span className="text-muted fw-light">Events /</span>{" "}
+            Workshops
           </h4>
           {/* Invoice List Widget */}
           <div className="card mb-4">
@@ -72,7 +73,7 @@ function ParticipantsContainer({isModalOpen,setIsModalOpen}) {
             </div>
           </div>
           {/* Invoice List Table */}
-          <ParticipantsCard
+          <WorkshopsCard
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
           />
@@ -80,4 +81,4 @@ function ParticipantsContainer({isModalOpen,setIsModalOpen}) {
   )
 }
 
-export default ParticipantsContainer
+export default WorkshopsContainer
