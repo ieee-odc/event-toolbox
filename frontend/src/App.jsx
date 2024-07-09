@@ -7,7 +7,6 @@ import SignUp from "./modules/Signup/pages/SignUp";
 import PrivateRoute from "./utils/PrivateRoute";
 import Participants from "./modules/Participants/pages/Participants";
 import ForgetPassword from "./modules/ForgetPass/pages/ForgetPassword";
-import Success from "./modules/TestAuth/pages/Success";
 import ResetPassword from "./modules/ForgetPass/pages/ResetPassword";
 import EventsPage from "./modules/Events/pages/EventsPage";
 import { Toaster } from "react-hot-toast";
@@ -23,11 +22,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
-        <Route path="/success" element={<Success />} />
-
-        <Route path="/participants" element={<Participants />} />
-        <Route path="/workshops" element={<Workshops />} />
-        <Route path="/events" element={<EventsPage />} />
+        <Route path="/participants" element={<PrivateRoute><Participants /></PrivateRoute>} />
+        <Route path="/workshops" element={<PrivateRoute><Workshops /></PrivateRoute>} />
+        <Route path="/events" element={<PrivateRoute><EventsPage /></PrivateRoute>} />
       </Routes>
     </div>
   );
