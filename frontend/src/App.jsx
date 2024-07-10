@@ -30,7 +30,6 @@ function App() {
 
         <Route path="/participants" element={<Participants />} />
         <Route path="/workshops" element={<Workshops />} />
-        <Route path="/events" element={<EventsPage />} />
         <Route path="/participants" element={<PrivateRoute><Participants /></PrivateRoute>} />
         <Route path="/workshops" element={<PrivateRoute><Workshops /></PrivateRoute>} />
         <Route path="/events" element={<PrivateRoute><EventsPage /></PrivateRoute>} />
