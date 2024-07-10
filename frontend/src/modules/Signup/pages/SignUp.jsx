@@ -64,7 +64,7 @@ function SignUp() {
   };
 
   return (
-    <div className="container-xxl">
+    <div className="container-xxl" style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
       <div className="authentication-wrapper authentication-basic container-p-y">
         <div className="authentication-inner">
           <div className="card">
