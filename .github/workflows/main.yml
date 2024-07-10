@@ -35,6 +35,6 @@ jobs:
         run: |
           docker ps -a
 
-      - name: Tear down
-        if: always()
-        run: docker-compose -f compose.yml down
+#      - name: Tear down
+#        if: always()
+#        run: docker-compose -f compose.yml down
