@@ -28,6 +28,14 @@ jobs:
           docker-compose -f compose.yml up -d
           docker-compose -f compose.yml ps
 
+      - name: npm run dev
+        run: nmp run dev
+
+      - name: upload artifacts
+        uses: action/upload-artifact@v3
+        with:
+          name: MernStack
+
       - name: Wait for services to start
         run: sleep 30
 
