@@ -31,8 +31,8 @@ const Register = async (req, res) => {
     newUser.password = await bcrypt.hash(password, salt);
 
     await newUser.save();
-    const payload = { id: newUser.id };
-    const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+    const payload = { id: newUser.id,username:newUser.username };
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     res.status(201).json({ token });
   } catch (err) {
@@ -50,8 +50,8 @@ const SignIn = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    const payload = { id: user.id };
-    const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+    const payload = { id: user.id,username:user.username };
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
     const { password: _, ...userData } = user.toObject();
 
     res.status(200).json({ token, user: userData });
@@ -59,6 +59,7 @@ const SignIn = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
+
 
 
 const signupWithGoogle = async (req, res) => {
@@ -81,8 +82,8 @@ const signupWithGoogle = async (req, res) => {
     let user = await User.findOne({ email });
     if (user) {
       // User already exists, log them in
-      const payload = { id: user.id };
-      const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+      const payload = { id: user.id,username:user.username };
+      const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
       return res.status(200).json({ token, user });
     }
@@ -107,8 +108,8 @@ const signupWithGoogle = async (req, res) => {
     });
     await user.save();
 
-    const payload = { id: user.id };
-    const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+    const payload = { id: user.id,username:user.username };
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     res.status(201).json({ token, user });
   } catch (err) {
@@ -131,8 +132,8 @@ const loginWithGoogle = async (req, res) => {
       return res.status(404).json({ msg: 'User does not exist' });
     }
 
-    const payload = { id: user.id };
-    const token = jwt.sign(payload, 'secret', { expiresIn: 3600 });
+    const payload = { id: user.id,username:user.username };
+    const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     res.status(200).json({ token, user });
   } catch (err) {
