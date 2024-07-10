@@ -11,6 +11,7 @@ import ResetPassword from "./modules/ForgetPass/pages/ResetPassword";
 import EventsPage from "./modules/Events/pages/EventsPage";
 import { Toaster } from "react-hot-toast";
 import Workshops from "./modules/Workshops/pages/Workshops";
+import Forms from "./modules/Form/pages/FormsPage";
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
           element={
             <PrivateRoute>
               <Participants />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms"
+          element={
+            <PrivateRoute>
+              <Forms />
             </PrivateRoute>
           }
         />

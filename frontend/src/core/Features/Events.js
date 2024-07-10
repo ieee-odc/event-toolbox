@@ -1,16 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UserData } from "../../utils/UserData";
 
 const EventsSlice = createSlice({
   name: "Events",
   initialState: {
     isLoading: false,
     events: [],
-    isEdit:false,
+    isEdit: false,
     filteredEvents: [],
     isModalOpen: false,
     filterStatus: "",
     selectedEvent: {
-    organizerId:"",
+      organizerId: UserData().id,
       name: "",
       description: "",
       location: "",
@@ -39,6 +40,8 @@ const EventsSlice = createSlice({
       const updatedEvents = state.events.map((event) =>
         event.id === action.payload.id ? action.payload : event
       );
+      console.log("new events");
+      console.log(updatedEvents);
       state.events = updatedEvents;
       state.filteredEvents = updatedEvents;
     },
@@ -55,15 +58,15 @@ const EventsSlice = createSlice({
       state.isLoading = !state.isLoading;
     },
     selectEvent: (state, action) => {
-        state.isEdit=true;
-        const { startDate, endDate, ...otherFields } = action.payload;
-        state.selectedEvent = {
-          ...state.selectedEvent,
-          ...otherFields,
-          startDate: startDate.split("T")[0],
-          endDate: endDate.split("T")[0],
-        };
-      },
+      state.isEdit = true;
+      const { startDate, endDate, ...otherFields } = action.payload;
+      state.selectedEvent = {
+        ...state.selectedEvent,
+        ...otherFields,
+        startDate: startDate.split("T")[0],
+        endDate: endDate.split("T")[0],
+      };
+    },
     setSelectedEvent: (state, action) => {
       state.selectedEvent = action.payload;
     },
@@ -74,19 +77,19 @@ const EventsSlice = createSlice({
         state.selectedEvent.endDate = "";
       }
     },
-    resetEventModal:(state)=>{
-        state.selectedEvent={
-          organizerId: "",
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        };
+    resetEventModal: (state, action) => {
+      state.selectedEvent = {
+        organizerId: UserData().id,
+        name: "",
+        description: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+      };
     },
-    changeFormState:(state,action)=>{
-        state.isEdit=action.payload
-    }
+    changeFormState: (state, action) => {
+      state.isEdit = action.payload;
+    },
   },
 });
 

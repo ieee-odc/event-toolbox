@@ -56,7 +56,7 @@ const WorkshopRouter = require("./routes/WorkshopRoutes");
 app.use("/workshop", WorkshopRouter);
 
 const FormRouter = require("./routes/FormRoutes");
-app.use("/form", FormRouter);
+app.use("/forms", FormRouter);
 app.get("/*", function (req, res) {
   res.sendFile(
     path.join(__dirname, "../frontend/dist/index.html"),
@@ -69,8 +69,8 @@ app.get("/*", function (req, res) {
   );
 });
 
-const SpaceRouter = require("./routes/SpaceRoutes")
-app.use("/space", SpaceRouter)
+const SpaceRouter = require("./routes/SpaceRoutes");
+app.use("/space", SpaceRouter);
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`server started on port ${process.env.PORT}`);

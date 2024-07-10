@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "./../../../utils/UserData";
@@ -32,11 +31,11 @@ function EventsList() {
     }
   };
 
-  const handleEditClick=(event)=>{
-    dispatch(selectEvent(event))
-    console.log(event)
-    dispatch(toggleEventModal())
-  }
+  const handleEditClick = (event) => {
+    dispatch(selectEvent(event));
+    console.log(event);
+    dispatch(toggleEventModal());
+  };
 
   const calculateDurationInDays = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -70,11 +69,9 @@ function EventsList() {
     dispatch(filterEvents(e.target.value));
   };
 
-
-const onAddEventClick=()=>{
-  dispatch(toggleEventModal())
-}
-
+  const onAddEventClick = () => {
+    dispatch(toggleEventModal());
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -92,7 +89,6 @@ const onAddEventClick=()=>{
 
     fetchEvents();
   }, []);
-
 
   return (
     <div className="content-wrapper">
@@ -261,8 +257,8 @@ const onAddEventClick=()=>{
                           <button
                             id="editButton"
                             className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
-                            onClick={()=>{
-                              handleEditClick(event)
+                            onClick={() => {
+                              handleEditClick(event);
                             }}
                           >
                             Edit

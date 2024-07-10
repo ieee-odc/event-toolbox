@@ -1,57 +1,88 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { UserData } from "./../../../utils/UserData";
 import EventModal from "../components/popUp";
 import axiosRequest from "../../../utils/AxiosConfig";
-import DashboardLayout from "../../../core/components/DashboardLayout/DashboardLayout";
+import { useDispatch, useSelector } from "react-redux";
+
 import "../Form.css";
+import {
+  initializeForms,
+  addForm,
+  deleteForm,
+  editForm,
+  toggleFormModal,
+  selectForm,
+} from "../../../core/Features/Forms";
 const FormLandingPage = () => {
-  const { eventId } = useParams();
-  const [forms, setForms] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [currentForm, setCurrentForm] = useState({
-    eventId: eventId,
-    name: "",
-    description: "",
-    // price: '',
-    data: {},
-  });
+  const dispatch = useDispatch();
+  const { forms, isFormModalOpen } = useSelector((store) => store.formsStore);
 
-  useEffect(() => {
-    fetchFormsByEventId();
-  }, [eventId]);
-
-  const fetchFormsByEventId = async () => {
-    try {
-      const response = await axiosRequest.get(`/form/${eventId}`);
-      setForms(response.data);
-    } catch (error) {
-      console.error("Error fetching forms:", error);
+  const validateFields = () => {
+    const { name, description, deadline } = selectedForm;
+    if (!name || !description || !deadline) {
+      {
+        /* ADD EVENTID LATER */
+      }
+      toast.error("Please fill in all fields.");
+      return false;
     }
+    return true;
   };
+  const [isEditMode, setIsEditMode] = useState(false);
+  const onAddFormClick = () => {
+    console.log({ isFormModalOpen });
+    dispatch(toggleFormModal());
+  };
+  const userData = UserData();
+  useEffect(() => {
+    const fetchForms = async () => {
+      try {
+        const response = await axiosRequest.get(
+          `/forms/get-organizer/${userData.id}`
+        );
+        console.log(response.data);
+        dispatch(initializeForms(response.data.forms));
+      } catch (error) {
+        console.error("Error fetching forms:", error);
+      } finally {
+        // dispatch(toggleEventsIsLoading());
+      }
+    };
 
-  const handleCreateForm = () => {
-    setCurrentForm({
-      eventId: eventId,
-      description: "",
-      name: "",
-      //   price: "",
-      data: {},
-    });
-    setIsEditMode(false);
-    setIsModalOpen(true);
-  };
+    fetchForms();
+  }, []);
 
-  const handleEditForm = (form) => {
-    setCurrentForm(form);
-    setIsEditMode(true);
-    setIsModalOpen(true);
-  };
+  // const fetchForms = async () => {
+  //   try {
+  //     const response = await axiosRequest.get(`/form/${eventId}`);
+  //     setForms(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching forms:", error);
+  //   }
+  // };
+
+  //   const handleCreateForm = () => {
+  //     setCurrentForm({
+  //       eventId: eventId,
+  //       description: "",
+  //       name: "",
+  //       data: {},
+  //     });
+  //     setIsEditMode(false);
+  //     setIsModalOpen(true);
+  //   };
+
+  //   const handleEditForm = (form) => {
+  //     setCurrentForm(form);
+  //     setIsEditMode(true);
+  //     setIsModalOpen(true);
+  //   };
 
   const handleUpdateForm = async (formId, updatedData) => {
     try {
       const response = await axiosRequest.put(
-        `/form/update/${formId}`,
+        `/forms/update/${formId}`,
         updatedData
       );
       const updatedForms = forms.map((form) => {
@@ -66,22 +97,28 @@ const FormLandingPage = () => {
     }
   };
 
-  const handleCreateNewForm = async (newData) => {
+  const handleCreateNewForm = async () => {
     try {
-      const response = await axiosRequest.post(`/form/createform`, newData);
-      setForms([...forms, response.data]);
+      if (!validateFields()) {
+        return;
+      }
+      const response = await axiosRequest.post("/forms/add", {
+        ...selectForm,
+        organizerId: userData.id,
+      });
+      dispatch(addForm(response.data));
+      dispatch(toggleFormModal());
     } catch (error) {
-      console.error("Error creating form:", error);
+      console.error("Error creating event:", error);
     }
   };
 
   const handleDeleteForm = async (formId) => {
     try {
-      const response = await axiosRequest.delete(`/form/delete/${formId}`);
-      const updatedForms = forms.filter((form) => form._id !== formId);
-      setForms(updatedForms);
+      await axiosRequest.delete(`/forms/delete/${formId}`);
+      dispatch(deleteForm(formId));
     } catch (error) {
-      console.error("Error deleting form:", error);
+      console.error("Error deleting event:", error);
     }
   };
 
@@ -113,67 +150,51 @@ const FormLandingPage = () => {
     }
   };
 
-  const addField = () => {
-    const newField = `field${Object.keys(currentForm.data).length + 1}`;
-    setCurrentForm((prevState) => ({
-      ...prevState,
-      data: {
-        ...prevState.data,
-        [newField]: "",
-      },
-    }));
-  };
+  //   const addField = () => {
+  //     const newField = `field${Object.keys(currentForm.data).length + 1}`;
+  //     setCurrentForm((prevState) => ({
+  //       ...prevState,
+  //       data: {
+  //         ...prevState.data,
+  //         [newField]: "",
+  //       },
+  //     }));
+  //   };
 
-  const removeField = (fieldName) => {
-    const { [fieldName]: _, ...newData } = currentForm.data;
-    setCurrentForm((prevState) => ({
-      ...prevState,
-      data: newData,
-    }));
-  };
-
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
-
-  const [openSideBar, setOpenSideBar] = useState(true);
-
-  const toggleSideBar = () => {
-    console.log("clicked");
-    setOpenSideBar((prev) => !prev);
-  };
+  //   const removeField = (fieldName) => {
+  //     const { [fieldName]: _, ...newData } = currentForm.data;
+  //     setCurrentForm((prevState) => ({
+  //       ...prevState,
+  //       data: newData,
+  //     }));
+  //   };
 
   return (
-    <DashboardLayout
-      openSideBar={openSideBar}
-      setOpenSideBar={openSideBar}
-      isModalOpen={isModalOpen}
-      toggleSideBar={toggleSideBar}
-    >
-      <div className="container-fluid mt-4">
-        <h4 className="py-3 mb-4">
-          <span className="text-muted fw-light">DataTables /</span> Forms
-        </h4>
-        <button className="btn btn-primary mb-4" onClick={handleCreateForm}>
-          Create Form
-        </button>
-        <div className="table-responsive">
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th>Actions</th>
-                {/* {forms.length > 0 &&
+    <div className="container-fluid mt-4">
+      <h4 className="py-3 mb-4">
+        <span className="text-muted fw-light">DataTables /</span> Forms
+      </h4>
+      <button className="btn btn-primary mb-4" onClick={onAddFormClick}>
+        Create Form
+      </button>
+      <div className="table-responsive">
+        <table className="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th>Actions</th>
+              {/* {forms.length > 0 &&
                   Object.keys(forms[0].data).map((field) => (
                     <th scope="col" key={field}>
                       {field}
                     </th>
                   ))} */}
-                {/* <th scope="col">Actions</th> */}
-              </tr>
-            </thead>
-            <tbody>
-              {forms.map((form) => (
+              {/* <th scope="col">Actions</th> */}
+            </tr>
+          </thead>
+          <tbody>
+            {forms &&
+              forms.map((form) => (
                 <tr key={form._id}>
                   <td>
                     <a href="">{form.name}</a>
@@ -200,22 +221,19 @@ const FormLandingPage = () => {
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
+          </tbody>
+        </table>
       </div>
-      <EventModal
-        isOpen={isModalOpen}
-        toggleModal={toggleModal}
-        handleSubmit={handleSubmit}
-        newEvent={currentForm}
-        handleInputChange={handleInputChange}
-        isEditMode={isEditMode}
-        addField={addField}
-        removeField={removeField}
-        eventId={eventId}
-      />
-    </DashboardLayout>
+    </div>
+    // {/* <EventModal
+    //   isOpen={isModalOpen}
+    //   toggleModal={toggleModal}
+    //   handleSubmit={handleSubmit}
+    //   handleInputChange={handleInputChange}
+    //   isEditMode={isEditMode}
+    //   addField={addField}
+    //   removeField={removeField}
+    // /> */}
   );
 };
 
