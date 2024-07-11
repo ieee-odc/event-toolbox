@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteWorkshop, filterWorkshops, initializeWorkshops, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import { deleteWorkshop, filterWorkshops, initializeWorkshops, setSelectedWorkshop, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 import { UserData } from './../../../utils/UserData';
 
 const WorkshopsCard = () => {
@@ -39,8 +39,6 @@ const dispatch=useDispatch();
 
     // Calculate difference in days
     const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-    console.log(differenceInTime)
-    console.log(differenceInDays)
     if (differenceInDays === 0) {
       return <span className="badge bg-label-info ms-auto">Today</span>;
     } else if (differenceInDays < 0) {
@@ -76,8 +74,13 @@ const dispatch=useDispatch();
   };
 
   const handleEditWorkshop = (workshop) => {
+    dispatch(setSelectedWorkshop({
+      ...workshop,
+      startTime:formatTime(workshop.startTime),
+      endTime: formatTime(workshop.endTime),
+      date:new Date(workshop.startTime)
+    }))
     dispatch(toggleWorkshopModal())
-    dispatch(updateSelectedWorkshopField(workshop))
     setDropdownStates({
       ...dropdownStates,
       [workshop.id]: false,

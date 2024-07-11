@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { filterWorkshops, toggleWorkshopModal } from '../../../core/Features/Workshops';
+import { filterWorkshops, toggleWorkshopModal,resetWorkshopModal } from '../../../core/Features/Workshops';
 
 function WorkshopTableHeader() {
   const dispatch=useDispatch();
@@ -33,6 +33,7 @@ function WorkshopTableHeader() {
             aria-controls="DataTables_Table_0"
             type="button"
             onClick={()=>{
+              dispatch(resetWorkshopModal())
               dispatch(toggleWorkshopModal())
             }}
           >
