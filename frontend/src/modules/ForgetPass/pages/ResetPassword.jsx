@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axiosRequest from '../../../utils/AxiosConfig';
-import './ForgetPassword.css';
+import { getAuth, confirmPasswordReset } from 'firebase/auth';
 
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState('');
@@ -9,23 +8,28 @@ function ResetPassword() {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = getAuth();
 
   const onChange = (e) => setNewPassword(e.target.value);
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const token = new URLSearchParams(location.search).get('token');
+    const code = new URLSearchParams(location.search).get('oobCode');
+    if (!code) {
+      setError('Invalid or expired code.');
+      return;
+    }
     try {
-      const res = await axiosRequest.post(`/auth/resetpassword?token=${token}`, { newPassword });
-      setMessage(res.data.msg);
+      await confirmPasswordReset(auth, code, newPassword);
+      setMessage('Password reset successfully');
       setError('');
       setTimeout(() => {
         navigate('/login');
       }, 3000);
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      console.error(err.message);
+      setError('An error occurred. Please try again.');
       setMessage('');
-      setError(err.response?.data?.msg || 'An error occurred');
     }
   };
 
