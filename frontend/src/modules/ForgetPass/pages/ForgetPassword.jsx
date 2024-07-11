@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosRequest from '../../../utils/AxiosConfig';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
 import './ForgetPassword.css';
 
 function ForgetPassword() {
@@ -8,6 +8,7 @@ function ForgetPassword() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const auth = getAuth();
 
   const onChange = (e) => setEmail(e.target.value);
 
@@ -19,12 +20,12 @@ function ForgetPassword() {
     }
 
     try {
-      const res = await axiosRequest.post('/auth/forgetpassword', { email });
+      await sendPasswordResetEmail(auth, email);
       setMessage('Password reset link sent to your email');
       setError('');
     } catch (err) {
-      console.error(err.response?.data || err.message);
-      setError(err.response?.data?.msg || 'An error occurred');
+      console.error(err.message);
+      setError('An error occurred. Please try again.');
       setMessage('');
     }
   };
