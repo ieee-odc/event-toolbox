@@ -10,8 +10,12 @@ import { UserData } from "./../../../utils/UserData";
 import { addWorkshop, editWorkshop, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 function WorkshopModal() {
   const { selectedWorkshop, isModalOpen, isEdit } = useSelector((state) => state.workshopsStore);
+  const { events } = useSelector((state) => state.eventsStore);
   const dispatch = useDispatch();
   const userData = UserData();
+
+  const [spaces,setSpaces]=useState([])
+
 
   const handleChangeStartTime = (e) => {
     let value = e.target.value;
@@ -361,15 +365,13 @@ function WorkshopModal() {
                     value={selectedWorkshop.eventId}
                     onChange={handleInputChange}
                   >
-                    <option value="1" data-select2-id={2}>
-                      Alaska
-                    </option>
-                    <option value="2" data-select2-id={54}>
-                      Hawaii
-                    </option>
-                    <option value="3" data-select2-id={55}>
-                      California
-                    </option>
+                    {
+                      events.map((event,index)=>{
+                        return <option value={event.id} data-select2-id={event.id}>
+                        {event.name}
+                      </option>
+                      })
+                    }
                   </select>
                 </div>
               </div>
