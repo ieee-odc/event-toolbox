@@ -14,6 +14,7 @@ import EventsPage from "./modules/Events/pages/EventsPage";
 import { Toaster } from 'react-hot-toast';
 import Workshops from "./modules/Workshops/pages/Workshops";
 import Spaces from "./modules/Space/page/Spaces";
+import Forms from "./modules/Form/pages/Forms";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/workshops" element={<PrivateRoute><Workshops /></PrivateRoute>} />
         <Route path="/events" element={<PrivateRoute><EventsPage /></PrivateRoute>} />
         <Route path="/spaces" element={<PrivateRoute><Spaces/></PrivateRoute>} />
+        <Route path="/forms" element={<PrivateRoute><Forms/></PrivateRoute>} />
 
       </Routes>
     </div>
