@@ -38,17 +38,22 @@ const createSpace = async (req, res) => {
 // get space By Organizer Id
 const getSpaceByOrgId = async (req,res) =>{
     const {orgId} = req.params;
-    try{
-        const space = await Space.findById(orgId);
-        if (!space) {
-            return res.status(404).json({ error: 'Space not found' });
+    try {
+        // Log the orgId to ensure it's being received correctly
+        console.log(`Fetching spaces for orgId: ${orgId}`);
+        
+        const spaces = await Space.find({ orgId });
+        
+        if (!spaces.length) {
+          return res.status(404).json({ message: "No spaces found for this organizer" });
         }
-        res.status(200).json(space)
-    }catch(error){
-        console.error('Error in getSpaceById controller:', error.message);
+    
+        res.status(200).json(spaces);
+      } catch (error) {
+        console.error('Error fetching spaces:', error.message);
         res.status(500).json({ error: 'Internal server error' });
-    }
-}
+      }
+    };
 // Update a Space by ID
 const updateSpaceById = async (req, res) => {
     const { spaceId } = req.params;
