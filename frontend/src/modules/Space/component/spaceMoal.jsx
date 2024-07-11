@@ -42,7 +42,6 @@ function SpaceModal({ isOpen, toggleModal, orgId, spaceId, name, capacity, onSpa
 
       console.log(isCreating ? 'Space created:' : 'Space updated:', response.data);
       setIsSuccess(true);
-
       setTimeout(() => {
         toggleModal();
         setIsSuccess(false);
