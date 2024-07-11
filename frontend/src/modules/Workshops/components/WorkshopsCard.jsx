@@ -6,71 +6,22 @@ import WorkshopModal from "./WorkshopModal";
 import { useNavigate } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteWorkshop, filterWorkshops, initializeWorkshops, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import { UserData } from './../../../utils/UserData';
 
-const WorkshopStatus = Object.freeze({
-  PAID: "Paid",
-  PENDING: "Pending",
-  CANCELED: "Canceled",
-});
-
-const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
-  const [workshops, setWorkshops] = useState([]);
-  const [filteredWorkshops, setFilteredWorkshops] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+const WorkshopsCard = () => {
+  const {filteredWorkshops}=useSelector((state)=>state.workshopsStore)
+  const userData=UserData();
+const dispatch=useDispatch();
   const [dropdownStates, setDropdownStates] = useState({});
-  const [data, setData] = useState({});
   const navigate = useNavigate();
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case WorkshopStatus.PAID:
-        return <span className="badge bg-label-success">Paid</span>;
-      case WorkshopStatus.PENDING:
-        return <span className="badge bg-label-warning">Pending</span>;
-      case WorkshopStatus.CANCELED:
-        return <span className="badge bg-label-danger">Canceled</span>;
-      default:
-        return <i className="bx bx-info-circle text-info"></i>;
-    }
-  };
 
-  const handleSearchChange = (event) => {
-    const filtered = workshops.filter(
-      (workshop) =>
-        workshop.fullName
-          .toLowerCase()
-          .includes(event.target.value.toLowerCase()) ||
-        workshop.email.toLowerCase().includes(event.target.value.toLowerCase())
-    );
-    setFilteredWorkshops(filtered);
-    setCurrentPage(1);
-  };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredWorkshops?.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-  const totalPages = Math.ceil(filteredWorkshops.length / itemsPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
 
   const handleDeleteWorkshop = (workshopId) => {
     axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
-      setWorkshops(workshops.filter((workshop) => workshop.id !== workshopId));
-      setFilteredWorkshops(
-        filteredWorkshops.filter((workshop) => workshop.id !== workshopId)
-      );
+      dispatch(deleteWorkshop(workshopId))
       toast.success("Workshop deleted successfully");
     });
   };
@@ -111,9 +62,8 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
 
   useEffect(() => {
     // Fetch workshops or initialize data
-    axiosRequest.get("/workshop/get-event/1").then((res) => {
-      setWorkshops(res.data.workshops);
-      setFilteredWorkshops(res.data.workshops);
+    axiosRequest.get(`/workshop/get-organizer/${userData.id}`).then((res) => {
+      dispatch(initializeWorkshops(res.data.workshops))
       initializeDropdownStates(res.data.workshops);
     });
   }, []);
@@ -124,10 +74,10 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
       [workshopId]: !dropdownStates[workshopId],
     });
   };
+
   const handleEditWorkshop = (workshop) => {
-    setData(workshop);
-    setIsModalOpen(true);
-    // Close the dropdown for this workshop
+    dispatch(toggleWorkshopModal())
+    dispatch(updateSelectedWorkshopField(workshop))
     setDropdownStates({
       ...dropdownStates,
       [workshop.id]: false,
@@ -142,11 +92,7 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <WorkshopTableHeader
-            handleSearchChange={handleSearchChange}
-            setIsModalOpen={setIsModalOpen}
-            setData={setData}
-          />
+          <WorkshopTableHeader/>
           <div className="row g-4">
             {filteredWorkshops &&
               filteredWorkshops.map((workshop) => {
@@ -298,11 +244,7 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
                 role="status"
                 aria-live="polite"
               >
-                {`Showing ${indexOfFirstItem + 1} to ${
-                  indexOfLastItem > filteredWorkshops.length
-                    ? filteredWorkshops.length
-                    : indexOfLastItem
-                } of ${filteredWorkshops.length} entries`}
+                {`Showing  to of ${filteredWorkshops.length} entries`}
               </div>
             </div>
             <div className="col-sm-12 col-md-6">
@@ -312,15 +254,11 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
               >
                 <ul className="pagination">
                   <li
-                    className={`paginate_button page-item previous ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
+                    className={`paginate_button page-item previous`}
                     id="DataTables_Table_0_previous"
                   >
                     <a
-                      onClick={handlePrevious}
                       aria-controls="DataTables_Table_0"
-                      aria-disabled={currentPage === 1}
                       role="link"
                       tabIndex={-1}
                       className="page-link"
@@ -328,35 +266,25 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
                       Previous
                     </a>
                   </li>
-                  {[...Array(totalPages).keys()].map((number) => (
                     <li
-                      key={number + 1}
-                      className={`paginate_button page-item ${
-                        currentPage === number + 1 ? "active" : ""
-                      }`}
+                      className={`paginate_button page-item active`}
                     >
                       <a
-                        onClick={() => paginate(number + 1)}
                         href="#"
                         aria-controls="DataTables_Table_0"
                         role="link"
                         tabIndex={0}
                         className="page-link"
                       >
-                        {number + 1}
+                        1
                       </a>
                     </li>
-                  ))}
                   <li
-                    className={`paginate_button page-item next ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
+                    className={`paginate_button page-item next}`}
                     id="DataTables_Table_0_next"
                   >
                     <a
-                      onClick={handleNext}
                       aria-controls="DataTables_Table_0"
-                      aria-disabled={currentPage === totalPages}
                       role="link"
                       tabIndex={0}
                       className="page-link"
@@ -369,12 +297,7 @@ const WorkshopsCard = ({ setIsModalOpen, isModalOpen }) => {
             </div>
           </div>
 
-          <WorkshopModal
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-            setWorkshops={setWorkshops}
-            data={data}
-          />
+          <WorkshopModal />
         </div>
       </div>
     </div>

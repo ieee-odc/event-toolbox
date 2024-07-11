@@ -1,6 +1,13 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { filterWorkshops, toggleWorkshopModal } from '../../../core/Features/Workshops';
 
-function WorkshopTableHeader({handleSearchChange,setIsModalOpen,setData}) {
+function WorkshopTableHeader() {
+  const dispatch=useDispatch();
+
+  const handleSearchChange = (event) => {
+    dispatch(filterWorkshops(event.target.value))
+  };
   return (
     <div className="row mx-1">
     <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -26,8 +33,7 @@ function WorkshopTableHeader({handleSearchChange,setIsModalOpen,setData}) {
             aria-controls="DataTables_Table_0"
             type="button"
             onClick={()=>{
-              setData({})
-              setIsModalOpen(true)
+              dispatch(toggleWorkshopModal())
             }}
           >
             <span>

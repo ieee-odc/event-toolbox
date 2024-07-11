@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import WorkshopsCard from './WorkshopsCard'
 
 function WorkshopsContainer() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="container-xxl flex-grow-1 container-p-y">
           <h4 className="py-3 mb-4">
@@ -73,10 +72,7 @@ function WorkshopsContainer() {
             </div>
           </div>
           {/* Invoice List Table */}
-          <WorkshopsCard
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-          />
+          <WorkshopsCard/>
         </div>
   )
 }

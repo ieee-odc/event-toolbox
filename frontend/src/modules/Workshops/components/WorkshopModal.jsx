@@ -5,50 +5,23 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
-function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
-  const [eventId, setEventId] = useState("1");
-  const [spaceId, setSpaceId] = useState("1");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [date, setDate] = useState(null); // Initialize with null or a valid Date object
-  const [isEditMode, setIsEditMode] = useState(false);
-  const startDate = data.startTime ? new Date(data.startTime) : null;
-
-  useEffect(() => {
-    if (data.eventId) {
-      console.log("edit mode");
-      setIsEditMode(true);
-    }
-    setEventId(data.eventId || "1");
-    setSpaceId(data.spaceId || "1");
-    setName(data.name || "");
-    setDescription(data.description || "");
-    try {
-      setStartTime(formatTime(data.startTime));
-      setEndTime(formatTime(data.endTime));
-      let formattedDate = startDate
-        ? `${startDate.getDate()}/${
-            startDate.getMonth() + 1
-          }/${startDate.getFullYear()}`
-        : "";
-      setDate(startDate);
-    } catch (e) {
-      console.log(e);
-    }
-  }, [data]);
-
+import { useDispatch, useSelector } from "react-redux";
+import { addWorkshop, editWorkshop, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+function WorkshopModal() {
+  const { selectedWorkshop,isModalOpen,isEdit } = useSelector((state) => state.workshopsStore);
+  const dispatch = useDispatch();
+  const [date,setDate] = useState(new Date(selectedWorkshop.startTime));
   const handleChangeStartTime = (e) => {
-    handleChangeTime(e, startTime, setStartTime);
-  };
-
-  const handleChangeTime = (e, time, setTime) => {
     let value = e.target.value;
 
-    let isDelete = time.length > value.length;
+    let isDelete = selectedWorkshop.startTime.length > value.length;
     if (isDelete) {
-      setTime(value);
+      dispatch(
+        updateSelectedWorkshopField({
+          id: "startTime",
+          value: value,
+        })
+      );
       return;
     }
 
@@ -107,13 +80,12 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
         return;
       }
     }
-
-    // If all validations pass, update the startTime state
-    setTime(value);
-  };
-
-  const handleChangeEndTime = (e) => {
-    handleChangeTime(e, endTime, setEndTime);
+    dispatch(
+      updateSelectedWorkshopField({
+        id: "startTime",
+        value: value,
+      })
+    );
   };
 
   const handleAddWorkshop = () => {
@@ -128,7 +100,6 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
 
-    // Create the request body
     const reqBody = {
       name,
       description,
@@ -143,14 +114,8 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
-        setIsModalOpen(false);
-        setWorkshops((workshops) => [
-          ...workshops,
-          {
-            ...res.data.workshop,
-            capacity: 50,
-          },
-        ]);
+        dispatch(toggleWorkshopModal())
+        dispatch(addWorkshop(res.data.workshop))
       })
       .catch((err) => {
         toast.error("Failed to add workshop");
@@ -183,18 +148,20 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
       .post(`/workshop/edit/${data.id}`, reqBody)
       .then((res) => {
         toast.success("Successfully Edited!");
-        setIsModalOpen(false);
-        setWorkshops((workshops) => {
-          const index = workshops.findIndex(
-            (workshop) => workshop.id === data.id
-          );
-          workshops[index] = { ...res.data.workshop, capacity: 50 };
-          return [...workshops];
-        });
+        dispatch(toggleWorkshopModal())
+        dispatch(editWorkshop(res.data.workshop))
       })
       .catch((err) => {
         toast.error("Failed to add workshop");
       });
+  };
+
+  const handleInputChange = (e) => {
+    const payload = e.target;
+console.log({ id: payload.id, value: payload.value })
+    dispatch(
+      updateSelectedWorkshopField({ id: payload.id, value: payload.value })
+    );
   };
 
   return (
@@ -218,20 +185,20 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={() => setIsModalOpen(false)}
+                onClick={handleInputChange}
               />
             </div>
             <div className="modal-body">
               <div className="row">
                 <div className="col mb-3">
-                  <label htmlFor="nameWithTitle" className="form-label">
+                  <label htmlFor="name" className="form-label">
                     Name
                   </label>
                   <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={selectedWorkshop.name}
+                    onChange={handleInputChange}
                     type="text"
-                    id="nameWithTitle"
+                    id="name"
                     className="form-control"
                     placeholder="Enter Name"
                   />
@@ -244,10 +211,11 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   </label>
                   <div className="input-group input-group-merge form-send-message">
                     <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      value={selectedWorkshop.description}
+                      onChange={handleInputChange}
                       className="form-control message-input"
                       placeholder="Enter Description"
+                      id="description"
                       rows="2"
                     ></textarea>
                     <span className="message-actions input-group-text">
@@ -262,14 +230,14 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                     Space
                   </label>
                   <select
-                    id="select2Basic"
+                    id="spaceId"
                     className="select2 form-select form-select-md select2-hidden-accessible"
                     data-allow-clear="true"
                     data-select2-id="select2Basic"
                     tabIndex={-1}
                     aria-hidden="true"
-                    value={spaceId}
-                    onChange={(e) => setSpaceId(e.target.value)}
+                    value={selectedWorkshop.spaceId}
+                    onChange={handleInputChange}
                   >
                     <option value="1" data-select2-id={2}>
                       Room 1
@@ -287,14 +255,14 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                     Event
                   </label>
                   <select
-                    id="select2Basic"
+                    id="eventId"
                     className="select2 form-select form-select-md select2-hidden-accessible"
                     data-allow-clear="true"
                     data-select2-id="select2Basic"
                     tabIndex={-1}
                     aria-hidden="true"
-                    value={eventId}
-                    onChange={(e) => setEventId(e.target.value)}
+                    value={selectedWorkshop.eventId}
+                    onChange={handleInputChange}
                   >
                     <option value="1" data-select2-id={2}>
                       Alaska
@@ -316,10 +284,10 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   <input
                     type="text"
                     className="form-control"
-                    id="start-time"
+                    id="startTime"
                     placeholder="HH:MM"
-                    value={startTime}
-                    onChange={handleChangeStartTime}
+                    value={selectedWorkshop.startTime}
+                    onChange={handleInputChange}
                   />
                 </div>
                 <div className="col mb-0">
@@ -329,10 +297,10 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   <input
                     type="text"
                     className="form-control"
-                    id="start-time"
+                    id="endTime"
                     placeholder="HH:MM"
-                    value={endTime}
-                    onChange={handleChangeEndTime}
+                    value={selectedWorkshop.endTime}
+                    onChange={handleInputChange}
                   />
                 </div>
               </div>
@@ -345,7 +313,7 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                     Date
                   </label>
                   <DatePicker
-                    selected={date || new Date()}
+                    selected={new Date()}
                     onChange={(date) => setDate(date)}
                     dateFormat="dd/MM/yyyy"
                     locale="en"
@@ -364,16 +332,18 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                 type="button"
                 className="btn btn-label-secondary"
                 data-bs-dismiss="modal"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  dispatch(toggleWorkshopModal())
+                }}
               >
                 Close
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={isEditMode ? handleEditWorkshop : handleAddWorkshop}
+                onClick={isEdit ? handleInputChange : handleAddWorkshop}
               >
-                {isEditMode ? "Save Changes" : "Create Workshop"}
+                {isEdit ? "Save Changes" : "Create Workshop"}
               </button>
             </div>
           </div>

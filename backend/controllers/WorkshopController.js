@@ -151,10 +151,38 @@ const getEventWorkshops = async (req, res) => {
     }
   };
 
+  const getOrganizerWorkshops = async (req, res) => {
+    try {
+      const organizerId = req.params.organizerId;
+      const workshops = await Workshop.find({
+        organizerId,
+      });
+      const workshopsWithCapacity = workshops.map(workshop => {
+        const workshopObj = workshop.toObject();
+        return {
+          ...workshopObj,
+          capacity: 50,
+        };
+      });
+  
+      return res.status(200).json({
+        status: "success",
+        message: "Workshop retrieved",
+        workshops: workshopsWithCapacity,
+      });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({
+        message: "Server Error!",
+      });
+    }
+  };
+
 module.exports = {
   addWorkshop,
   deleteWorkshop,
   editWorkshop,
   getSpaceWorkshops,
   getEventWorkshops,
+  getOrganizerWorkshops
 };

@@ -5,10 +5,13 @@ import "./index.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
 import eventsStore from "./core/Features/Events.js"
+import workshopsStore from "./core/Features/Workshops.js"
+
 import { Provider } from "react-redux";
 const store = configureStore({
   reducer: {
     eventsStore: eventsStore,
+    workshopsStore:workshopsStore
   }
 })
 

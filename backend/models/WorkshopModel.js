@@ -36,6 +36,10 @@ const WorkshopSchema=mongoose.Schema({
     },
     formId:{
         type:Number,
+    },
+    organizerId:{
+        type:Number,
+        required:true,
     }
     
 } ,{ timestamps: true })
