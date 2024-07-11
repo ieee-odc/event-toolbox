@@ -31,3 +31,6 @@ a {
 a:hover {
   color: #696cff;
 }
+.transform {
+  transform: scale(1.3);
+}

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UserData } from "../../utils/UserData";
 
 const FormsSlice = createSlice({
   name: "Forms",
@@ -7,9 +8,12 @@ const FormsSlice = createSlice({
     isLoading: false,
     isEdit: false,
     isFormModalOpen: false,
+    filterStatus: "",
+    filteredForms: [],
     selectedForm: {
-      organizerId: "",
+      organizerId: UserData().id,
       name: "",
+      deadline: "",
       description: "",
       data: {},
     },
@@ -34,12 +38,17 @@ const FormsSlice = createSlice({
         form.id === action.payload.id ? action.payload : form
       );
       state.forms = updatedForms;
-      state.filteredForms = updatedForms;
+      state.filteredForms = updatedEvents;
     },
+    // editForm: (state, action) => {
+    //   const index = state.forms.findIndex((form) => form.id === action.payload.id);
+    //   if (index !== -1) {
+    //     state.forms[index] = action.payload;
+    //   }
+    // },
     toggleFormModal: (state) => {
       state.isFormModalOpen = !state.isFormModalOpen;
     },
-
     toggleFormsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
     },
@@ -55,23 +64,28 @@ const FormsSlice = createSlice({
     },
     updateSelectedFormField: (state, action) => {
       const { id, value } = action.payload;
-      state.selectedForm[id] = value;
-      // if (id === "startDate") {
-      //   state.selectedForm.endDate = "";
-      // }
-      if (id.startsWith("data.")) {
+
+      // Update directly if id matches top-level keys in selectedForm
+      if (state.selectedForm.hasOwnProperty(id)) {
+        state.selectedForm[id] = value;
+      } else if (id.startsWith("data.")) {
+        // Update nested data field
         const field = id.split(".")[1];
-        const Data = {
+        state.selectedForm.data = {
           ...state.selectedForm.data,
           [field]: value,
         };
-        state.selectedForm.data = Data;
+      } else {
+        console.warn(`Unhandled field update: ${id}`);
       }
     },
-    addField: (state) => {
-      const newField = `field${Object.keys(state.currentForm.data).length + 1}`;
-      state.currentForm.data[newField] = "";
-    },
+
+    // addField: (state) => {
+    //   const newField = `field${
+    //     Object.keys(state.selectedForm.data).length + 1
+    //   }`;
+    //   state.selectedForm.data[newField] = "";
+    // },
     removeField: (state, action) => {
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedForm.data;
@@ -82,11 +96,44 @@ const FormsSlice = createSlice({
         organizerId: "",
         name: "",
         description: "",
+        deadline: "",
         data: {},
       };
     },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
+    },
+    addField: (state, action) => {
+      const { key, value } = action.payload;
+      state.selectedForm.data[key] = value;
+    },
+    removeField: (state, action) => {
+      const key = action.payload;
+      delete state.selectedForm.data[key];
+    },
+    resetFormModal: (state, action) => {
+      state.selectedForm = {
+        organizerId: UserData().id,
+        name: "",
+        deadline: "",
+        description: "",
+        data: {},
+      };
+    },
+    changeFormState: (state, action) => {
+      state.isEdit = action.payload;
+    },
+    // selectForm: (state, action) => {
+    //   state.isEdit = true;
+    //   const { deadline, ...otherFields } = action.payload;
+    //   state.selectedForm = {
+    //     ...state.selectedForm,
+    //     ...otherFields,
+    //     deadline,
+    //   };
+    // },
+    setSelectedForm: (state, action) => {
+      state.selectedForm = action.payload;
     },
   },
 });
@@ -101,8 +148,9 @@ export const {
   selectForm,
   setSelectedForm,
   updateSelectedFormField,
+  addField,
+  removeField,
   resetFormModal,
   changeFormState,
-  //   removeField,
 } = FormsSlice.actions;
 export default FormsSlice.reducer;

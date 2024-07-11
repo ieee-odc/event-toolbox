@@ -10,38 +10,27 @@ import {
   initializeForms,
   addForm,
   deleteForm,
-  editForm,
   toggleFormModal,
   selectForm,
 } from "../../../core/Features/Forms";
+
 const FormLandingPage = () => {
   const dispatch = useDispatch();
-  const { forms, isFormModalOpen } = useSelector((store) => store.formsStore);
+  const { forms, filteredForms } = useSelector((store) => store.formsStore);
 
-  const validateFields = () => {
-    const { name, description, deadline } = selectedForm;
-    if (!name || !description || !deadline) {
-      {
-        /* ADD EVENTID LATER */
-      }
-      toast.error("Please fill in all fields.");
-      return false;
-    }
-    return true;
-  };
-  const [isEditMode, setIsEditMode] = useState(false);
+  const userData = UserData();
+  const [hoveredIcon, setHoveredIcon] = useState(null);
+
   const onAddFormClick = () => {
-    console.log({ isFormModalOpen });
     dispatch(toggleFormModal());
   };
-  const userData = UserData();
+
   useEffect(() => {
     const fetchForms = async () => {
       try {
         const response = await axiosRequest.get(
           `/forms/get-organizer/${userData.id}`
         );
-        console.log(response.data);
         dispatch(initializeForms(response.data.forms));
       } catch (error) {
         console.error("Error fetching forms:", error);
@@ -53,31 +42,10 @@ const FormLandingPage = () => {
     fetchForms();
   }, []);
 
-  // const fetchForms = async () => {
-  //   try {
-  //     const response = await axiosRequest.get(`/form/${eventId}`);
-  //     setForms(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching forms:", error);
-  //   }
-  // };
-
-  //   const handleCreateForm = () => {
-  //     setCurrentForm({
-  //       eventId: eventId,
-  //       description: "",
-  //       name: "",
-  //       data: {},
-  //     });
-  //     setIsEditMode(false);
-  //     setIsModalOpen(true);
-  //   };
-
-  //   const handleEditForm = (form) => {
-  //     setCurrentForm(form);
-  //     setIsEditMode(true);
-  //     setIsModalOpen(true);
-  //   };
+  const handleEditClick = (form) => {
+    dispatch(selectForm(form));
+    dispatch(toggleFormModal());
+  };
 
   const handleUpdateForm = async (formId, updatedData) => {
     try {
@@ -94,22 +62,6 @@ const FormLandingPage = () => {
       setForms(updatedForms);
     } catch (error) {
       console.error("Error updating form:", error);
-    }
-  };
-
-  const handleCreateNewForm = async () => {
-    try {
-      if (!validateFields()) {
-        return;
-      }
-      const response = await axiosRequest.post("/forms/add", {
-        ...selectForm,
-        organizerId: userData.id,
-      });
-      dispatch(addForm(response.data));
-      dispatch(toggleFormModal());
-    } catch (error) {
-      console.error("Error creating event:", error);
     }
   };
 
@@ -150,24 +102,26 @@ const FormLandingPage = () => {
     }
   };
 
-  //   const addField = () => {
-  //     const newField = `field${Object.keys(currentForm.data).length + 1}`;
-  //     setCurrentForm((prevState) => ({
-  //       ...prevState,
-  //       data: {
-  //         ...prevState.data,
-  //         [newField]: "",
-  //       },
-  //     }));
-  //   };
+  function formatDate(originalDate) {
+    const date = new Date(originalDate);
 
-  //   const removeField = (fieldName) => {
-  //     const { [fieldName]: _, ...newData } = currentForm.data;
-  //     setCurrentForm((prevState) => ({
-  //       ...prevState,
-  //       data: newData,
-  //     }));
-  //   };
+    const day = String(date.getDate()).padStart(2, "0"); // padStart utility: 11/7 -> 11/07
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
+
+    return formattedDate;
+  }
+
+  const handleMouseEnter = (iconId) => {
+    setHoveredIcon(iconId);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIcon(null);
+  };
 
   return (
     <div className="container-fluid mt-4">
@@ -182,41 +136,63 @@ const FormLandingPage = () => {
           <thead>
             <tr>
               <th scope="col">Name</th>
-              <th>Actions</th>
-              {/* {forms.length > 0 &&
-                  Object.keys(forms[0].data).map((field) => (
-                    <th scope="col" key={field}>
-                      {field}
-                    </th>
-                  ))} */}
-              {/* <th scope="col">Actions</th> */}
+              <th>Deadline</th>
+              <th>Event</th>
+              <th style={{ textAlign: "right" }}></th>
             </tr>
           </thead>
           <tbody>
-            {forms &&
-              forms.map((form) => (
+            {filteredForms &&
+              filteredForms.map((form) => (
                 <tr key={form._id}>
                   <td>
                     <a href="">{form.name}</a>
                   </td>
-                  {/* {Object.keys(form.data).map((field) => (
-                    <td key={field}>{form.data[field]}</td>
-                  ))} */}
                   <td>
+                    <a href="">{formatDate(form.deadline)}</a>
+                  </td>
+                  <td></td>
+                  <td style={{ textAlign: "right" }}>
                     <button
                       className="btn btn-link p-0"
-                      onClick={() => handleEditForm(form)}
+                      onClick={() => handleEditClick(form)}
                     >
-                      <i className="bx bx-edit-alt"></i>
+                      <i
+                        className={`bx bx-edit-alt bx-sm ${
+                          hoveredIcon === `edit_${form._id}` ? "transform" : ""
+                        }`}
+                        onMouseEnter={() =>
+                          handleMouseEnter(`edit_${form._id}`)
+                        }
+                        onMouseLeave={handleMouseLeave}
+                      ></i>
                     </button>
                     <button
                       className="btn btn-link p-0"
                       onClick={() => handleDeleteForm(form._id)}
                     >
-                      <i className="bx bx-trash"></i>
+                      <i
+                        className={`bx bx-trash bx-sm ${
+                          hoveredIcon === `delete_${form._id}`
+                            ? "transform"
+                            : ""
+                        }`}
+                        onMouseEnter={() =>
+                          handleMouseEnter(`delete_${form._id}`)
+                        }
+                        onMouseLeave={handleMouseLeave}
+                      ></i>
                     </button>
                     <button className="btn btn-link p-0">
-                      <i className="bx bx-share"></i>
+                      <i
+                        className={`bx bx-share bx-sm ${
+                          hoveredIcon === `share_${form._id}` ? "transform" : ""
+                        }`}
+                        onMouseEnter={() =>
+                          handleMouseEnter(`share_${form._id}`)
+                        }
+                        onMouseLeave={handleMouseLeave}
+                      ></i>
                     </button>
                   </td>
                 </tr>
@@ -225,15 +201,6 @@ const FormLandingPage = () => {
         </table>
       </div>
     </div>
-    // {/* <EventModal
-    //   isOpen={isModalOpen}
-    //   toggleModal={toggleModal}
-    //   handleSubmit={handleSubmit}
-    //   handleInputChange={handleInputChange}
-    //   isEditMode={isEditMode}
-    //   addField={addField}
-    //   removeField={removeField}
-    // /> */}
   );
 };
 

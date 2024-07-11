@@ -1,34 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import "../Form.css";
 import toast from "react-hot-toast";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
 import axiosRequest from "../../../utils/AxiosConfig";
-import { UserData } from "./../../../utils/UserData";
+import { UserData } from "../../../utils/UserData";
+import "./DatePicker.css";
 import {
   addForm,
-  //   changeFormState,
   editForm,
-  //   resetFormModal,
   toggleFormModal,
   updateSelectedFormField,
-  //   removeField,
+  addField,
+  removeField,
+  changeFormState,
+  resetFormModal,
 } from "../../../core/Features/Forms";
 
 function FormModal() {
   const dispatch = useDispatch();
-  //   console.log({ isFormModalOpen });
   const userData = UserData();
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
     (store) => store.formsStore
   );
   const modalClassName = isFormModalOpen ? "modal fade show" : "modal fade";
+  const [newFieldKey, setNewFieldKey] = useState("");
+  const [showDynamicFields, setShowDynamicFields] = useState(false);
+
   const validateFields = () => {
-    const { name, description } = selectedForm;
-    if (!name || !description) {
-      {
-        /* ADD EVENTID & DEADLINE LATER */
-      }
+    const { name, description, deadline } = selectedForm;
+    if (!name || !description || !deadline) {
+      console.log({ selectedForm });
       toast.error("Please fill in all fields.");
       return false;
     }
@@ -46,60 +48,86 @@ function FormModal() {
       });
       dispatch(addForm(response.data));
       dispatch(toggleFormModal());
-      //   dispatch(
-      //     updateSelectedEventField({
-      //       organizerId: userData.id,
-      //       name: "",
-      //       description: "",
-      //       location: "",
-      //       startDate: "",
-      //       endDate: "",
-      //     })
-      //   );
+      dispatch(
+        updateSelectedFormField({
+          organizerId: userData.id,
+          name: "",
+          description: "",
+          deadline: "",
+          data: {},
+        })
+      );
     } catch (error) {
-      console.error("Error creating event:", error);
+      console.error("Error creating form:", error);
+    }
+  };
+  const handleEditForm = async (formId) => {
+    try {
+      if (!validateFields()) {
+        return;
+      }
+      const response = await axiosRequest.post(`/forms/edit/${formId}`, {
+        organizerId: userData.id,
+        ...selectedForm,
+      });
+      console.log(response.data.form);
+      dispatch(editForm(response.data.form));
+      dispatch(toggleFormModal());
+      dispatch(
+        updateSelectedFormField({
+          organizerId: userData.id,
+          name: "",
+          deadline: "",
+          description: "",
+          data: {},
+        })
+      );
+    } catch (error) {
+      console.error("Error creating form:", error);
     }
   };
 
-  //   const handleEditEvent = async (eventId) => {
-  //     try {
-  //       if (!validateFields()) {
-  //         return;
-  //       }
-  //       const response = await axiosRequest.post(`/events/edit/${eventId}`, {
-  //         organizerId: userData.id,
-  //         ...selectedEvent,
-  //       });
-  //       console.log(response.data.event);
-  //       dispatch(editEvent(response.data.event));
-  //       dispatch(toggleEventModal());
-  //       dispatch(
-  //         updateSelectedEventField({
-  //           organizerId: userData.id,
-  //           name: "",
-  //           description: "",
-  //           location: "",
-  //           startDate: "",
-  //           endDate: "",
-  //         })
-  //       );
-  //     } catch (error) {
-  //       console.error("Error creating event:", error);
-  //     }
-  //   };
-
   const handleSubmit = () => {
-    handleAddForm();
-    // if (isEdit) {
-    //   handleEditEvent(selectedEvent.id);
-    // } else {
-    //   handleAddEvent();
-    // }
+    if (isEdit) {
+      handleEditForm(selectedForm.id);
+    } else {
+      handleAddForm();
+    }
   };
 
   const handleInputChange = (e) => {
-    const payload = e.target;
-    dispatch(updateSelectedFormField({ id: payload.id, value: payload.value }));
+    const { id, value } = e.target;
+    dispatch(updateSelectedFormField({ id, value }));
+  };
+
+  const handleAddField = () => {
+    if (!showDynamicFields) {
+      setShowDynamicFields(true);
+      return;
+    }
+    if (newFieldKey && !selectedForm.data[newFieldKey]) {
+      dispatch(addField({ key: newFieldKey, value: "" }));
+      setNewFieldKey("");
+    } else {
+      toast.error("Field key is empty or already exists.");
+    }
+  };
+
+  const handleRemoveField = (key) => {
+    dispatch(removeField(key));
+  };
+
+  const handleDateChange = (selectedDates) => {
+    console.log({ selectedDates });
+    const selectedDate = selectedDates[0]; // Assuming single date selection
+    if (selectedDate) {
+      handleInputChange({
+        target: {
+          id: "deadline",
+          value: selectedDate instanceof Date ? selectedDate.toISOString() : "",
+        },
+      });
+    }
   };
 
   return (
@@ -123,7 +151,7 @@ function FormModal() {
                 type="button"
                 className="btn-close"
                 onClick={() => {
-                  //   dispatch(resetFormModal());
+                  dispatch(resetFormModal());
                   if (isEdit) {
                     dispatch(changeFormState(false));
                   }
@@ -133,10 +161,8 @@ function FormModal() {
               ></button>
             </div>
             <div className="modal-body">
-              {/* {!isEditMode && <div className="mb-3"></div>} */}
-              <div className="mb-3"></div>
               <div className="mb-3">
-                <label htmlFor="description" className="form-label">
+                <label htmlFor="name" className="form-label">
                   Name
                 </label>
                 <input
@@ -164,64 +190,74 @@ function FormModal() {
               <div className="mb-3">
                 <label className="form-label">Deadline</label>
                 <Flatpickr
-                  //   value={selectedDateTime}
-                  //   onChange={handleDateChange}
+                  id="deadline"
+                  value={selectedForm.deadline}
                   options={{
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
-                    minDate: selectedForm.startDate,
-                    maxDate: selectedForm.endDate
-                      ? new Date(
-                          eventDates.endDate.getFullYear(),
-                          eventDates.endDate.getMonth(),
-                          eventDates.endDate.getDate(),
-                          23,
-                          59,
-                          59,
-                          999
-                        )
-                      : null,
+                    // minDate: selectedForm.startDate,
+                    // maxDate: selectedForm.endDate,
                   }}
                   className="form-control"
+                  onChange={handleDateChange}
                 />
               </div>
 
-              {Object.keys(selectedForm.data || {}).map((key) => (
-                <div className="mb-3" key={key}>
-                  <label htmlFor={key} className="form-label">
-                    {key}
-                  </label>
-                  <div className="d-flex">
+              {showDynamicFields && (
+                <>
+                  {Object.keys(selectedForm.data || {}).map((key) => (
+                    <div className="mb-3" key={key}>
+                      <label htmlFor={key} className="form-label">
+                        {key}
+                      </label>
+                      <div className="d-flex">
+                        <input
+                          type="text"
+                          id={`data.${key}`}
+                          className="form-control"
+                          placeholder={`Enter ${key}`}
+                          value={selectedForm.data[key] || ""}
+                          onChange={handleInputChange}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-danger ms-2"
+                          onClick={() => handleRemoveField(key)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="d-flex mb-3">
                     <input
                       type="text"
-                      id={`data.${key}`}
                       className="form-control"
-                      placeholder={`Enter ${key}`}
-                      value={newEvent.data[key] || ""}
-                      onChange={handleInputChange}
+                      placeholder="New Field Key"
+                      value={newFieldKey}
+                      onChange={(e) => setNewFieldKey(e.target.value)}
                     />
                     <button
                       type="button"
-                      className="btn btn-danger ms-2"
-                      // onClick={() => removeField(key)}
+                      className="btn btn-secondary ms-2"
+                      onClick={handleAddField}
                     >
-                      Remove
+                      Add Field
                     </button>
                   </div>
+                </>
+              )}
+              {!showDynamicFields && (
+                <div className="d-flex justify-content-center mb-3">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={handleAddField}
+                  >
+                    Add Field
+                  </button>
                 </div>
-              ))}
-              <button
-                type="button"
-                className="btn btn-secondary"
-                // onClick={addField}
-              >
-                {/*  removeField: (state, action) => {
-      const fieldName = action.payload;
-      const { [fieldName]: _, ...newData } = state.currentForm.data;
-      state.currentForm.data = newData;
-    }, */}
-                Add Field
-              </button>
+              )}
             </div>
             <div className="modal-footer">
               <button
