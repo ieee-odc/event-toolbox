@@ -37,9 +37,9 @@ const getSpaceByOrgId = async (req, res) => {
         const spaces = await Space.find({ organizerId });
 
         res.status(200).json({
-            spaces,
             message: "Spaces retrieved successfully",
-            status:"success"
+            status:"success",
+            spaces
         });
     } catch (error) {
         console.error('Error fetching spaces:', error.message);
@@ -50,15 +50,19 @@ const getSpaceByOrgId = async (req, res) => {
 const updateSpaceById = async (req, res) => {
     const { spaceId } = req.params;
     try {
-        const updatedSpace = await Space.findByIdAndUpdate(
-            spaceId,
+        const updatedSpace = await Space.findOneAndUpdate(
+            {id:spaceId},
             { ...req.body},
             { new: true }
         );
         if (!updatedSpace) {
             return res.status(404).json({ error: 'Space not found' });
         }
-        res.json(updatedSpace);
+        res.status(200).json({
+            status:"success",
+            message:"Space updated successfully",
+            space:updatedSpace
+        });
     } catch (error) {
         console.error('Error in updateSpaceById controller:', error.message);
         res.status(500).json({ error: 'Internal server error' });
@@ -69,7 +73,9 @@ const updateSpaceById = async (req, res) => {
 const deleteSpaceById = async (req, res) => {
     const { spaceId } = req.params;
     try {
-        const deletedSpace = await Space.findByIdAndDelete(spaceId);
+        const deletedSpace = await Space.findOneAndDelete({
+            id:spaceId
+        });
         if (!deletedSpace) {
             return res.status(404).json({ error: 'Space not found' });
         }
