@@ -7,15 +7,29 @@ import "react-datepicker/dist/react-datepicker.css";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { useDispatch, useSelector } from "react-redux";
 import { UserData } from "./../../../utils/UserData";
-import { addWorkshop, editWorkshop, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import { addWorkshop, editWorkshop, resetWorkshopModal, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import { initializeEvents } from "../../../core/Features/Events";
+import { initializeSpaces } from "../../../core/Features/Spaces";
 function WorkshopModal() {
   const { selectedWorkshop, isModalOpen, isEdit } = useSelector((state) => state.workshopsStore);
   const { events } = useSelector((state) => state.eventsStore);
+  const { spaces } = useSelector((state) => state.spacesStore);
   const dispatch = useDispatch();
   const userData = UserData();
 
-  const [spaces,setSpaces]=useState([])
 
+
+  useEffect(() => {
+    axiosRequest.get(`/space/get-organizer/${userData.id}`).then((res) => {
+      dispatch(initializeSpaces(res.data.spaces))
+    })
+  }, [])
+
+  useEffect(() => {
+    axiosRequest.get(`/events/get-organizer/${userData.id}`).then((res) => {
+      dispatch(initializeEvents(res.data.events))
+    })
+  }, [])
 
   const handleChangeStartTime = (e) => {
     let value = e.target.value;
@@ -244,11 +258,11 @@ function WorkshopModal() {
         dispatch(toggleWorkshopModal())
         dispatch(editWorkshop({
           ...res.data.workshop,
-          capacity:50
+          capacity: 50
         }))
       })
       .catch((err) => {
-        toast.error("Failed to add workshop");
+        toast.error("Failed to edit workshop");
       });
   };
 
@@ -259,7 +273,7 @@ function WorkshopModal() {
     );
   };
 
-  const handleDateChange=(date)=>{
+  const handleDateChange = (date) => {
     dispatch(
       updateSelectedWorkshopField({ id: "date", value: date })
     );
@@ -279,14 +293,19 @@ function WorkshopModal() {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="modalCenterTitle">
-                {isEdit?"Edit":"Add"} Workshop
+                {isEdit ? "Edit" : "Add"} Workshop
               </h5>
               <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={handleInputChange}
+                onClick={()=>{
+                  dispatch(toggleWorkshopModal())
+                  if(isEdit){
+                    dispatch(resetWorkshopModal())
+                  }
+                }}
               />
             </div>
             <div className="modal-body">
@@ -340,15 +359,13 @@ function WorkshopModal() {
                     value={selectedWorkshop.spaceId}
                     onChange={handleInputChange}
                   >
-                    <option value="1" data-select2-id={2}>
-                      Room 1
-                    </option>
-                    <option value="2" data-select2-id={54}>
-                      Room 2
-                    </option>
-                    <option value="3" data-select2-id={55}>
-                      Room 3
-                    </option>
+                    {
+                      spaces.map((space, i) => {
+                        return <option value={space.id} data-select2-id={space.id}>
+                          {space.name}
+                        </option>
+                      })
+                    }
                   </select>
                 </div>
                 <div className="col mb-0">
@@ -366,10 +383,10 @@ function WorkshopModal() {
                     onChange={handleInputChange}
                   >
                     {
-                      events.map((event,index)=>{
+                      events.map((event, index) => {
                         return <option value={event.id} data-select2-id={event.id}>
-                        {event.name}
-                      </option>
+                          {event.name}
+                        </option>
                       })
                     }
                   </select>
