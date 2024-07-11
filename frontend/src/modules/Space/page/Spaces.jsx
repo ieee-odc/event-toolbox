@@ -2,7 +2,7 @@ import React from 'react';
 import DashboardLayout from '../../../core/components/DashboardLayout/DashboardLayout';
 import SpaceContainer from '../component/SpaceContainer';
 
-function Space() {
+function Spaces() {
 
   return (
     <DashboardLayout>
@@ -11,4 +11,4 @@ function Space() {
   );
 }
 
-export default Space;
+export default Spaces;
