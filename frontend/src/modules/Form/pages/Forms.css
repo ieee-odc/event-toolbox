@@ -1,0 +1,32 @@
+.full-width {
+  width: 100%;
+  padding: 0 15px; /* Adjust padding as needed */
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table th, .table td {
+  padding: 0.75rem; /* Adjust padding for better alignment */
+  white-space: nowrap;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table tbody + tbody {
+  border-top: 2px solid #dee2e6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table .dropdown-menu {
+  min-width: 100px;
+  text-align: left;
+}

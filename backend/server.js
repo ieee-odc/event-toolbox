@@ -58,6 +58,9 @@ app.use("/workshop", WorkshopRouter);
 const SpaceRouter = require("./routes/SpaceRoutes");
 app.use("/space", SpaceRouter);
 
+const FormRouter = require("./routes/FormRoutes");
+app.use("/form", FormRouter);
+
 app.get("/*", function (req, res) {
   res.sendFile(
     path.join(__dirname, "../frontend/dist/index.html"),

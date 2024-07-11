@@ -5,50 +5,43 @@ import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
-function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
-  const [eventId, setEventId] = useState("1");
-  const [spaceId, setSpaceId] = useState("1");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [date, setDate] = useState(null); // Initialize with null or a valid Date object
-  const [isEditMode, setIsEditMode] = useState(false);
-  const startDate = data.startTime ? new Date(data.startTime) : null;
+import { useDispatch, useSelector } from "react-redux";
+import { UserData } from "./../../../utils/UserData";
+import { addWorkshop, editWorkshop, resetWorkshopModal, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import { initializeEvents } from "../../../core/Features/Events";
+import { initializeSpaces } from "../../../core/Features/Spaces";
+function WorkshopModal() {
+  const { selectedWorkshop, isModalOpen, isEdit } = useSelector((state) => state.workshopsStore);
+  const { events } = useSelector((state) => state.eventsStore);
+  const { spaces } = useSelector((state) => state.spacesStore);
+  const dispatch = useDispatch();
+  const userData = UserData();
+
+
 
   useEffect(() => {
-    if (data.eventId) {
-      console.log("edit mode");
-      setIsEditMode(true);
-    }
-    setEventId(data.eventId || "1");
-    setSpaceId(data.spaceId || "1");
-    setName(data.name || "");
-    setDescription(data.description || "");
-    try {
-      setStartTime(formatTime(data.startTime));
-      setEndTime(formatTime(data.endTime));
-      let formattedDate = startDate
-        ? `${startDate.getDate()}/${
-            startDate.getMonth() + 1
-          }/${startDate.getFullYear()}`
-        : "";
-      setDate(startDate);
-    } catch (e) {
-      console.log(e);
-    }
-  }, [data]);
+    axiosRequest.get(`/space/get-organizer/${userData.id}`).then((res) => {
+      dispatch(initializeSpaces(res.data.spaces))
+    })
+  }, [])
+
+  useEffect(() => {
+    axiosRequest.get(`/events/get-organizer/${userData.id}`).then((res) => {
+      dispatch(initializeEvents(res.data.events))
+    })
+  }, [])
 
   const handleChangeStartTime = (e) => {
-    handleChangeTime(e, startTime, setStartTime);
-  };
-
-  const handleChangeTime = (e, time, setTime) => {
     let value = e.target.value;
 
-    let isDelete = time.length > value.length;
+    let isDelete = selectedWorkshop.startTime.length > value.length;
     if (isDelete) {
-      setTime(value);
+      dispatch(
+        updateSelectedWorkshopField({
+          id: "startTime",
+          value: value,
+        })
+      );
       return;
     }
 
@@ -107,95 +100,184 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
         return;
       }
     }
-
-    // If all validations pass, update the startTime state
-    setTime(value);
+    dispatch(
+      updateSelectedWorkshopField({
+        id: "startTime",
+        value: value,
+      })
+    );
   };
 
   const handleChangeEndTime = (e) => {
-    handleChangeTime(e, endTime, setEndTime);
+    let value = e.target.value;
+
+    let isDelete = selectedWorkshop.endTime.length > value.length;
+    if (isDelete) {
+      dispatch(
+        updateSelectedWorkshopField({
+          id: "endTime",
+          value: value,
+        })
+      );
+      return;
+    }
+
+    if (value.length >= 6) {
+      return;
+    }
+    if (value.length === 2) {
+      value += ":";
+    }
+
+    // Handle hours
+    if (value.length === 1) {
+      if (value !== "0" && value !== "1" && value !== "2") {
+        return;
+      }
+    } else if (value.length === 3) {
+      const firstChar = value.charAt(0);
+      if (firstChar === "2") {
+        if (
+          value.charAt(1) !== "0" &&
+          value.charAt(1) !== "1" &&
+          value.charAt(1) !== "2" &&
+          value.charAt(1) !== "3"
+        ) {
+          return;
+        }
+      }
+    }
+
+    if (value.length === 4) {
+      const minutesFirstChar = value.charAt(3);
+      if (
+        minutesFirstChar !== "0" &&
+        minutesFirstChar !== "1" &&
+        minutesFirstChar !== "2" &&
+        minutesFirstChar !== "3" &&
+        minutesFirstChar !== "4" &&
+        minutesFirstChar !== "5"
+      ) {
+        return;
+      }
+    } else if (value.length === 5) {
+      const minutesFirstChar = value.charAt(4);
+      if (
+        minutesFirstChar !== "0" &&
+        minutesFirstChar !== "1" &&
+        minutesFirstChar !== "2" &&
+        minutesFirstChar !== "3" &&
+        minutesFirstChar !== "4" &&
+        minutesFirstChar !== "5" &&
+        minutesFirstChar !== "6" &&
+        minutesFirstChar !== "7" &&
+        minutesFirstChar !== "8" &&
+        minutesFirstChar !== "9"
+      ) {
+        return;
+      }
+    }
+    dispatch(
+      updateSelectedWorkshopField({
+        id: "endTime",
+        value: value,
+      })
+    );
   };
 
-  const handleAddWorkshop = () => {
+  const handleAddWorkshop = (workshop) => {
     // Combine date, startTime, and endTime into a single Date object
-    const startDate = new Date(date);
-    const [hours, minutes] = startTime.split(":");
+    const startDate = selectedWorkshop.date;
+    const [hours, minutes] = selectedWorkshop.startTime.split(":");
     startDate.setHours(parseInt(hours, 10));
     startDate.setMinutes(parseInt(minutes, 10));
 
-    const endDate = new Date(date);
-    const [endHours, endMinutes] = endTime.split(":");
+    const endDate = selectedWorkshop.date;
+    const [endHours, endMinutes] = selectedWorkshop.endTime.split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
 
-    // Create the request body
     const reqBody = {
-      name,
-      description,
+      organizerId: userData.id,
+      name: selectedWorkshop.name,
+      description: selectedWorkshop.description,
       startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
       endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
-      eventId,
-      spaceId,
+      eventId: selectedWorkshop.eventId,
+      spaceId: selectedWorkshop.spaceId,
     };
+
+    console.log(reqBody)
 
     // Make the API request
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
-        setIsModalOpen(false);
-        setWorkshops((workshops) => [
-          ...workshops,
-          {
-            ...res.data.workshop,
-            capacity: 50,
-          },
-        ]);
+        dispatch(toggleWorkshopModal())
+        dispatch(addWorkshop({
+          ...res.data.workshop,
+          capacity: 50
+        }))
       })
       .catch((err) => {
+        console.log(err)
         toast.error("Failed to add workshop");
       });
   };
 
   const handleEditWorkshop = () => {
-    const startDate = new Date(date);
-    const [hours, minutes] = startTime.split(":");
+    const startDate = selectedWorkshop.date;
+    const [hours, minutes] = selectedWorkshop.startTime.split(":");
     startDate.setHours(parseInt(hours, 10));
     startDate.setMinutes(parseInt(minutes, 10));
 
-    const endDate = new Date(date);
-    const [endHours, endMinutes] = endTime.split(":");
+    const endDate = selectedWorkshop.date;
+    const [endHours, endMinutes] = selectedWorkshop.endTime.split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
 
     // Create the request body
     const reqBody = {
-      name,
-      description,
+      organizerId: userData.id,
+      name: selectedWorkshop.name,
+      description: selectedWorkshop.description,
       startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
       endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
-      eventId,
-      spaceId,
+      eventId: selectedWorkshop.eventId,
+      spaceId: selectedWorkshop.spaceId,
     };
+
+    console.log(reqBody)
 
     // Make the API request
     axiosRequest
-      .post(`/workshop/edit/${data.id}`, reqBody)
+      .post(`/workshop/edit/${selectedWorkshop.id}`, reqBody)
       .then((res) => {
         toast.success("Successfully Edited!");
-        setIsModalOpen(false);
-        setWorkshops((workshops) => {
-          const index = workshops.findIndex(
-            (workshop) => workshop.id === data.id
-          );
-          workshops[index] = { ...res.data.workshop, capacity: 50 };
-          return [...workshops];
-        });
+        dispatch(toggleWorkshopModal())
+        dispatch(editWorkshop({
+          ...res.data.workshop,
+          capacity: 50
+        }))
       })
       .catch((err) => {
-        toast.error("Failed to add workshop");
+        toast.error("Failed to edit workshop");
       });
   };
+
+  const handleInputChange = (e) => {
+    const payload = e.target;
+    dispatch(
+      updateSelectedWorkshopField({ id: payload.id, value: payload.value })
+    );
+  };
+
+  const handleDateChange = (date) => {
+    dispatch(
+      updateSelectedWorkshopField({ id: "date", value: date })
+    );
+  }
 
   return (
     isModalOpen && (
@@ -211,27 +293,32 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="modalCenterTitle">
-                Add Workshop
+                {isEdit ? "Edit" : "Add"} Workshop
               </h5>
               <button
                 type="button"
                 className="btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                onClick={() => setIsModalOpen(false)}
+                onClick={()=>{
+                  dispatch(toggleWorkshopModal())
+                  if(isEdit){
+                    dispatch(resetWorkshopModal())
+                  }
+                }}
               />
             </div>
             <div className="modal-body">
               <div className="row">
                 <div className="col mb-3">
-                  <label htmlFor="nameWithTitle" className="form-label">
+                  <label htmlFor="name" className="form-label">
                     Name
                   </label>
                   <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={selectedWorkshop.name}
+                    onChange={handleInputChange}
                     type="text"
-                    id="nameWithTitle"
+                    id="name"
                     className="form-control"
                     placeholder="Enter Name"
                   />
@@ -244,10 +331,11 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   </label>
                   <div className="input-group input-group-merge form-send-message">
                     <textarea
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      value={selectedWorkshop.description}
+                      onChange={handleInputChange}
                       className="form-control message-input"
                       placeholder="Enter Description"
+                      id="description"
                       rows="2"
                     ></textarea>
                     <span className="message-actions input-group-text">
@@ -262,24 +350,22 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                     Space
                   </label>
                   <select
-                    id="select2Basic"
+                    id="spaceId"
                     className="select2 form-select form-select-md select2-hidden-accessible"
                     data-allow-clear="true"
                     data-select2-id="select2Basic"
                     tabIndex={-1}
                     aria-hidden="true"
-                    value={spaceId}
-                    onChange={(e) => setSpaceId(e.target.value)}
+                    value={selectedWorkshop.spaceId}
+                    onChange={handleInputChange}
                   >
-                    <option value="1" data-select2-id={2}>
-                      Room 1
-                    </option>
-                    <option value="2" data-select2-id={54}>
-                      Room 2
-                    </option>
-                    <option value="3" data-select2-id={55}>
-                      Room 3
-                    </option>
+                    {
+                      spaces.map((space, i) => {
+                        return <option value={space.id} data-select2-id={space.id}>
+                          {space.name}
+                        </option>
+                      })
+                    }
                   </select>
                 </div>
                 <div className="col mb-0">
@@ -287,24 +373,22 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                     Event
                   </label>
                   <select
-                    id="select2Basic"
+                    id="eventId"
                     className="select2 form-select form-select-md select2-hidden-accessible"
                     data-allow-clear="true"
                     data-select2-id="select2Basic"
                     tabIndex={-1}
                     aria-hidden="true"
-                    value={eventId}
-                    onChange={(e) => setEventId(e.target.value)}
+                    value={selectedWorkshop.eventId}
+                    onChange={handleInputChange}
                   >
-                    <option value="1" data-select2-id={2}>
-                      Alaska
-                    </option>
-                    <option value="2" data-select2-id={54}>
-                      Hawaii
-                    </option>
-                    <option value="3" data-select2-id={55}>
-                      California
-                    </option>
+                    {
+                      events.map((event, index) => {
+                        return <option value={event.id} data-select2-id={event.id}>
+                          {event.name}
+                        </option>
+                      })
+                    }
                   </select>
                 </div>
               </div>
@@ -316,9 +400,9 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   <input
                     type="text"
                     className="form-control"
-                    id="start-time"
+                    id="startTime"
                     placeholder="HH:MM"
-                    value={startTime}
+                    value={selectedWorkshop.startTime}
                     onChange={handleChangeStartTime}
                   />
                 </div>
@@ -329,9 +413,9 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                   <input
                     type="text"
                     className="form-control"
-                    id="start-time"
+                    id="endTime"
                     placeholder="HH:MM"
-                    value={endTime}
+                    value={selectedWorkshop.endTime}
                     onChange={handleChangeEndTime}
                   />
                 </div>
@@ -345,8 +429,8 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                     Date
                   </label>
                   <DatePicker
-                    selected={date || new Date()}
-                    onChange={(date) => setDate(date)}
+                    selected={selectedWorkshop.date}
+                    onChange={handleDateChange}
                     dateFormat="dd/MM/yyyy"
                     locale="en"
                     placeholderText="Choose a date"
@@ -364,16 +448,18 @@ function WorkshopModal({ isModalOpen, setIsModalOpen, setWorkshops, data }) {
                 type="button"
                 className="btn btn-label-secondary"
                 data-bs-dismiss="modal"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  dispatch(toggleWorkshopModal())
+                }}
               >
                 Close
               </button>
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={isEditMode ? handleEditWorkshop : handleAddWorkshop}
+                onClick={isEdit ? handleEditWorkshop : handleAddWorkshop}
               >
-                {isEditMode ? "Save Changes" : "Create Workshop"}
+                {isEdit ? "Save Changes" : "Create Workshop"}
               </button>
             </div>
           </div>
