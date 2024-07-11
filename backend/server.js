@@ -55,6 +55,9 @@ app.use("/auth", authRouter);
 const WorkshopRouter = require("./routes/WorkshopRoutes");
 app.use("/workshop", WorkshopRouter);
 
+const SpaceRouter = require("./routes/SpaceRoutes");
+app.use("/space", SpaceRouter);
+
 app.get("/*", function (req, res) {
   res.sendFile(
     path.join(__dirname, "../frontend/dist/index.html"),

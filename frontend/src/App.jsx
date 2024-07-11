@@ -11,6 +11,7 @@ import ResetPassword from "./modules/ForgetPass/pages/ResetPassword";
 import EventsPage from "./modules/Events/pages/EventsPage";
 import { Toaster } from "react-hot-toast";
 import Workshops from "./modules/Workshops/pages/Workshops";
+import Space from "./modules/Space/page/space"
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
         <Route path="/participants" element={<PrivateRoute><Participants /></PrivateRoute>} />
         <Route path="/workshops" element={<PrivateRoute><Workshops /></PrivateRoute>} />
         <Route path="/events" element={<PrivateRoute><EventsPage /></PrivateRoute>} />
+        <Route path="/space" element={<Space/>} />
+
       </Routes>
     </div>
   );
