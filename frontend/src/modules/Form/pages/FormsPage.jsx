@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import FormLandingPage from "./FormLandingPage";
+import FormsList from "../components/FormsList";
 import DashboardLayout from "../../../core/components/DashboardLayout/DashboardLayout";
 import FormModal from "../components/FormModal";
 function Forms() {
@@ -14,8 +14,9 @@ function Forms() {
       openSideBar={openSideBar}
       setOpenSideBar={openSideBar}
       toggleSideBar={toggleSideBar}
+      isModalOpen={isModalOpen}
     >
-      <FormLandingPage />
+      <FormsList />
       <FormModal />
     </DashboardLayout>
   );

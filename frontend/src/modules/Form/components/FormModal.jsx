@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../Form.css";
 import toast from "react-hot-toast";
 import Flatpickr from "react-flatpickr";
 import { useDispatch, useSelector } from "react-redux";
+
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "../../../utils/UserData";
 import "./DatePicker.css";
@@ -20,6 +21,7 @@ import {
 function FormModal() {
   const dispatch = useDispatch();
   const userData = UserData();
+  const [events, setEvents] = useState([]);
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
     (store) => store.formsStore
   );
@@ -27,10 +29,25 @@ function FormModal() {
   const [newFieldKey, setNewFieldKey] = useState("");
   const [showDynamicFields, setShowDynamicFields] = useState(false);
 
+  // Fetch user's events on component mount
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await axiosRequest.get(
+          `/events/get-organizer/${userData.id}`
+        );
+        setEvents(response.data.events);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    }
+
+    fetchEvents();
+  }, [userData.id]);
+
   const validateFields = () => {
     const { name, description, deadline } = selectedForm;
     if (!name || !description || !deadline) {
-      console.log({ selectedForm });
       toast.error("Please fill in all fields.");
       return false;
     }
@@ -57,10 +74,17 @@ function FormModal() {
           data: {},
         })
       );
+
+      // Fetch events every time the "Create Form" button is clicked
+      const eventsResponse = await axiosRequest.get(
+        `/events/get-organizer/${userData.id}`
+      );
+      setEvents(eventsResponse.data.events);
     } catch (error) {
       console.error("Error creating form:", error);
     }
   };
+
   const handleEditForm = async (formId) => {
     try {
       if (!validateFields()) {
@@ -70,7 +94,6 @@ function FormModal() {
         organizerId: userData.id,
         ...selectedForm,
       });
-      console.log(response.data.form);
       dispatch(editForm(response.data.form));
       dispatch(toggleFormModal());
       dispatch(
@@ -83,7 +106,7 @@ function FormModal() {
         })
       );
     } catch (error) {
-      console.error("Error creating form:", error);
+      console.error("Error editing form:", error);
     }
   };
 
@@ -118,7 +141,6 @@ function FormModal() {
   };
 
   const handleDateChange = (selectedDates) => {
-    console.log({ selectedDates });
     const selectedDate = selectedDates[0]; // Assuming single date selection
     if (selectedDate) {
       handleInputChange({
@@ -195,12 +217,29 @@ function FormModal() {
                   options={{
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
-                    // minDate: selectedForm.startDate,
-                    // maxDate: selectedForm.endDate,
                   }}
                   className="form-control"
                   onChange={handleDateChange}
                 />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="event" className="form-label">
+                  Event
+                </label>
+                <select
+                  id="event"
+                  className="form-select"
+                  value={selectedForm.event}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select Event</option>
+                  {events.map((event) => (
+                    <option key={event.id} value={event.id}>
+                      {event.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {showDynamicFields && (
