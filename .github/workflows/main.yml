@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@v3
 
       - name: Build Docker images
         run: |
@@ -33,7 +33,7 @@ jobs:
 
       - name: upload artifacts
         # working-directory: /app/backend
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MernStack
           path: /app/backend
