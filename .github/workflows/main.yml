@@ -33,7 +33,7 @@ jobs:
 
       - name: upload artifacts
         # working-directory: /app/backend
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: MernStack
           path: /app/backend
