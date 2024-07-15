@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MernStack
-          path: /app/backend
+          path: /backend
       - name: Wait for services to start
         run: sleep 30
 
