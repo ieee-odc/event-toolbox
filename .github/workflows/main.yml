@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MernStack
-          path: event-toolbox/
+          path: .git/
       - name: Wait for services to start
         run: sleep 30
 
