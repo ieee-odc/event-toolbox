@@ -28,22 +28,22 @@ jobs:
           docker-compose -f compose.yml up -d
           docker-compose -f compose.yml ps
 
-      - name: npm run dev
-        run: nmp run dev
+      # - name: npm run dev
+      #   run: nmp run dev
 
       - name: upload artifacts
         working-directory: /app/backend
-        uses: action/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MernStack
-          path: /app
+          path: /app/backend
       - name: Wait for services to start
         run: sleep 30
 
-      - name: Verify Docker Containers
-        run: |
-          docker ps -a
+      # - name: Verify Docker Containers
+      #   run: |
+      #     docker ps -a
 
-#      - name: Tear down
-#        if: always()
-#        run: docker-compose -f compose.yml down
+    #  - name: Tear down
+    #    if: always()
+    #    run: docker-compose -f compose.yml down
