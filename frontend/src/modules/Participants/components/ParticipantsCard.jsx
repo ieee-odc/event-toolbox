@@ -4,6 +4,8 @@ import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteParticipant } from "../../../core/Features/Participants";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -11,12 +13,9 @@ const ParticipationStatus = Object.freeze({
   CANCELED: "Canceled",
 });
 
-const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
-  const [participants, setParticipants] = useState([]);
-  const [filteredParticipants, setFilteredParticipants] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-
+const ParticipantsCard = () => {
+const { participants,filteredParticipants}=useSelector((store)=>store.participantsStore)
+const dispatch=useDispatch();
   const getStatusIcon = (status) => {
     switch (status) {
       case ParticipationStatus.PAID:
@@ -30,61 +29,10 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
     }
   };
 
-  const handleSearchChange = (event) => {
-    const filtered = participants.filter(
-      (participant) =>
-        participant.fullName
-          .toLowerCase()
-          .includes(event.target.value.toLowerCase()) ||
-        participant.email
-          .toLowerCase()
-          .includes(event.target.value.toLowerCase())
-    );
-    setFilteredParticipants(filtered);
-    setCurrentPage(1);
-  };
-
-  useEffect(() => {
-    // Change this when we add events
-    axiosRequest.get("/participant/get-event/1").then((res) => {
-      setParticipants(res.data.participants);
-      setFilteredParticipants(res.data.participants);
-    });
-  }, []);
-
-  useEffect(() => {
-    setFilteredParticipants(participants);
-  }, [participants]);
-
-  // Calculate pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredParticipants.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-  const totalPages = Math.ceil(filteredParticipants.length / itemsPerPage);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const handlePrevious = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
 
   const handleDeleteParticipant = (participantId) => {
     axiosRequest.post(`/participant/delete/${participantId}`).then(() => {
-      setParticipants(
-        participants.filter((participant) => participant.id !== participantId)
-      );
-      setFilteredParticipants(
-        filteredParticipants.filter(
-          (participant) => participant.id !== participantId
-        )
-      );
+      dispatch(deleteParticipant(participantId))
       toast.success("Participant deleted successfully");
     });
   };
@@ -97,10 +45,7 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <ParticipantTableHeader
-            handleSearchChange={handleSearchChange}
-            setIsModalOpen={setIsModalOpen}
-          />
+          <ParticipantTableHeader/>
           <div className="table-responsive">
             <table
               className="invoice-list-table table border-top dataTable no-footer dtr-column"
@@ -176,7 +121,7 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
                 </tr>
               </thead>
               <tbody>
-                {currentItems.map((participant, index) => (
+                {filteredParticipants.map((participant, index) => (
                   <tr
                     className={`${index % 2 === 0 ? "even" : "odd"}`}
                     key={participant.id}
@@ -304,11 +249,7 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
                 role="status"
                 aria-live="polite"
               >
-                {`Showing ${indexOfFirstItem + 1} to ${
-                  indexOfLastItem > filteredParticipants.length
-                    ? filteredParticipants.length
-                    : indexOfLastItem
-                } of ${filteredParticipants.length} entries`}
+                {`Showing  of ${filteredParticipants.length} entries`}
               </div>
             </div>
             <div className="col-sm-12 col-md-6">
@@ -318,15 +259,11 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
               >
                 <ul className="pagination">
                   <li
-                    className={`paginate_button page-item previous ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
+                    className={`paginate_button page-item previous`}
                     id="DataTables_Table_0_previous"
                   >
                     <a
-                      onClick={handlePrevious}
                       aria-controls="DataTables_Table_0"
-                      aria-disabled={currentPage === 1}
                       role="link"
                       tabIndex={-1}
                       className="page-link"
@@ -334,35 +271,24 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
                       Previous
                     </a>
                   </li>
-                  {[...Array(totalPages).keys()].map((number) => (
                     <li
-                      key={number + 1}
-                      className={`paginate_button page-item ${
-                        currentPage === number + 1 ? "active" : ""
-                      }`}
+                      className={`paginate_button page-item active`}
                     >
                       <a
-                        onClick={() => paginate(number + 1)}
                         href="#"
                         aria-controls="DataTables_Table_0"
                         role="link"
                         tabIndex={0}
                         className="page-link"
                       >
-                        {number + 1}
-                      </a>
+1                      </a>
                     </li>
-                  ))}
                   <li
-                    className={`paginate_button page-item next ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
+                    className={`paginate_button page-item next`}
                     id="DataTables_Table_0_next"
                   >
                     <a
-                      onClick={handleNext}
                       aria-controls="DataTables_Table_0"
-                      aria-disabled={currentPage === totalPages}
                       role="link"
                       tabIndex={0}
                       className="page-link"
@@ -375,11 +301,7 @@ const ParticipantsCard = ({ setIsModalOpen, isModalOpen }) => {
             </div>
           </div>
 
-          <ParticipantModal
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-            setParticipants={setParticipants}
-          />
+          <ParticipantModal/>
         </div>
       </div>
     </div>

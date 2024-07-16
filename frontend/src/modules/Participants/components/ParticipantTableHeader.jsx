@@ -1,6 +1,9 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
+import { toggleParticipantModal } from '../../../core/Features/Participants'
 
-function ParticipantTableHeader({handleSearchChange,setIsModalOpen}) {
+function ParticipantTableHeader() {
+  const dispatch=useDispatch()
   return (
     <div className="row mx-1">
     <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -26,7 +29,7 @@ function ParticipantTableHeader({handleSearchChange,setIsModalOpen}) {
             aria-controls="DataTables_Table_0"
             type="button"
             onClick={()=>{
-              setIsModalOpen(true)
+              dispatch(toggleParticipantModal())
             }}
           >
             <span>
@@ -47,7 +50,9 @@ function ParticipantTableHeader({handleSearchChange,setIsModalOpen}) {
                 className="form-control"
                 placeholder="Search Participant"
                 aria-controls="DataTables_Table_0"
-                onChange={handleSearchChange}
+                onChange={()=>{
+                  // dispatch()
+                }}
               />
             </label>
           </div>
