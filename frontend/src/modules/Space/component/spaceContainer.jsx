@@ -79,7 +79,7 @@ function SpaceContainer() {
           </div>
         </div>
       </div>
-      <div className="container-xxl flex-grow-1 container-p-y">
+      <div className="flex-grow-1 container-p-y">
         <div className="card overflow-hidden">
           <div className="d-flex app-logistics-fleet-wrapper">
             <div className="flex-shrink-0 position-fixed m-4 d-md-none w-auto z-1">
@@ -96,7 +96,10 @@ function SpaceContainer() {
               className="app-logistics-fleet-sidebar col h-100 show"
               id="app-logistics-fleet-sidebar"
             >
-              <div className="card-header border-0 pt-4 pb-2 d-flex justify-content-between" style={{alignItems:"center"}}>
+              <div
+                className="card-header border-0 pt-4 pb-2 d-flex justify-content-between"
+                style={{ alignItems: "center" }}
+              >
                 <h5 className="mb-0 card-title">Spaces</h5>
                 <button
                   className="btn btn-primary"
@@ -107,7 +110,7 @@ function SpaceContainer() {
                   Add Space
                 </button>
               </div>
-              
+
               <div className="card-body p-0 logistics-fleet-sidebar-body ps">
                 <div
                   className="accordion p-2"

@@ -198,6 +198,16 @@ function FormContainer() {
                       </td>
                     </tr>
                   ))}
+
+                  {filteredForms&&
+                    filteredForms.length===0&& (
+                      <tr>
+                      <td colSpan="4" style={{ textAlign: "center" }}>
+                        <span>There is no data currently</span>
+                      </td>
+                    </tr>
+                    )
+                  }
               </tbody>
             </table>
           </div>
