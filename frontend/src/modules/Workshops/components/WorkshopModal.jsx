@@ -10,7 +10,9 @@ import { UserData } from "./../../../utils/UserData";
 import { addWorkshop, editWorkshop, resetWorkshopModal, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 import { initializeEvents } from "../../../core/Features/Events";
 import { initializeSpaces } from "../../../core/Features/Spaces";
+import { useParams } from "react-router-dom";
 function WorkshopModal() {
+  const { eventId } = useParams();
   const { selectedWorkshop, isModalOpen, isEdit } = useSelector((state) => state.workshopsStore);
   const { events } = useSelector((state) => state.eventsStore);
   const { spaces } = useSelector((state) => state.spacesStore);
@@ -20,13 +22,13 @@ function WorkshopModal() {
 
 
   useEffect(() => {
-    axiosRequest.get(`/space/get-organizer/${userData.id}`).then((res) => {
+    axiosRequest.get(`/space/get-event/${userData.id}`).then((res) => {
       dispatch(initializeSpaces(res.data.spaces))
     })
   }, [])
 
   useEffect(() => {
-    axiosRequest.get(`/events/get-organizer/${userData.id}`).then((res) => {
+    axiosRequest.get(`/events/get-event/${userData.id}`).then((res) => {
       dispatch(initializeEvents(res.data.events))
     })
   }, [])

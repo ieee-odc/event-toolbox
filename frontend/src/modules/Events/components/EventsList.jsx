@@ -12,6 +12,7 @@ import {
   toggleEventModal,
   selectEvent,
 } from "../../../core/Features/Events";
+import { useNavigate } from "react-router-dom";
 
 function EventsList() {
   const dispatch = useDispatch();
@@ -74,6 +75,8 @@ function EventsList() {
 const onAddEventClick=()=>{
   dispatch(toggleEventModal())
 }
+
+const navigate=useNavigate();
 
 
   useEffect(() => {
@@ -176,7 +179,9 @@ const onAddEventClick=()=>{
                 ) : (
                   filteredEvents &&
                   filteredEvents.map((event) => (
-                    <div className="col-sm-6 col-lg-4" key={event._id}>
+                    <div className="col-sm-6 col-lg-4 cursor-pointer" key={event._id} onClick={()=>{
+                      navigate(`/event/${event.id}`)
+                    }}>
                       <div className="card p-2 h-100 shadow-none border">
                         <div className="rounded-2 text-center mb-0"></div>
                         {/* <div className="rounded-2 text-center mb-3">
