@@ -4,58 +4,66 @@ import "./CustomSideBar.css";
 function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
   const navigate = useNavigate();
   const [routes, setRoutes] = useState([
+    // {
+    //   name: "Events",
+    //   icon: "bx bx-party",
+    //   route: "/events",
+    //   isActive: activeTab === "/events",
+    //   isSubMenuOpen: false,
+    //   childRoutes: [
+    //     {
+    //       name: "Spaces",
+    //       icon: "bx bx-home-alt",
+    //       route: "/spaces",
+    //       isActive: activeTab === "/spaces",
+    //     },
+    //     {
+    //       name: "Participants",
+    //       icon: "bx bx-user",
+    //       route: "/participants",
+    //       isActive: activeTab === "/participants",
+    //     },
+    //     {
+    //       name: "Forms",
+    //       icon: "bx bx-file",
+    //       route: "/forms",
+    //       isActive: activeTab === "/forms",
+    //     },
+    //     {
+    //       name: "Workshops",
+    //       icon: "bx bx-hard-hat",
+    //       route: "/workshops",
+    //       isActive: activeTab === "/workshops",
+    //     },
+    //   ],
+    // },
+
     {
       name: "Events",
       icon: "bx bx-party",
       route: "/events",
       isActive: activeTab === "/events",
       isSubMenuOpen: false,
-      childRoutes: [
-        {
-          name: "Spaces",
-          icon: "bx bx-home-alt",
-          route: "/spaces",
-          isActive: activeTab === "/spaces",
-        },
-        {
-          name: "Participants",
-          icon: "bx bx-user",
-          route: "/participants",
-          isActive: activeTab === "/participants",
-        },
-        {
-          name: "Forms",
-          icon: "bx bx-file",
-          route: "/forms",
-          isActive: activeTab === "/forms",
-        },
-        {
-          name: "Workshops",
-          icon: "bx bx-hard-hat",
-          route: "/workshops",
-          isActive: activeTab === "/workshops",
-        },
-      ],
     },
   ]);
 
-  useEffect(() => {
-    let isAnyChildActive = false;
-    const updatedRoutes = routes.map((route) => {
-      const anyChildActive = route.childRoutes.some(
-        (childRoute) => childRoute.isActive
-      );
-      if (anyChildActive) {
-        isAnyChildActive = true;
-        return { ...route, isSubMenuOpen: true };
-      } else {
-        return { ...route, isSubMenuOpen: false };
-      }
-    });
-    if (isAnyChildActive) {
-      setRoutes(updatedRoutes);
-    }
-  }, [activeTab]);
+  // useEffect(() => {
+  //   let isAnyChildActive = false;
+  //   const updatedRoutes = routes.map((route) => {
+  //     const anyChildActive = route.childRoutes.some(
+  //       (childRoute) => childRoute.isActive
+  //     );
+  //     if (anyChildActive) {
+  //       isAnyChildActive = true;
+  //       return { ...route, isSubMenuOpen: true };
+  //     } else {
+  //       return { ...route, isSubMenuOpen: false };
+  //     }
+  //   });
+  //   if (isAnyChildActive) {
+  //     setRoutes(updatedRoutes);
+  //   }
+  // }, [activeTab]);
 
   const toggleSubMenu = (index) => {
     const updatedRoutes = [...routes];
@@ -183,44 +191,15 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
             }`}
           >
             <a
-              className="menu-link menu-toggle"
+              className="menu-link"
               onClick={(e) => {
-                e.preventDefault();
-                toggleSubMenu(index);
+                navigate(route.route);
               }}
             >
               <i className={`menu-icon tf-icons ${route.icon}`} />
               <div className="text-truncate">{route.name}</div>
             </a>
 
-            {/* Conditionally render submenu with CSS transition */}
-            <ul
-              className="menu-sub"
-              style={{
-                display: route.isSubMenuOpen ? "flex" : "none",
-                height: "45px",
-              }}
-            >
-              {route.childRoutes.map((childRoute, childIndex) => (
-                <li
-                  key={childIndex}
-                  className={`menu-item ${childRoute.isActive ? "active" : ""}`}
-                >
-                  <a
-                    href={childRoute.route}
-                    className={`menu-link ${
-                      childRoute.isActive ? "active" : ""
-                    }`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(childRoute.route);
-                    }}
-                  >
-                    <div className="text-truncate">{childRoute.name}</div>
-                  </a>
-                </li>
-              ))}
-            </ul>
           </li>
         ))}
       </ul>

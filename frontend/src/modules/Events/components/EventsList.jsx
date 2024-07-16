@@ -12,6 +12,7 @@ import {
   toggleEventModal,
   selectEvent,
 } from "../../../core/Features/Events";
+import { useNavigate } from "react-router-dom";
 
 function EventsList() {
   const dispatch = useDispatch();
@@ -19,8 +20,6 @@ function EventsList() {
     (store) => store.eventsStore
   );
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage] = useState(6);
   const userData = UserData();
 
   const handleDeleteEvent = async (eventId) => {
@@ -75,6 +74,8 @@ const onAddEventClick=()=>{
   dispatch(toggleEventModal())
 }
 
+const navigate=useNavigate();
+
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -110,7 +111,7 @@ const onAddEventClick=()=>{
             <div className="card-header d-flex flex-wrap justify-content-between gap-3">
               <div className="card-title mb-0 me-1">
                 <h5 className="mb-1">My Events</h5>
-                <p className="text-muted mb-0">Total {events.length} events</p>
+                <p className="text-muted mb-0">Total {events &&events.length} events</p>
               </div>
               <div className="d-flex justify-content-md-end align-items-center gap-3 flex-wrap">
                 <div className="position-relative">
@@ -176,18 +177,20 @@ const onAddEventClick=()=>{
                 ) : (
                   filteredEvents &&
                   filteredEvents.map((event) => (
-                    <div className="col-sm-6 col-lg-4" key={event._id}>
+                    <div className="col-sm-6 col-lg-4 cursor-pointer" key={event._id} onClick={()=>{
+                      navigate(`/event/${event.id}`)
+                    }}>
                       <div className="card p-2 h-100 shadow-none border">
                         <div className="rounded-2 text-center mb-0"></div>
-                        {/* <div className="rounded-2 text-center mb-3">
+                        <div className="rounded-2 text-center mb-3">
                           <a href="">
                             <img
                               className="img-fluid"
-                              src={tutorImage}
+                              src={"https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"}
                               alt="tutor image 1"
                             />
                           </a>
-                        </div> */}
+                        </div>
                         <div className="card-body p-3 pt-3" id="eventCardBody">
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span
@@ -285,50 +288,30 @@ const onAddEventClick=()=>{
               <nav className="mt-4" aria-label="...">
                 <ul className="pagination">
                   <li
-                    className={`page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
+                    className={`page-item`}
                   >
                     <button
                       className="page-link"
-                      onClick={() => paginate(currentPage - 1)}
                       tabIndex="-1"
-                      aria-disabled={currentPage === 1}
                     >
                       Previous
                     </button>
                   </li>
-                  {Array.from(
-                    {
-                      length: Math.ceil(filteredEvents.length / eventsPerPage),
-                    },
-                    (_, index) => (
-                      <li
-                        key={index}
-                        className={`page-item ${
-                          currentPage === index + 1 ? "active" : ""
-                        }`}
+           
+                  <li
+                        className={`page-ite`}
                       >
                         <button
                           className="page-link"
-                          onClick={() => paginate(index + 1)}
                         >
-                          {index + 1}
+                          1
                         </button>
                       </li>
-                    )
-                  )}
                   <li
-                    className={`page-item ${
-                      currentPage ===
-                      Math.ceil(filteredEvents.length / eventsPerPage)
-                        ? "disabled"
-                        : ""
-                    }`}
+                    className={`page-item `}
                   >
                     <button
                       className="page-link"
-                      onClick={() => paginate(currentPage + 1)}
                     >
                       Next
                     </button>

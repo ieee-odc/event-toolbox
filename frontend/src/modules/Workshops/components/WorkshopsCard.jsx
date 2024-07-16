@@ -58,13 +58,7 @@ const dispatch=useDispatch();
     setDropdownStates(initialStates);
   };
 
-  useEffect(() => {
-    // Fetch workshops or initialize data
-    axiosRequest.get(`/workshop/get-organizer/${userData.id}`).then((res) => {
-      dispatch(initializeWorkshops(res.data.workshops))
-      initializeDropdownStates(res.data.workshops);
-    });
-  }, []);
+
 
   const toggleDropdown = (workshopId) => {
     setDropdownStates({

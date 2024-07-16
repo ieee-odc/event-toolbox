@@ -30,22 +30,6 @@ function FormModal() {
   );
   const modalClassName = isFormModalOpen ? "modal fade show" : "modal fade";
 
-  useEffect(() => {
-    async function fetchEvents() {
-      try {
-        const response = await axiosRequest.get(
-          `/events/get-organizer/${userData.id}`
-        );
-        dispatch(initializeEvents(response.data.events));
-        dispatch(updateSelectedFormField({id:"eventId",value:response.data.events[0].id||null}))
-      } catch (error) {
-        console.error("Error fetching events:", error);
-      }
-    }
-
-    fetchEvents();
-  }, [userData.id]);
-
   const validateFields = () => {
     const { name, description, deadline } = selectedForm;
     if (!name || !description || !deadline) {
@@ -206,24 +190,7 @@ function FormModal() {
                 />
               </div>
 
-              <div className="mb-3">
-                <label htmlFor="event" className="form-label">
-                  Event
-                </label>
-                <select
-                  id="event"
-                  className="form-select"
-                  value={selectedForm.event}
-                  onChange={handleInputChange}
-                >
-                  {events.map((event) => (
-                    <option key={event.id} value={event.id}>
-                      {event.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+          
               <>
                 {selectedForm.data.map((element, index) => (
                   <div className="mb-3" key={index}>

@@ -91,20 +91,20 @@ const getOrganizerEvents = async (req, res) => {
 
     const organizer = await User.findOne({id:organizerId});
     if(!organizer){
-      res.status(400).json({
+      return res.status(400).json({
         message: "Organizer doesn't exist!",
       });
     }
     const events = await Event.find({ organizerId });
 
-    res.status(200).json({
+    return res.status(200).json({
       status: "success",
       message: "Events retrieved successfully",
       events
     });
   } catch (e) {
     console.error(e);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server Error!",
     });
   }

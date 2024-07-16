@@ -3,11 +3,7 @@ import WorkshopsCard from './WorkshopsCard'
 
 function WorkshopsContainer() {
   return (
-    <div className="container-xxl flex-grow-1 container-p-y">
-          <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">Events /</span>{" "}
-            Workshops
-          </h4>
+    <div className="flex-grow-1 container-p-y">
           {/* Invoice List Widget */}
           <div className="card mb-4">
             <div className="card-widget-separator-wrapper">

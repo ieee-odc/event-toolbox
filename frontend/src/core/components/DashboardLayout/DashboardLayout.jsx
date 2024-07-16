@@ -78,7 +78,6 @@ function DashboardLayout({ children, activeTab, isModalOpen }) {
             className="content-backdrop fade"
             style={{ zIndex: "999", opacity: "0.3" }}
           >
-            azdazd
           </div>
         )}
       </div>

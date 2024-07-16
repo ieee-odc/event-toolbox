@@ -10,7 +10,10 @@ const SpaceSchema = new Schema(
             type: Number,
             required: true,
         },
-
+        eventId: {
+            type: Number,
+            required: true,
+        },
         capacity: {
             type: Number,
             default: 0

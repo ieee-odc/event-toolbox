@@ -1,6 +1,7 @@
 const Form = require("../models/FormModel");
 const User = require("../models/OrganizerModel");
 const Counter = require("../models/CounterModel");
+const Event = require("../models/EventModel");
 
 const createForm = async (req, res) => {
   try {
@@ -90,9 +91,35 @@ const getOrganizerForms = async (req, res) => {
   }
 };
 
+const getEventForms = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const event = await Event.findOne({ id: eventId });
+    if (!event) {
+      return res.status(400).json({
+        message: "Event doesn't exist!",
+      });
+    }
+    const forms = await Form.find({ eventId });
+
+   return  res.status(200).json({
+      status: "success",
+      message: "Forms retrieved successfully",
+      forms,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
 module.exports = {
   createForm,
   getOrganizerForms,
   updateForm,
   deleteForm,
+  getEventForms
 };

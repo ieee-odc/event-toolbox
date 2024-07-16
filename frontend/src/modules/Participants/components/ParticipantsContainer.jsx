@@ -2,14 +2,9 @@ import React, { useState } from 'react'
 import ParticipantsCard from './ParticipantsCard'
 
 function ParticipantsContainer() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="container-xxl flex-grow-1 container-p-y">
-          <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">Events /</span>{" "}
-            Participants
-          </h4>
+    <div className="flex-grow-1 container-p-y" style={{padding:"0 !important"}}>
           {/* Invoice List Widget */}
           <div className="card mb-4">
             <div className="card-widget-separator-wrapper">
@@ -74,10 +69,7 @@ function ParticipantsContainer() {
             </div>
           </div>
           {/* Invoice List Table */}
-          <ParticipantsCard
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-          />
+          <ParticipantsCard/>
         </div>
   )
 }
