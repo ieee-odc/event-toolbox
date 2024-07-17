@@ -1,13 +1,15 @@
 const Counter = require("../models/CounterModel");
 const Event = require("../models/EventModel");
 const User = require("../models/OrganizerModel");
-
+const Space = require("../models/SpaceModel");
+const Workshop = require("../models/WorkshopModel");
+const Form = require("../models/FormModel");
+const mongoose = require("mongoose");
 
 const getEvents = async (req, res) => {
   const events = await Event.find({}).sort({ createdAt: -1 });
   res.status(200).json(events);
 };
-
 
 const createEvent = async (req, res) => {
   try {
@@ -18,7 +20,7 @@ const createEvent = async (req, res) => {
     );
     const newEvent = await Event.create({
       id: counter.seq,
-      ...req.body
+      ...req.body,
     });
     res.status(200).json(newEvent);
   } catch (error) {
@@ -27,26 +29,25 @@ const createEvent = async (req, res) => {
 };
 
 const updateEvent = async (req, res) => {
-  try{
+  try {
     const { eventId } = req.params;
 
-  const updatedEvent = await Event.findOneAndUpdate(
-    { id:eventId },
-    {
-      ...req.body,
-    },
-    { new: true }
+    const updatedEvent = await Event.findOneAndUpdate(
+      { id: eventId },
+      {
+        ...req.body,
+      },
+      { new: true }
+    );
+    if (!updatedEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-  );
-  if (!updatedEvent) {
-    return res.status(404).json({ message: "Event not found" });
-  }
-
-  res.status(200).json({
-    message:"Event successfully updated",
-    event:updatedEvent
-  });
-  }catch(e){
+    res.status(200).json({
+      message: "Event successfully updated",
+      event: updatedEvent,
+    });
+  } catch (e) {
     console.error(e);
     res.status(500).json({
       message: "Server Error!",
@@ -56,7 +57,7 @@ const updateEvent = async (req, res) => {
 const deleteEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const deletedEvent = await Event.findOneAndDelete({ id:eventId });
+    const deletedEvent = await Event.findOneAndDelete({ id: eventId });
     if (!deletedEvent) {
       return res.status(400).json({ error: "No such item" });
     }
@@ -69,28 +70,13 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-const getEvent = async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const searchedEvent = await Event.findOne({ id:eventId });
-    if (!searchedEvent) {
-      return res.status(404).json({ error: "No such Event" });
-    }
-    res.status(200).json(searchedEvent);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({
-      message: "Server Error!",
-    });
-  }
-};
 
 const getOrganizerEvents = async (req, res) => {
   try {
     const { organizerId } = req.params;
 
-    const organizer = await User.findOne({id:organizerId});
-    if(!organizer){
+    const organizer = await User.findOne({ id: organizerId });
+    if (!organizer) {
       return res.status(400).json({
         message: "Organizer doesn't exist!",
       });
@@ -100,7 +86,7 @@ const getOrganizerEvents = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Events retrieved successfully",
-      events
+      events,
     });
   } catch (e) {
     console.error(e);
@@ -110,11 +96,128 @@ const getOrganizerEvents = async (req, res) => {
   }
 };
 
+const getOneEvent = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const event = await Event.findOne({ id: eventId });
+    if (!event) {
+      return res.status(400).json({
+        message: "Event doesn't exist!",
+      });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Event retrieved successfully",
+      event,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
+const duplicateEvent = async (req, res) => {
+  const { eventId } = req.params;
+
+  try {
+    const originalEvent = await Event.findOne({ id: eventId });
+    if (!originalEvent) {
+      return res.status(404).send({ message: "Event not found" });
+    }
+    const counter = await Counter.findOneAndUpdate(
+      { id: "autovalEvents" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const duplicatedEvent = new Event({
+      ...originalEvent.toObject(),
+      name:`${originalEvent.name} Duplicate`,
+      id: counter.seq,
+      _id: new mongoose.Types.ObjectId(),
+    });
+    await duplicatedEvent.save();
+
+    // Duplicate associated spaces
+    const spaces = await Space.find({ eventId });
+    const duplicatedSpaces = await Promise.all(
+      spaces.map(async (space) => {
+        const spacesCounter = await Counter.findOneAndUpdate(
+          { id: "autovalSpaces" },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        const duplicatedSpace = new Space({
+          ...space.toObject(),
+          id: spacesCounter.seq,
+          eventId: counter.seq,
+          _id: new mongoose.Types.ObjectId(),
+        });
+        await duplicatedSpace.save();
+        return duplicatedSpace;
+      })
+    );
+
+    // Duplicate associated workshops
+    const workshops = await Workshop.find({ eventId });
+    const duplicatedWorkshops = await Promise.all(
+      workshops.map(async (workshop) => {
+        const workshopsCounter = await Counter.findOneAndUpdate(
+          { id: "autovalWorkshops" },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        const duplicatedWorkshop = new Workshop({
+          ...workshop.toObject(),
+          id: workshopsCounter.seq,
+          eventId: counter.seq,
+          _id: new mongoose.Types.ObjectId(),
+
+        });
+        await duplicatedWorkshop.save();
+        return duplicatedWorkshop;
+      })
+    );
+
+    // Duplicate associated forms
+    const forms = await Form.find({ eventId });
+    const duplicatedForms = await Promise.all(
+      forms.map(async (form) => {
+        const FormsCounter = await Counter.findOneAndUpdate(
+          { id: "autovalForms" },
+          { $inc: { seq: 1 } },
+          { new: true, upsert: true }
+        );
+        const duplicatedForm = new Form({
+          ...form.toObject(),
+          id: FormsCounter.seq,
+          eventId: counter.seq,
+          _id: new mongoose.Types.ObjectId(),
+        });
+        await duplicatedForm.save();
+        return duplicatedForm;
+      })
+    );
+
+    res.status(201).send({
+      message: "Event duplicated successfully",
+      event: duplicatedEvent,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   createEvent,
   deleteEvent,
   updateEvent,
   getEvents,
-  getEvent,
   getOrganizerEvents,
+  duplicateEvent,
+  getOneEvent
 };
