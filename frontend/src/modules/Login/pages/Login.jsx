@@ -77,7 +77,7 @@ function Login() {
   };
 
   const onGoogleFailure = (err) => {
-    setErrors({ server: err.response.data.msg });
+    setErrors({ server: err.response.msg });
   };
 
   const [obscureText, setObscureText] = useState(true);
@@ -212,8 +212,15 @@ function Login() {
                   buttonText="Sign in with Google"
                   onSuccess={onGoogleSuccess}
                   onFailure={onGoogleFailure}
-                  action={(data) =>
-                    axiosRequest.post("/auth/loginwithgoogle", data)
+                  action={(data) =>{
+
+                    console.log(data)
+                    return axiosRequest.post("/auth/loginwithgoogle", data).then((response) =>{
+                      console.log(response.data)
+                    }).catch((err)=>{
+                      console.log(err)
+                    })
+                  }
                   }
                 />
               </div>

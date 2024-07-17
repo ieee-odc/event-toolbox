@@ -3,7 +3,7 @@ import WorkshopsCard from './WorkshopsCard'
 
 function WorkshopsContainer() {
   return (
-    <div className="flex-grow-1 container-p-y">
+    <div className="flex-grow-1">
           {/* Invoice List Widget */}
           <div className="card mb-4">
             <div className="card-widget-separator-wrapper">

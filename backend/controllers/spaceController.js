@@ -23,7 +23,6 @@ const createSpace = async (req, res) => {
             space:newSpace
         });
     } catch (error) {
-        console.log(error)
         res.status(500).json({ error: 'Internal server error' });
     }
 };;

@@ -19,10 +19,12 @@ import {
   updateData,
 } from "../../../core/Features/Forms";
 import { initializeEvents } from "../../../core/Features/Events";
+import { useParams } from "react-router-dom";
 
 function FormModal() {
   const dispatch = useDispatch();
   const userData = UserData();
+  const { eventId } = useParams();
 
   const { events } = useSelector((store) => store.eventsStore)
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
@@ -48,6 +50,7 @@ function FormModal() {
       const response = await axiosRequest.post("/form/add", {
         ...selectedForm,
         organizerId: userData.id,
+        eventId
       });
       dispatch(addForm(response.data));
       dispatch(toggleFormModal());
@@ -55,7 +58,6 @@ function FormModal() {
 
       toast.success("Form added successfully")
 
-      // Fetch events every time the "Create Form" button is clicked
       const eventsResponse = await axiosRequest.get(
         `/events/get-organizer/${userData.id}`
       );
@@ -72,6 +74,7 @@ function FormModal() {
       }
       const response = await axiosRequest.post(`/form/edit/${formId}`, {
         organizerId: userData.id,
+        eventId,
         ...selectedForm,
       });
       dispatch(editForm(response.data.form));

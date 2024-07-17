@@ -5,9 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addSpace, deleteSpace, editSpace, resetSpaceModal, toggleSpaceModal, updateSelectedSpaceField } from '../../../core/Features/Spaces';
 import toast from 'react-hot-toast';
 import { UserData } from '../../../utils/UserData';
+import { useParams } from 'react-router-dom';
 
 function SpaceModal() {
   const dispatch = useDispatch();
+  const { eventId } = useParams();
 
   const { isModalOpen, selectedSpace, isEdit } = useSelector((store) => store.spacesStore)
 
@@ -35,8 +37,14 @@ function SpaceModal() {
   };
 
   const handleCreateSpace = () => {
+    console.log({
+      ...selectedSpace,
+      eventId,
+      organizerId: userData.id
+    })
     axiosRequest.post("/space/add", {
       ...selectedSpace,
+      eventId,
       organizerId: userData.id
     }).then((res) => {
       dispatch(toggleSpaceModal())
