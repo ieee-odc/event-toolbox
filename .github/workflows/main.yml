@@ -18,18 +18,50 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Create docker image
+        run: docker-compose -f compose.yml build
+
+
+
+
+
+
+
+
+
+        ##### create an artifact for local download 
+        ########## this is not the main goal
       
 
-      - name: build docker image for frontend
-        run: cd ./frontend && ls && npm install && npm run build
+      # - name: build docker image for frontend
+      #   run: cd ./frontend && ls && npm install && npm run build
 
         
 
-      - name: upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: MernStack
-          path: ./frontend
+      # - name: upload artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: MernStack
+      #     path: ./frontend
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          ########## this part is meant for docker compose which is not taken in consideration for the moment
 
       # - name: Build Docker images
       #   run: |
