@@ -35,7 +35,7 @@ jobs:
           push: true
           tags: latest
           # tags: latest, ${{github.run_number }}
-          repository: chayma02
+          repository: chayma02/eventmanager
           # tags: latest, ${{github.run_number }}
 
 
