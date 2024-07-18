@@ -26,9 +26,8 @@ jobs:
         with:
           context: ./frontend
           push: true
-          tags: latest
           # tags: latest, ${{github.run_number }}
-          repository: chayma02/eventmanager
+          tags: chayma02/eventmanager:latest
           # tags: latest, ${{github.run_number }}
 
 
