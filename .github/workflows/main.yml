@@ -34,8 +34,7 @@ jobs:
           context: ./frontend
           push: true
           tags: user/app:latest, ${{github.run_number }}
-
-          # repository: ieee/eventToolBox
+          repository: chayma02/eventToolBox
           # tags: latest, ${{github.run_number }}
 
 
