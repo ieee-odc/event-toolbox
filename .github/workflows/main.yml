@@ -26,11 +26,11 @@ jobs:
         
 
       - name: upload artifacts
-        working-directory: /app/backend
+        working-directory: /app/frontend
         uses: actions/upload-artifact@v4
-        with:
-          name: MernStack
-          path: ./
+        # with:
+        #   name: MernStack
+        #   path: ./
 
       # - name: Build Docker images
       #   run: |
