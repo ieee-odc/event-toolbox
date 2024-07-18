@@ -42,11 +42,15 @@ function SpaceModal({ isOpen, toggleModal, orgId, spaceId, name, capacity, onSpa
 
       console.log(isCreating ? 'Space created:' : 'Space updated:', response.data);
       setIsSuccess(true);
+     // toggleModal(); // Close modal immediately after success
+      //onSpaceCreated(); // Notify parent component of space creation/update
+
       setTimeout(() => {
         toggleModal();
         setIsSuccess(false);
         onSpaceCreated(); // Notify parent component of space creation/update
-      }, 2000); // Close modal and reset success state after 2 seconds
+        window.location.reload(); // Reload the page after update
+      }, 1500); // Close modal and reset success state after 2 seconds
     } catch (error) {
       console.error(isCreating ? 'Error creating space:' : 'Error updating space:', error);
       setError(error.message || `Failed to ${isCreating ? 'create' : 'update'} space`);
@@ -66,6 +70,7 @@ function SpaceModal({ isOpen, toggleModal, orgId, spaceId, name, capacity, onSpa
         toggleModal();
         setIsSuccess(false);
         onSpaceCreated(); // Notify parent component of space deletion
+        window.location.reload(); // Reload the page after delete
       }, 2000);
     } catch (error) {
       console.error('Error deleting space:', error);

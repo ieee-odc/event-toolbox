@@ -13,6 +13,7 @@ function Space() {
   // Function to handle opening and closing modal
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
+    
   };
 
   // Example function to get orgId dynamically
@@ -47,9 +48,12 @@ function Space() {
     fetchOrgId();
   }, []);
 
-  // Function to handle space creation success
-  const handleSpaceCreated = () => {
+  // Function to handle space creation success or update
+  const handleSpaceCreatedOrUpdated = () => {
     fetchSpaces(); // Refresh the space list
+    setIsModalOpen(false); // Close the modal after creation/update
+    window.location.reload(); // Reload the page after space creation
+
   };
 
   return (
@@ -57,7 +61,12 @@ function Space() {
       <div className="container-xxl flex-grow-1 container-p-y">
         <div className="d-flex justify-content-end mb-3">
           <button className="btn btn-primary" onClick={toggleModal}>Add Space</button>
-          <SpaceModal isOpen={isModalOpen} toggleModal={toggleModal} orgId={orgId} onSpaceCreated={handleSpaceCreated} />
+          <SpaceModal
+            isOpen={isModalOpen}
+            toggleModal={toggleModal}
+            orgId={orgId}
+            onSpaceCreated={handleSpaceCreatedOrUpdated}
+          />
         </div>
         <div className="card overflow-hidden">
           <div className="d-flex app-logistics-fleet-wrapper">
