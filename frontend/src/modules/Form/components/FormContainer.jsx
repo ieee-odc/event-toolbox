@@ -52,7 +52,7 @@ function FormContainer() {
   };
 
   return (
-    <div className="flex-grow-1 container-p-y">
+    <div className="flex-grow-1">
       <div className="card mb-4">
         <div className="card-widget-separator-wrapper">
           <div className="card-body card-widget-separator">
@@ -125,7 +125,12 @@ function FormContainer() {
               // dispatch(resetFormModal());
             }}
           >
-            Create Form
+            <span>
+              <i className="bx bx-plus me-md-1" />
+              <span className="d-md-inline-block d-none">
+              Create Form              </span>
+            </span>
+            
           </button>
           </div>
           <div className="table-responsive">

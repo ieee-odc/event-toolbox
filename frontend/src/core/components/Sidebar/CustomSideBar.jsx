@@ -37,7 +37,13 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
     //     },
     //   ],
     // },
-
+    {
+      name: "Dashboard",
+      icon: "bx bxs-dashboard",
+      route: "/dashboard",
+      isActive: activeTab === "/dashboard",
+      isSubMenuOpen: false,
+    },
     {
       name: "Events",
       icon: "bx bx-party",
