@@ -32,11 +32,6 @@ jobs:
           # tags: latest, ${{github.run_number }}
 
 
-
-
-
-
-
         ##### create an artifact for local download 
         ########## this is not the main goal
       
