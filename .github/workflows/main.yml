@@ -21,7 +21,7 @@ jobs:
       
 
       - name: build docker image for frontend
-        run: cd ./frontend && ls && npm run dev
+        run: cd ./frontend && ls && nmp install && npm run dev
 
         
 
