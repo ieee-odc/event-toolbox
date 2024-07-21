@@ -74,6 +74,12 @@ app.use("/space", SpaceRouter);
 const FormRouter = require("./routes/FormRoutes");
 app.use("/form", FormRouter);
 
+const linkRoutes = require('./routes/LinkRoutes');
+app.use('/link', linkRoutes);
+
+
+
+
 app.get("/*", function (req, res) {
   res.sendFile(
     path.join(__dirname, "../frontend/dist/index.html"),

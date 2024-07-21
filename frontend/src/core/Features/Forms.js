@@ -1,4 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
+import axiosRequest from "../../utils/AxiosConfig";
+
+export const generateShareLink = createAsyncThunk(
+  "Forms/generateShareLink",
+  async ({ formId, expirationDate }, { rejectWithValue }) => {
+    try {
+      const response = await axiosRequest.post("/link/create", {
+        formId,
+        expirationDate,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 const FormsSlice = createSlice({
   name: "Forms",
@@ -17,6 +33,7 @@ const FormsSlice = createSlice({
       eventId:"",
       data: [],
     },
+    shareLink: null,
   },
   reducers: {
     initializeForms: (state, action) => {
@@ -100,6 +117,15 @@ const FormsSlice = createSlice({
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(generateShareLink.fulfilled, (state, action) => {
+        state.shareLink = action.payload.link;
+      })
+      .addCase(generateShareLink.rejected, (state, action) => {
+        state.shareLink = null;
+      });
   },
 });
 
