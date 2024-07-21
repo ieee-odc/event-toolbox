@@ -7,6 +7,7 @@ import {
   setSelectedForm,
   toggleFormModal,
   generateShareLink,
+  fetchShareLinks,
 } from "../../../core/Features/Forms";
 import FormModal from "./FormModal";
 import ShareLinkModal from "./ShareLinkModal";
@@ -31,6 +32,10 @@ function FormContainer() {
 
     return formattedDate;
   }
+  useEffect(() => {
+    dispatch(fetchShareLinks());
+  }, [dispatch]);
+  
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [currentFormId, setCurrentFormId] = useState(null);

@@ -4,11 +4,8 @@ const linkSchema = new mongoose.Schema({
   formId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Form',
-    required: true
-  },
-  expirationDate: {
-    type: Date,
-    required: true
+    required: true,
+    unique: true
   },
   link: {
     type: String,

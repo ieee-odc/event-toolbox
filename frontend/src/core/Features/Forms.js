@@ -1,17 +1,28 @@
-import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosRequest from "../../utils/AxiosConfig";
 
-export const generateShareLink = createAsyncThunk(
-  "Forms/generateShareLink",
-  async ({ formId, expirationDate }, { rejectWithValue }) => {
+export const fetchShareLinks = createAsyncThunk(
+  "Forms/fetchShareLinks",
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosRequest.post("/link/create", {
-        formId,
-        expirationDate,
-      });
+      const response = await axiosRequest.get("/links");
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const generateShareLink = createAsyncThunk(
+  "Forms/generateShareLink",
+  async ({ formId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosRequest.post("/link/create", {
+        formId,
+      });
+      return { formId, link: response.data.link };
+    } catch (error) {
+      return rejectWithValue({ formId, error: error.response.data });
     }
   }
 );
@@ -33,7 +44,7 @@ const FormsSlice = createSlice({
       eventId:"",
       data: [],
     },
-    shareLink: null,
+    shareLinks: {},
   },
   reducers: {
     initializeForms: (state, action) => {
@@ -43,12 +54,14 @@ const FormsSlice = createSlice({
     addForm: (state, action) => {
       state.forms = [...state.forms, action.payload];
       state.filteredForms = [...state.filteredForms, action.payload];
+      state.shareLinks[action.payload.id] = {}; // Initialize shareLinks for new form
     },
     deleteForm: (state, action) => {
       state.forms = state.forms.filter((form) => form.id !== action.payload);
       state.filteredForms = state.filteredForms.filter(
         (form) => form.id !== action.payload
       );
+      delete state.shareLinks[action.payload]; // Delete share link information
     },
     editForm: (state, action) => {
       const updatedForms = state.forms.map((form) =>
@@ -65,16 +78,10 @@ const FormsSlice = createSlice({
     },
     selectForm: (state, action) => {
       state.isEdit = true;
-      console.log("updated is edit to true 2")
-
-      const { Data } = action.payload;
-      state.selectedForm = {
-        ...Data,
-      };
+      state.selectedForm = { ...action.payload };
     },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
-      console.log("updated is edit to true")
       state.selectedForm = action.payload;
     },
     updateSelectedFormField: (state, action) => {
@@ -82,18 +89,9 @@ const FormsSlice = createSlice({
       state.selectedForm[id] = value;
     },
     updateData: (state, action) => {
-      state.selectedForm.data = action.payload
-    },
-
-    removeField: (state, action) => {
-      const fieldName = action.payload;
-      const { [fieldName]: _, ...newData } = state.selectedForm.data;
-      state.selectedForm.data = newData;
+      state.selectedForm.data = action.payload;
     },
     resetFormModal: (state) => {
-      console.log("reseting form")
-      console.log("updated is edit to false")
-
       state.isEdit = false;
       state.selectedForm = {
         organizerId: "",
@@ -104,15 +102,11 @@ const FormsSlice = createSlice({
         data: [],
       };
     },
-    changeFormState: (state, action) => {
-      state.isEdit = action.payload;
-    },
     addField: (state, action) => {
-      state.selectedForm.data=[...state.selectedForm.data,action.payload]
+      state.selectedForm.data = [...state.selectedForm.data, action.payload];
     },
     removeField: (state, action) => {
-      state.selectedForm.data.splice(action.payload, 1); // Just splice, don't reassign
-      
+      state.selectedForm.data.splice(action.payload, 1);
     },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
@@ -120,11 +114,18 @@ const FormsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchShareLinks.fulfilled, (state, action) => {
+        action.payload.forEach(link => {
+          state.shareLinks[link.formId] = { link: `${process.env.BASE_URL}/forms/${link.link}` };
+        });
+      })
       .addCase(generateShareLink.fulfilled, (state, action) => {
-        state.shareLink = action.payload.link;
+        const { formId, link } = action.payload;
+        state.shareLinks[formId] = { link };
       })
       .addCase(generateShareLink.rejected, (state, action) => {
-        state.shareLink = null;
+        const { formId, error } = action.payload;
+        state.shareLinks[formId] = { error };
       });
   },
 });
@@ -145,4 +146,5 @@ export const {
   resetFormModal,
   changeFormState,
 } = FormsSlice.actions;
+
 export default FormsSlice.reducer;
