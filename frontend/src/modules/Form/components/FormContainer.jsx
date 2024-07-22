@@ -134,7 +134,6 @@ function FormContainer() {
                 <tr>
                   <th scope="col">Name</th>
                   <th>Deadline</th>
-                  <th>Event</th>
                   <th style={{ textAlign: "right" }}></th>
                 </tr>
               </thead>
@@ -148,7 +147,6 @@ function FormContainer() {
                       <td>
                         <a href="">{formatDate(form.deadline)}</a>
                       </td>
-                      <td></td>
                       <td style={{ textAlign: "right" }}>
                         <button
                           className="btn btn-link p-0"
