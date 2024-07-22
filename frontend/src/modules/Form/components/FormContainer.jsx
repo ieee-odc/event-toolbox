@@ -132,7 +132,7 @@ function FormContainer() {
             className="btn btn-primary mb-4"
             onClick={() => {
               dispatch(toggleFormModal());
-              // dispatch(resetFormModal());
+              dispatch(resetFormModal());
             }}
           >
             <span>
