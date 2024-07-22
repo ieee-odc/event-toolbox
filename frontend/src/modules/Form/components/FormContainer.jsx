@@ -6,8 +6,6 @@ import {
   resetFormModal,
   setSelectedForm,
   toggleFormModal,
-  generateShareLink,
-  fetchShareLinks,
 } from "../../../core/Features/Forms";
 import FormModal from "./FormModal";
 import ShareLinkModal from "./ShareLinkModal";
@@ -32,9 +30,7 @@ function FormContainer() {
 
     return formattedDate;
   }
-  useEffect(() => {
-    dispatch(fetchShareLinks());
-  }, [dispatch]);
+
   
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
@@ -66,6 +62,7 @@ function FormContainer() {
 
   return (
     <div className="flex-grow-1">
+      {isShareModalOpen&&<div className="modal-backdrop fade show"></div>}
       <div className="card mb-4">
         <div className="card-widget-separator-wrapper">
           <div className="card-body card-widget-separator">
@@ -204,7 +201,7 @@ function FormContainer() {
                       className="btn btn-link p-0"
                       onMouseEnter={() => handleMouseEnter(`share_${form._id}`)}
                       onMouseLeave={handleMouseLeave}
-                      onClick={() => handleShareClick(form._id)}
+                      onClick={() => handleShareClick(form.id)}
                     >
                       <i
                         className={`bx bx-share bx-sm ${

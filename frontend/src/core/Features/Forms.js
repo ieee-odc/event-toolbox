@@ -1,31 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axiosRequest from "../../utils/AxiosConfig";
 
-export const fetchShareLinks = createAsyncThunk(
-  "Forms/fetchShareLinks",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosRequest.get("/links");
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const generateShareLink = createAsyncThunk(
-  "Forms/generateShareLink",
-  async ({ formId }, { rejectWithValue }) => {
-    try {
-      const response = await axiosRequest.post("/link/create", {
-        formId,
-      });
-      return { formId, link: response.data.link };
-    } catch (error) {
-      return rejectWithValue({ formId, error: error.response.data });
-    }
-  }
-);
 
 const FormsSlice = createSlice({
   name: "Forms",
@@ -41,7 +15,7 @@ const FormsSlice = createSlice({
       name: "",
       deadline: "",
       description: "",
-      eventId:"",
+      eventId: "",
       data: [],
     },
     shareLinks: {},
@@ -98,7 +72,7 @@ const FormsSlice = createSlice({
         name: "",
         description: "",
         deadline: "",
-        eventId:"",
+        eventId: "",
         data: [],
       };
     },
@@ -112,22 +86,7 @@ const FormsSlice = createSlice({
       state.isEdit = action.payload;
     },
   },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchShareLinks.fulfilled, (state, action) => {
-        action.payload.forEach(link => {
-          state.shareLinks[link.formId] = { link: `${process.env.BASE_URL}/forms/${link.link}` };
-        });
-      })
-      .addCase(generateShareLink.fulfilled, (state, action) => {
-        const { formId, link } = action.payload;
-        state.shareLinks[formId] = { link };
-      })
-      .addCase(generateShareLink.rejected, (state, action) => {
-        const { formId, error } = action.payload;
-        state.shareLinks[formId] = { error };
-      });
-  },
+  
 });
 
 export const {

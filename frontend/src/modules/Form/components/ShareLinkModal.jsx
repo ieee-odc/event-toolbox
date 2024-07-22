@@ -1,63 +1,99 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { generateShareLink } from "../../../core/Features/Forms";
 import toast from "react-hot-toast";
 import "./ShareLinkModal.css";
+import { UserData } from "../../../utils/UserData";
+
+
+
+// Function to perform base64 URL encoding
+const base64UrlEncode = (str) => {
+  return btoa(str)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+};
+
+// Function to perform base64 URL decoding
+const base64UrlDecode = (str) => {
+  let base64 = str
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+  // Add padding if necessary
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  return atob(base64);
+};
 
 const ShareLinkModal = ({ formId, onClose }) => {
   const dispatch = useDispatch();
-  const shareLinkInfo = useSelector((state) => state.formsStore.shareLinks[formId]);
-  const form = useSelector((state) => state.formsStore.forms.find(f => f.id === formId));
+const userData=UserData();
+console.log(userData)
 
-  const handleGenerateLink = () => {
-    dispatch(generateShareLink({ formId }));
-  };
+
+
 
   const handleCopyLink = () => {
-    if (shareLinkInfo && shareLinkInfo.link) {
-      navigator.clipboard.writeText(shareLinkInfo.link);
+      navigator.clipboard.writeText(shareLink);
       toast.success("Link copied to clipboard");
-    } else {
-      toast.error("No link to copy");
-    }
+
   };
+  const token=base64UrlEncode(JSON.stringify({userId:userData.id,formId}))
+
+  const shareLink=`${window.location.origin}/form/${token}`
 
   return (
-    <div className="modal-backdrop">
+    <div className="modal fade show"
+    id="modalCenter"
+    tabIndex={-1}
+    style={{ display: "block" }}
+    aria-modal="true"
+    role="dialog">
+              <div className="modal-dialog modal-dialog-centered" role="document">
+
       <div className="modal-content">
         <div className="modal-header">
           <h5 className="modal-title">Share Form</h5>
-          <button type="button" className="close" onClick={onClose}>
-            &times;
-          </button>
+          <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+                onClick={() => {
+                  onClose()
+                }}
+              />
+        
         </div>
         <div className="modal-body">
           <p>The link will expire when the form's deadline is over. To extend the deadline, update the form.</p>
-          {shareLinkInfo && shareLinkInfo.link && (
+     
             <div className="form-group">
               <label htmlFor="generatedLink">Generated Link</label>
               <input
                 type="text"
+                style={{cursor:"not-allowed",opacity:0.7}}
                 id="generatedLink"
                 className="form-control"
-                value={shareLinkInfo.link}
+                value={shareLink}
                 readOnly
               />
             </div>
-          )}
         </div>
         <div className="modal-footer">
           <button
             type="button"
             className="btn btn-primary"
-            onClick={shareLinkInfo && shareLinkInfo.link ? handleCopyLink : handleGenerateLink}
+            onClick={ handleCopyLink }
           >
-            {shareLinkInfo && shareLinkInfo.link ? "Copy Link" : "Generate Link"}
+           Copy Link
           </button>
           <button type="button" className="btn btn-secondary" onClick={onClose}>
             Close
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
