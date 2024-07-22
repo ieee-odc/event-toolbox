@@ -15,7 +15,6 @@ const FormsSlice = createSlice({
       name: "",
       deadline: "",
       description: "",
-      eventId: "",
       data: [],
     },
   },
@@ -49,7 +48,13 @@ const FormsSlice = createSlice({
     },
     selectForm: (state, action) => {
       state.isEdit = true;
-      state.selectedForm = { ...action.payload };
+
+      console.log("updated is edit to true 2");
+
+      const { Data } = action.payload;
+      state.selectedForm = {
+        ...Data,
+      };
     },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
@@ -62,6 +67,13 @@ const FormsSlice = createSlice({
     updateData: (state, action) => {
       state.selectedForm.data = action.payload;
     },
+
+    removeField: (state, action) => {
+      const fieldName = action.payload;
+      const { [fieldName]: _, ...newData } = state.selectedForm.data;
+      state.selectedForm.data = newData;
+
+    },
     resetFormModal: (state) => {
       state.isEdit = false;
       state.selectedForm = {
@@ -69,15 +81,51 @@ const FormsSlice = createSlice({
         name: "",
         description: "",
         deadline: "",
-        eventId: "",
         data: [],
       };
     },
     addField: (state, action) => {
-      state.selectedForm.data = [...state.selectedForm.data, action.payload];
+      state.selectedForm.data = [
+        ...state.selectedForm.data,
+        {
+          type: "input",
+          question: "",
+        },
+      ];
+    },
+    switchQuestionType: (state, action) => {
+      const { index, newType } = action.payload;
+      if (index >= 0 && index < state.selectedForm.data.length) {
+        state.selectedForm.data[index].type = newType;
+        if(newType==="select" || newType==="multi-select"){
+          state.selectedForm.data[index].options=[
+            "First Option","Second Option"
+          ]
+        }else if(newType==="input"){
+          state.selectedForm.data[index].options=[]
+        }
+      }
+    },
+    updateQuestionOptions: (state, action) => {
+      const { index, options } = action.payload;
+      if (index >= 0 && index < state.selectedForm.data.length) {
+        state.selectedForm.data[index].options = options;
+      }
+    },
+    removeOption: (state, action) => {
+      const { questionIndex, optionIndex } = action.payload;
+      if (questionIndex >= 0 && questionIndex < state.selectedForm.data.length) {
+        state.selectedForm.data[questionIndex].options.splice(optionIndex, 1);
+      }
+    },
+    addOption: (state, action) => {
+      const index = action.payload;
+      if (index >= 0 && index < state.selectedForm.data.length) {
+        state.selectedForm.data[index].options.push("");
+      }
     },
     removeField: (state, action) => {
-      state.selectedForm.data.splice(action.payload, 1);
+      state.selectedForm.data.splice(action.payload, 1); // Just splice, don't reassign
     },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
@@ -101,6 +149,9 @@ export const {
   removeField,
   resetFormModal,
   changeFormState,
+  switchQuestionType,
+  updateQuestionOptions,
+  removeOption,
+  addOption
 } = FormsSlice.actions;
-
 export default FormsSlice.reducer;

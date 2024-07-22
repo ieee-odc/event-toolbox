@@ -132,7 +132,7 @@ function FormContainer() {
             className="btn btn-primary mb-4"
             onClick={() => {
               dispatch(toggleFormModal());
-              // dispatch(resetFormModal());
+              dispatch(resetFormModal());
             }}
           >
             <span>
@@ -149,7 +149,6 @@ function FormContainer() {
                 <tr>
                   <th scope="col">Name</th>
                   <th>Deadline</th>
-                  <th>Event</th>
                   <th style={{ textAlign: "right" }}></th>
                 </tr>
               </thead>
@@ -163,7 +162,6 @@ function FormContainer() {
                       <td>
                         <a href="">{formatDate(form.deadline)}</a>
                       </td>
-                      <td></td>
                       <td style={{ textAlign: "right" }}>
                         <button
                           className="btn btn-link p-0"
