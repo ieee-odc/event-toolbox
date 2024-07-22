@@ -8,6 +8,7 @@ import {
   toggleFormModal,
 } from "../../../core/Features/Forms";
 import FormModal from "./FormModal";
+import ShareLinkModal from "./ShareLinkModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
@@ -29,7 +30,11 @@ function FormContainer() {
 
     return formattedDate;
   }
+
+  
   const [hoveredIcon, setHoveredIcon] = useState(null);
+  const [isShareModalOpen, setShareModalOpen] = useState(false);
+  const [currentFormId, setCurrentFormId] = useState(null);
 
   const handleMouseEnter = (iconId) => {
     setHoveredIcon(iconId);
@@ -50,9 +55,14 @@ function FormContainer() {
     dispatch(setSelectedForm(form));
     dispatch(toggleFormModal());
   };
+  const handleShareClick = (formId) => {
+    setCurrentFormId(formId);
+    setShareModalOpen(true);
+  };
 
   return (
     <div className="flex-grow-1">
+      {isShareModalOpen&&<div className="modal-backdrop fade show"></div>}
       <div className="card mb-4">
         <div className="card-widget-separator-wrapper">
           <div className="card-body card-widget-separator">
@@ -187,19 +197,20 @@ function FormContainer() {
                             onMouseLeave={handleMouseLeave}
                           ></i>
                         </button>
-                        <button className="btn btn-link p-0">
-                          <i
-                            className={`bx bx-share bx-sm ${
-                              hoveredIcon === `share_${form._id}`
-                                ? "transform"
-                                : ""
-                            }`}
-                            onMouseEnter={() =>
-                              handleMouseEnter(`share_${form._id}`)
-                            }
-                            onMouseLeave={handleMouseLeave}
-                          ></i>
-                        </button>
+                        <button
+                      className="btn btn-link p-0"
+                      onMouseEnter={() => handleMouseEnter(`share_${form._id}`)}
+                      onMouseLeave={handleMouseLeave}
+                      onClick={() => handleShareClick(form.id)}
+                    >
+                      <i
+                        className={`bx bx-share bx-sm ${
+                          hoveredIcon === `share_${form._id}`
+                            ? "transform"
+                            : ""
+                        }`}
+                      ></i>
+                    </button>
                       </td>
                     </tr>
                   ))}
@@ -217,6 +228,12 @@ function FormContainer() {
             </table>
           </div>
           <FormModal />
+          {isShareModalOpen && (
+        <ShareLinkModal
+          formId={currentFormId}
+          onClose={() => setShareModalOpen(false)}
+        />
+      )}
         </div>
       </div>
     </div>

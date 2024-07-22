@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
 
 const FormsSlice = createSlice({
   name: "Forms",
@@ -14,7 +15,7 @@ const FormsSlice = createSlice({
       name: "",
       deadline: "",
       description: "",
-      eventId:"",
+      eventId: "",
       data: [],
     },
   },
@@ -48,16 +49,10 @@ const FormsSlice = createSlice({
     },
     selectForm: (state, action) => {
       state.isEdit = true;
-      console.log("updated is edit to true 2")
-
-      const { Data } = action.payload;
-      state.selectedForm = {
-        ...Data,
-      };
+      state.selectedForm = { ...action.payload };
     },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
-      console.log("updated is edit to true")
       state.selectedForm = action.payload;
     },
     updateSelectedFormField: (state, action) => {
@@ -65,42 +60,30 @@ const FormsSlice = createSlice({
       state.selectedForm[id] = value;
     },
     updateData: (state, action) => {
-      state.selectedForm.data = action.payload
-    },
-
-    removeField: (state, action) => {
-      const fieldName = action.payload;
-      const { [fieldName]: _, ...newData } = state.selectedForm.data;
-      state.selectedForm.data = newData;
+      state.selectedForm.data = action.payload;
     },
     resetFormModal: (state) => {
-      console.log("reseting form")
-      console.log("updated is edit to false")
-
       state.isEdit = false;
       state.selectedForm = {
         organizerId: "",
         name: "",
         description: "",
         deadline: "",
-        eventId:"",
+        eventId: "",
         data: [],
       };
     },
-    changeFormState: (state, action) => {
-      state.isEdit = action.payload;
-    },
     addField: (state, action) => {
-      state.selectedForm.data=[...state.selectedForm.data,action.payload]
+      state.selectedForm.data = [...state.selectedForm.data, action.payload];
     },
     removeField: (state, action) => {
-      state.selectedForm.data.splice(action.payload, 1); // Just splice, don't reassign
-      
+      state.selectedForm.data.splice(action.payload, 1);
     },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
     },
   },
+  
 });
 
 export const {
@@ -119,4 +102,5 @@ export const {
   resetFormModal,
   changeFormState,
 } = FormsSlice.actions;
+
 export default FormsSlice.reducer;
