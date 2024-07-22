@@ -18,7 +18,6 @@ const FormsSlice = createSlice({
       eventId: "",
       data: [],
     },
-    shareLinks: {},
   },
   reducers: {
     initializeForms: (state, action) => {
@@ -28,14 +27,12 @@ const FormsSlice = createSlice({
     addForm: (state, action) => {
       state.forms = [...state.forms, action.payload];
       state.filteredForms = [...state.filteredForms, action.payload];
-      state.shareLinks[action.payload.id] = {}; // Initialize shareLinks for new form
     },
     deleteForm: (state, action) => {
       state.forms = state.forms.filter((form) => form.id !== action.payload);
       state.filteredForms = state.filteredForms.filter(
         (form) => form.id !== action.payload
       );
-      delete state.shareLinks[action.payload]; // Delete share link information
     },
     editForm: (state, action) => {
       const updatedForms = state.forms.map((form) =>

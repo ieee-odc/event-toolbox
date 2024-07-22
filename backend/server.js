@@ -74,9 +74,6 @@ app.use("/space", SpaceRouter);
 const FormRouter = require("./routes/FormRoutes");
 app.use("/form", FormRouter);
 
-const linkRoutes = require('./routes/LinkRoutes');
-app.use('/link', linkRoutes);
-
 
 
 
