@@ -44,7 +44,7 @@ function Login() {
       } else {
         sessionStorage.setItem("token", res.data.token);
       }
-      navigate("/success");
+      navigate("/events");
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
