@@ -26,6 +26,9 @@ const ParticipantSchema=mongoose.Schema({
     eventId:{
         type:Number,
         required:true,
+    },
+    workshopId:{
+        type:Number,
     }
     
 } ,{ timestamps: true })

@@ -2,6 +2,7 @@ const Form = require("../models/FormModel");
 const User = require("../models/OrganizerModel");
 const Counter = require("../models/CounterModel");
 const Event = require("../models/EventModel");
+const Workshop = require("../models/WorkshopModel");
 
 const createForm = async (req, res) => {
   try {
@@ -116,10 +117,37 @@ const getEventForms = async (req, res) => {
   }
 };
 
+const getWorkshopForms = async (req, res) => {
+  try {
+    const { workshopId } = req.params;
+
+    const workshop = await Workshop.findOne({ id: workshopId });
+    if (!workshop) {
+      return res.status(400).json({
+        message: "Workshop doesn't exist!",
+      });
+    }
+    const forms = await Form.find({ workshopId });
+
+   return  res.status(200).json({
+      status: "success",
+      message: "Forms retrieved successfully",
+      forms,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
+
 module.exports = {
   createForm,
   getOrganizerForms,
   updateForm,
   deleteForm,
-  getEventForms
+  getEventForms,
+  getWorkshopForms
 };
