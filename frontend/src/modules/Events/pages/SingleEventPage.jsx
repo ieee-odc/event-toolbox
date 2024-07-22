@@ -16,12 +16,19 @@ import { initializeWorkshops } from "../../../core/Features/Workshops";
 function SingleEventPage() {
   const { eventId } = useParams();
 
-  const [activeTab,setActiveTab]=useState("Participants");
-
+  const [activeTab, setActiveTab] = useState("Participants");
+  const [event, setEvent] = useState({});
   const dispatch = useDispatch();
 
   useEffect(() => {
+    axiosRequest.get(`/events/${eventId}`).then((res) => {
+      setEvent(res.data.event);
+    });
+  }, [eventId]);
+
+  useEffect(() => {
     axiosRequest.get(`/form/get-event/${eventId}`).then((res) => {
+      console.log(res.data.forms);
       dispatch(initializeForms(res.data.forms));
     });
   }, [eventId]);
@@ -49,7 +56,8 @@ function SingleEventPage() {
       <div style={{ padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">Events /</span> {activeTab}
+            <span className="text-muted fw-light">{event?.name} /</span>{" "}
+            {activeTab}
           </h4>
           <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li className="nav-item" role="presentation">
@@ -62,8 +70,8 @@ function SingleEventPage() {
                 role="tab"
                 aria-controls="pills-participant"
                 aria-selected="true"
-                onClick={()=>{
-                    setActiveTab("Participants")
+                onClick={() => {
+                  setActiveTab("Participants");
                 }}
               >
                 Participants
@@ -79,8 +87,8 @@ function SingleEventPage() {
                 role="tab"
                 aria-controls="pills-workshop"
                 aria-selected="false"
-                onClick={()=>{
-                    setActiveTab("Workshops")
+                onClick={() => {
+                  setActiveTab("Workshops");
                 }}
               >
                 Workshops
@@ -96,8 +104,8 @@ function SingleEventPage() {
                 role="tab"
                 aria-controls="pills-form"
                 aria-selected="false"
-                onClick={()=>{
-                    setActiveTab("Forms")
+                onClick={() => {
+                  setActiveTab("Forms");
                 }}
               >
                 Forms
@@ -113,8 +121,8 @@ function SingleEventPage() {
                 role="tab"
                 aria-controls="pills-space"
                 aria-selected="false"
-                onClick={()=>{
-                    setActiveTab("Spaces")
+                onClick={() => {
+                  setActiveTab("Spaces");
                 }}
               >
                 Spaces
@@ -123,7 +131,11 @@ function SingleEventPage() {
           </ul>
         </div>
 
-        <div className="tab-content" id="pills-tabContent" style={{padding:0}}>
+        <div
+          className="tab-content"
+          id="pills-tabContent"
+          style={{ padding: 0 }}
+        >
           <div
             className="tab-pane fade show active"
             id="pills-participant"

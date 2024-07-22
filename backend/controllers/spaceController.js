@@ -4,9 +4,8 @@ const Organizer = require('../models/OrganizerModel');
 
 // Create a new Space
 const createSpace = async (req, res) => {
-    const { capacity, name, organizerId } = req.body;
     try {
-        const organizer = await Organizer.findOne({id:organizerId});
+        const organizer = await Organizer.findOne({id:req.body.organizerId});
         if (!organizer) {
             res.status(400).json({ message: "Organizer not found" });
         }
@@ -16,7 +15,7 @@ const createSpace = async (req, res) => {
             { $inc: { seq: 1 } },
             { new: true, upsert: true }
         );
-        const newSpace = new Space({ id: counter.seq, organizerId, capacity, name });
+        const newSpace = new Space({ id: counter.seq, ...req.body });
         await newSpace.save();
         res.status(201).json({
             status: "success",

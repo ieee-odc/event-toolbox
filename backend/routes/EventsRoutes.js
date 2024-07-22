@@ -5,16 +5,18 @@ const {
   deleteEvent,
   updateEvent,
   getEvents,
-  getEvent,
   getOrganizerEvents,
+  duplicateEvent,
+  getOneEvent,
 } = require("../controllers/EventController");
 
 router.get("/", getEvents);
 router.post("/add", createEvent);
-router.get("/:eventId", getEvent);
+router.get("/:eventId", getOneEvent);
 router.get("/get-organizer/:organizerId", getOrganizerEvents);
 
 router.delete("/delete/:eventId", deleteEvent);
 router.post("/edit/:eventId", updateEvent);
+router.post("/duplicate/:eventId", duplicateEvent);
 
 module.exports = router;

@@ -62,7 +62,6 @@ function FormModal() {
 
       toast.success("Form added successfully");
 
-      // Fetch events every time the "Create Form" button is clicked
       const eventsResponse = await axiosRequest.get(
         `/events/get-organizer/${userData.id}`
       );

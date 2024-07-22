@@ -16,7 +16,7 @@ function SpaceContainer() {
   const userData = UserData();
 
   return (
-    <div className="flex-grow-1 container-p-y">
+    <div className="flex-grow-1">
       <div className="card mb-4">
         <div className="card-widget-separator-wrapper">
           <div className="card-body card-widget-separator">
@@ -79,7 +79,7 @@ function SpaceContainer() {
           </div>
         </div>
       </div>
-      <div className="flex-grow-1 container-p-y">
+      <div className="flex-grow-1">
         <div className="card overflow-hidden">
           <div className="d-flex app-logistics-fleet-wrapper">
             <div className="flex-shrink-0 position-fixed m-4 d-md-none w-auto z-1">
@@ -97,17 +97,21 @@ function SpaceContainer() {
               id="app-logistics-fleet-sidebar"
             >
               <div
-                className="card-header border-0 pt-4 pb-2 d-flex justify-content-between"
+                className="card-header border-0 pt-4 pb-2 d-flex justify-content-end"
                 style={{ alignItems: "center" }}
               >
-                <h5 className="mb-0 card-title">Spaces</h5>
                 <button
                   className="btn btn-primary"
                   onClick={() => {
                     dispatch(toggleSpaceModal());
                   }}
                 >
-                  Add Space
+                   <span>
+              <i className="bx bx-plus me-md-1" />
+              <span className="d-md-inline-block d-none">
+                Create Space
+              </span>
+            </span>
                 </button>
               </div>
 

@@ -4,7 +4,7 @@ import ParticipantsCard from './ParticipantsCard'
 function ParticipantsContainer() {
 
   return (
-    <div className="flex-grow-1 container-p-y" style={{padding:"0 !important"}}>
+    <div className="flex-grow-1" style={{padding:"0 !important"}}>
           {/* Invoice List Widget */}
           <div className="card mb-4">
             <div className="card-widget-separator-wrapper">

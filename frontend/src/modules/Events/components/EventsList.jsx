@@ -11,8 +11,10 @@ import {
   toggleEventsIsLoading,
   toggleEventModal,
   selectEvent,
+  addEvent,
 } from "../../../core/Features/Events";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function EventsList() {
   const dispatch = useDispatch();
@@ -26,6 +28,7 @@ function EventsList() {
     try {
       await axiosRequest.delete(`/events/delete/${eventId}`);
       dispatch(deleteEvent(eventId));
+      toast.success("Event Deleted Successfully")
     } catch (error) {
       console.error("Error deleting event:", error);
     }
@@ -76,6 +79,16 @@ const onAddEventClick=()=>{
 
 const navigate=useNavigate();
 
+const handleDuplicateEvent=(event)=>{
+  try {
+   axiosRequest.post(`/events/duplicate/${event.id}`).then((res)=>{
+    dispatch(addEvent(res.data.event))
+    toast.success("Event Duplicated Successfully")
+   });
+  } catch (error) {
+    console.error("Error deleting event:", error);
+  }
+}
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -171,27 +184,32 @@ const navigate=useNavigate();
               </div>
             </div>
             <div className="card-body">
-              <div className="row gy-4 mb-4">
+              <div className="row gy-4 mb-4" style={{justifyContent:"center"}}>
                 {isLoading ? (
                   <p>Loading events...</p>
                 ) : (
                   filteredEvents &&
                   filteredEvents.map((event) => (
-                    <div className="col-sm-6 col-lg-4 cursor-pointer" key={event._id} onClick={()=>{
-                      navigate(`/event/${event.id}`)
-                    }}>
+                    <div className="col-sm-6 col-lg-4" key={event._id} >
                       <div className="card p-2 h-100 shadow-none border">
-                        <div className="rounded-2 text-center mb-0"></div>
                         <div className="rounded-2 text-center mb-3">
-                          <a href="">
-                            <img
-                              className="img-fluid"
+                            <div onClick={()=>{
+                              handleDuplicateEvent(event)
+                            }} style={{cursor:"pointer",background:"var(--primary-color)",padding:5,borderRadius:"50%",display:"flex",justifyContent:"center",alignItems:"center",position:"absolute",top:15,right:15}}>
+
+                          <i className="bx bx-duplicate" style={{margin:0,color:"white"}}></i>
+                            </div>
+                          <img
+                          onClick={()=>{
+                            navigate(`/event/${event.id}`)
+                          }}
+                              className="img-fluid cursor-pointer"
                               src={"https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"}
                               alt="tutor image 1"
                             />
-                          </a>
-                        </div>
-                        <div className="card-body p-3 pt-3" id="eventCardBody">
+                        <div className="card-body p-3 pt-3 cursor-pointer" id="eventCardBody" onClick={()=>{
+                      navigate(`/event/${event.id}`)
+                    }}>
                           <div className="d-flex justify-content-between align-items-center mb-3">
                             <span
                               className={
@@ -250,6 +268,7 @@ const navigate=useNavigate();
                             </p>
                           </div>
                         </div>
+                          </div>
                         <div
                           id="button-container"
                           className="d-flex flex-column flex-md-row gap-2 text-nowrap pe-xl-3 pe-xxl-0 mt-1 mb-3 justify-content-center align-items-end"
@@ -271,6 +290,8 @@ const navigate=useNavigate();
                             Edit
                             <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>
                           </button>
+
+                           
                           {/* <a
                             className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
                             href="app-academy-course-details.html"

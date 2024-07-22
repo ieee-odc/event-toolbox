@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
 
 const FormsSlice = createSlice({
   name: "Forms",
@@ -47,6 +48,7 @@ const FormsSlice = createSlice({
     },
     selectForm: (state, action) => {
       state.isEdit = true;
+
       console.log("updated is edit to true 2");
 
       const { Data } = action.payload;
@@ -56,7 +58,6 @@ const FormsSlice = createSlice({
     },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
-      console.log("updated is edit to true");
       state.selectedForm = action.payload;
     },
     updateSelectedFormField: (state, action) => {
@@ -71,6 +72,7 @@ const FormsSlice = createSlice({
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedForm.data;
       state.selectedForm.data = newData;
+
     },
     resetFormModal: (state) => {
       state.isEdit = false;
@@ -81,9 +83,6 @@ const FormsSlice = createSlice({
         deadline: "",
         data: [],
       };
-    },
-    changeFormState: (state, action) => {
-      state.isEdit = action.payload;
     },
     addField: (state, action) => {
       state.selectedForm.data = [
@@ -132,6 +131,7 @@ const FormsSlice = createSlice({
       state.isEdit = action.payload;
     },
   },
+  
 });
 
 export const {
