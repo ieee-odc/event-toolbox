@@ -245,7 +245,7 @@ const dispatch=useDispatch();
                 role="status"
                 aria-live="polite"
               >
-                {`Showing  to of ${filteredWorkshops.length} entries`}
+                {`Showing  to of ${filteredWorkshops && filteredWorkshops.length} entries`}
               </div>
             </div>
             <div className="col-sm-12 col-md-6">
