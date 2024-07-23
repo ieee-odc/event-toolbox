@@ -27,7 +27,7 @@ jobs:
           context: ./frontend
           push: true
           # tags: latest, ${{github.run_number }}
-          tags: chayma02/event-management-platform-front:latest, ${{github.run_number }}
+          tags: chayma02/event-management-platform-front:latest
          
 
 
