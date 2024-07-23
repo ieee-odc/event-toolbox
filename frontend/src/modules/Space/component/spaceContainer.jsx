@@ -155,6 +155,9 @@ function SpaceContainer() {
                       </div>
                     </div>
                   ))}
+                  {spaces.length===0&&<div>
+                    No spaces at the moment
+                    </div>}
                 </div>
               </div>
               <div
