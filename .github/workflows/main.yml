@@ -55,7 +55,7 @@ jobs:
         with:
           context: ./backend
           push: true
-          tags: ${{ steps.meta.outputs.tags }}.${{ github.head_ref }}.${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}.${{ env.branch }}.${{ env.sha_short }}
           labels: ${{ steps.meta.outputs.labels}}
 
       # - name: publish to dockerhub
