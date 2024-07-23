@@ -6,7 +6,7 @@ const DataItemSchema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ["multi-select", "input", "select"], // Define allowed values
+    enum: ["input", "checkbox","radio","file","dropdown","date","time"], // Define allowed values
   },
   question: {
     type: String,
@@ -14,9 +14,6 @@ const DataItemSchema = new Schema({
   },
   options: {
     type: [String],
-    required: function () {
-      return this.type === "multi-select" || this.type === "select";
-    },
   },
 }, { _id: false }); // No need for _id in subdocuments
 
@@ -49,6 +46,10 @@ const FormSchema = new Schema({
     type: Number,
     required: false,
   },
+  workshopId: {
+    type: Number,
+    required: false,
+  },
 });
 
 FormSchema.path('eventId').validate(function(value) {
@@ -58,6 +59,5 @@ FormSchema.path('eventId').validate(function(value) {
 FormSchema.path('workshopId').validate(function(value) {
   return this.eventId != null || this.workshopId != null;
 }, 'Either eventId or workshopId must be provided.');
-
 
 module.exports = mongoose.model("Form", FormSchema);
