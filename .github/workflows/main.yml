@@ -27,8 +27,38 @@ jobs:
           context: ./frontend
           push: true
           # tags: latest, ${{github.run_number }}
-          tags: chayma02/eventmanager:latest
-          # tags: latest, ${{github.run_number }}
+          tags: chayma02/event-management-platform-front:latest, ${{github.run_number }}
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         ##### create an artifact for local download 
