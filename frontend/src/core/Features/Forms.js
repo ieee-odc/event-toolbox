@@ -97,11 +97,12 @@ const FormsSlice = createSlice({
       const { index, newType } = action.payload;
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].type = newType;
-        if(newType==="select" || newType==="multi-select"){
+        const optionsArray=["checkbox","radio","dropdown"]
+        if(optionsArray.includes(newType)){
           state.selectedForm.data[index].options=[
             "First Option","Second Option"
           ]
-        }else if(newType==="input"){
+        }else{
           state.selectedForm.data[index].options=[]
         }
       }

@@ -28,7 +28,7 @@ import { useParams } from "react-router-dom";
 function FormModal() {
   const dispatch = useDispatch();
   const userData = UserData();
-  const { eventId } = useParams();
+  const { eventId,workshopId } = useParams();
 
   const { events } = useSelector((store) => store.eventsStore);
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
@@ -54,7 +54,7 @@ function FormModal() {
       const response = await axiosRequest.post("/form/add", {
         ...selectedForm,
         organizerId: userData.id,
-        eventId
+        eventId,
       });
       dispatch(addForm(response.data));
       dispatch(toggleFormModal());
@@ -241,8 +241,12 @@ function FormModal() {
                         aria-hidden="true"
                       >
                         <option value="input">Input</option>
-                        <option value="multi-select">Multi-Select</option>
-                        <option value="select">Select</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="radio">Radio</option>
+                        <option value="file">File Upload</option>
+                        <option value="dropdown">Dropdown</option>
+                        <option value="date">Date</option>
+                        <option value="time">Time</option>
                       </select>
                       <button
                         type="button"

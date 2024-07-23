@@ -3,7 +3,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import { toast } from "react-hot-toast";
 import WorkshopTableHeader from "./WorkshopTableHeader";
 import WorkshopModal from "./WorkshopModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,6 +11,8 @@ import { deleteWorkshop, filterWorkshops, initializeWorkshops, setSelectedWorksh
 import { UserData } from './../../../utils/UserData';
 
 const WorkshopsCard = () => {
+  const { eventId } = useParams();
+
   const {filteredWorkshops}=useSelector((state)=>state.workshopsStore)
   const userData=UserData();
 const dispatch=useDispatch();
@@ -169,7 +171,9 @@ const dispatch=useDispatch();
                           </div>
                         </div>
                       </div>
-                      <div className="card-body">
+                      <div className="card-body" style={{cursor:"pointer"}} onClick={()=>{
+                        navigate(`/event/${eventId}/workshop/${workshop.id}`)
+                      }}>
                         <div className="d-flex align-items-center flex-wrap">
                           <div className="bg-lighter p-2 rounded me-auto mb-3">
                             <h6 className="mb-1">
@@ -241,7 +245,7 @@ const dispatch=useDispatch();
                 role="status"
                 aria-live="polite"
               >
-                {`Showing  to of ${filteredWorkshops.length} entries`}
+                {`Showing  to of ${filteredWorkshops && filteredWorkshops.length} entries`}
               </div>
             </div>
             <div className="col-sm-12 col-md-6">

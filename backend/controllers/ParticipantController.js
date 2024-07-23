@@ -103,9 +103,30 @@ const getEventParticipants = async (req, res) => {
   }
 };
 
+const getWorkshopParticipants = async (req, res) => {
+  try {
+    const workshopId = req.params.workshopId;
+    const participants = await Participant.find({
+      workshopId,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Participant retrieved",
+      participants,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
 module.exports = {
   addParticipant,
   deleteParticipant,
   editParticipant,
   getEventParticipants,
+  getWorkshopParticipants
 };
