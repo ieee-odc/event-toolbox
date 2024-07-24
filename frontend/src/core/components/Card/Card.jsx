@@ -63,7 +63,7 @@ const Card = ({
           </div>
         </div>
 
-        <h6 style={{ fontSize: "18px" }}>{description}</h6>
+        <h6 style={{ fontSize: "16px" }}>{description}</h6>
       </div>
       <div className="card-body border-top">
         <div className="d-flex align-items-center mb-3">{badgeText}</div>
