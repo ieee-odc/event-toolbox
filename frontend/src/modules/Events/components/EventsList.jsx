@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
-import { UserData } from "../../../utils/UserData";
+import { UserData } from "./../../../utils/UserData";
 import { useDispatch, useSelector } from "react-redux";
 import {
   filterEvents,
@@ -12,7 +12,7 @@ import {
   toggleEventModal,
   selectEvent,
   addEvent,
-  setEventsPerPage, // Ensure you have this action
+  setEventsPerPage,
 } from "../../../core/Features/Events";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -45,6 +45,7 @@ function EventsList() {
 
   const handleEditClick = (event) => {
     dispatch(selectEvent(event));
+    console.log(event);
     dispatch(toggleEventModal());
   };
 
@@ -52,9 +53,9 @@ function EventsList() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const durationInMilliseconds = end - start;
-    return Math.round(durationInMilliseconds / (1000 * 60 * 60 * 24));
+    const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
+    return Math.round(durationInDays);
   };
-
   const formatDate = (passedDate) => {
     const dateObj = new Date(passedDate);
     const day = dateObj.getUTCDate().toString().padStart(2, "0");
@@ -62,7 +63,6 @@ function EventsList() {
     const year = dateObj.getUTCFullYear().toString();
     return `${day}/${month}/${year}`;
   };
-
   const getEventStatus = (startDate, endDate) => {
     const currentDate = new Date();
     const start = new Date(startDate);
@@ -94,7 +94,7 @@ function EventsList() {
         toast.success("Event Duplicated Successfully");
       });
     } catch (error) {
-      console.error("Error duplicating event:", error);
+      console.error("Error deleting event:", error);
     }
   };
 
@@ -292,20 +292,17 @@ function EventsList() {
                                 days
                               </p>
                             </div>
-                            <div className="d-flex align-items-center mb-1">
-                              <i className="bx bx-calendar ms-2"></i>
-
+                            <div className="d-flex align-items-center mb-1 date-container">
+                              <i className="bx bx-calendar ms-2 date-icon"></i>
                               <b>
-                                <p className="d-flex align-items-center text mb-0 ">
-                                  Dates :
-                                </p>{" "}
+                                <span className="text mb-0">Dates:</span>
                               </b>
-                              <span className="dates-span">
-                                <p className="d-flex align-items-center mb-0 ms-0">
+                              <span className="dates-span d-flex align-items-center ms-2 mt-1">
+                                <p className="mb-0 date">
                                   {formatDate(event.startDate)}
                                 </p>
-                                <span className="date-separator"> - </span>
-                                <p className="d-flex align-items-center mb-0 ms-0">
+                                <span className="date-separator mx-1"> - </span>
+                                <p className="mb-0 date">
                                   {formatDate(event.endDate)}
                                 </p>
                               </span>

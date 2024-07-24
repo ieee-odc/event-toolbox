@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
@@ -7,6 +6,7 @@ import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
 import { deleteParticipant } from "../../../core/Features/Participants";
 import Pagination from "../../../core/components/Pagination/Pagination";
+import { useDispatch, useSelector } from "react-redux";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",

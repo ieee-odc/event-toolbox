@@ -12,8 +12,8 @@ import { useParams } from "react-router-dom";
 
 function ParticipantModal() {
   const dispatch = useDispatch();
-  const { eventId } = useParams();
-
+  const { eventId, workshopId } = useParams();
+  console.log(workshopId);
   const { isParticipantModalOpen, selectedParticipant, isEdit } = useSelector(
     (store) => store.participantsStore
   );
@@ -22,6 +22,7 @@ function ParticipantModal() {
       email: selectedParticipant.email,
       fullName: selectedParticipant.fullName,
       eventId,
+      workshopId,
     };
     axiosRequest
       .post("/participant/add", reqBody)
@@ -114,7 +115,7 @@ function ParticipantModal() {
                   className="btn btn-label-secondary"
                   data-bs-dismiss="modal"
                   onClick={() => {
-                    dispatch(toggleParticipantModal());
+                    setIsModalOpen(false);
                   }}
                 >
                   Close

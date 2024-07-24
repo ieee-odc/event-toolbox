@@ -17,6 +17,10 @@ import {
   changeFormState,
   resetFormModal,
   updateData,
+  switchQuestionType,
+  updateQuestionOptions,
+  removeOption,
+  addOption,
 } from "../../../core/Features/Forms";
 import { initializeEvents } from "../../../core/Features/Events";
 import { useParams } from "react-router-dom";
@@ -24,9 +28,9 @@ import { useParams } from "react-router-dom";
 function FormModal() {
   const dispatch = useDispatch();
   const userData = UserData();
-  const { eventId } = useParams();
+  const { eventId, workshopId } = useParams();
 
-  const { events } = useSelector((store) => store.eventsStore)
+  const { events } = useSelector((store) => store.eventsStore);
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
     (store) => store.formsStore
   );
@@ -50,18 +54,18 @@ function FormModal() {
       const response = await axiosRequest.post("/form/add", {
         ...selectedForm,
         organizerId: userData.id,
-        eventId
+        eventId,
       });
       dispatch(addForm(response.data));
       dispatch(toggleFormModal());
       dispatch(resetFormModal());
 
-      toast.success("Form added successfully")
+      toast.success("Form added successfully");
 
       const eventsResponse = await axiosRequest.get(
         `/events/get-organizer/${userData.id}`
       );
-      initializeEvents(eventsResponse.data.events)
+      initializeEvents(eventsResponse.data.events);
     } catch (error) {
       console.error("Error creating form:", error);
     }
@@ -73,16 +77,15 @@ function FormModal() {
         return;
       }
       const response = await axiosRequest.post(`/form/edit/${formId}`, {
+        ...selectedForm,
         organizerId: userData.id,
         eventId,
-        ...selectedForm,
       });
       dispatch(editForm(response.data.form));
       dispatch(toggleFormModal());
       dispatch(resetFormModal());
 
-      toast.success("Form edited successfully")
-
+      toast.success("Form edited successfully");
     } catch (error) {
       console.error("Error editing form:", error);
     }
@@ -120,7 +123,13 @@ function FormModal() {
       });
     }
   };
-
+  const handleOptionChange = (questionIndex, optionIndex, newValue) => {
+    const newOptions = [...selectedForm.data[questionIndex].options];
+    newOptions[optionIndex] = newValue;
+    dispatch(
+      updateQuestionOptions({ index: questionIndex, options: newOptions })
+    );
+  };
   return (
     <>
       {isFormModalOpen && <div className="modal-backdrop fade show"></div>}
@@ -144,7 +153,7 @@ function FormModal() {
                 onClick={() => {
                   dispatch(resetFormModal());
                   if (isEdit) {
-                    console.log("is edit")
+                    console.log("is edit");
                     dispatch(changeFormState(false));
                   }
                   dispatch(toggleFormModal());
@@ -193,7 +202,6 @@ function FormModal() {
                 />
               </div>
 
-          
               <>
                 {selectedForm.data.map((element, index) => (
                   <div className="mb-3" key={index}>
@@ -206,26 +214,106 @@ function FormModal() {
                         id={`data.${index}`}
                         className="form-control"
                         placeholder={`Enter Question ${index + 1}`}
-                        value={element || ""}
-                        onChange={(e)=>{
+                        value={element.question || ""}
+                        onChange={(e) => {
                           const newDataArray = [...selectedForm.data];
-                          newDataArray[index] = e.target.value;
+                          newDataArray[index] = {
+                            ...newDataArray[index],
+                            question: e.target.value,
+                          };
                           dispatch(updateData(newDataArray));
                         }}
                       />
+                      <select
+                        id="select2_course_select"
+                        className="select2 form-select select2-hidden-accessible"
+                        data-placeholder="All Courses"
+                        onChange={(e) => {
+                          dispatch(
+                            switchQuestionType({
+                              index,
+                              newType: e.target.value,
+                            })
+                          );
+                        }}
+                        tabIndex="-1"
+                        value={element.type}
+                        aria-hidden="true"
+                      >
+                        <option value="input">Input</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="radio">Radio</option>
+                        <option value="file">File Upload</option>
+                        <option value="dropdown">Dropdown</option>
+                        <option value="date">Date</option>
+                        <option value="time">Time</option>
+                      </select>
                       <button
                         type="button"
                         className="btn btn-danger ms-2"
-                        onClick={() => handleRemoveField(index)}
+                        onClick={() => dispatch(removeField(index))}
                       >
                         Remove
                       </button>
                     </div>
+
+                    {element.options &&
+                      element.options.map((option, optionIndex) => (
+                        <div
+                          key={optionIndex}
+                          className="form-check mt-3"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                          }}
+                        >
+                          <input
+                            name="default-radio-1"
+                            className="form-check-input"
+                            type="radio"
+                            value=""
+                            id="defaultRadio1"
+                          />
+                          <input
+                            type="text"
+                            id={`data.${index}.options.${optionIndex}`}
+                            className="form-control"
+                            placeholder={`Enter Option ${optionIndex + 1}`}
+                            value={option || ""}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                dispatch(addOption(index));
+                              }
+                            }}
+                            onChange={(e) =>
+                              handleOptionChange(
+                                index,
+                                optionIndex,
+                                e.target.value
+                              )
+                            }
+                          />
+
+                          <button
+                            type="button"
+                            className="btn btn-danger ms-2"
+                            onClick={() =>
+                              dispatch(
+                                removeOption({
+                                  questionIndex: index,
+                                  optionIndex,
+                                })
+                              )
+                            }
+                          >
+                            Remove Option
+                          </button>
+                        </div>
+                      ))}
                   </div>
                 ))}
-
               </>
-
 
               <div className="d-flex justify-content-center mb-3">
                 <button
@@ -236,7 +324,6 @@ function FormModal() {
                   Add Field
                 </button>
               </div>
-
             </div>
             <div className="modal-footer">
               <button

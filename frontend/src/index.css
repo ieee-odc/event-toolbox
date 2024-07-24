@@ -7,7 +7,9 @@
   --red: #d45154;
   --text-hover: #5c6daa;
 }
-
+html {
+  font-size: 90% !important;
+}
 select {
   height: 40px !important;
 }
@@ -773,6 +775,13 @@ a:hover {
 .bg-menu-theme .menu-horizontal-next {
   color: #697a8d;
 }
+.menu-link {
+  cursor: pointer !important;
+}
+.menu-link:hover {
+  cursor: pointer !important;
+  color: #c0c0c0 !important;
+}
 .bg-menu-theme .menu-link:hover,
 .bg-menu-theme .menu-link:focus,
 .bg-menu-theme .menu-horizontal-prev:hover,
@@ -789,7 +798,7 @@ a:hover {
 .bg-menu-theme .menu-item.disabled .menu-link,
 .bg-menu-theme .menu-horizontal-prev.disabled,
 .bg-menu-theme .menu-horizontal-next.disabled {
-  color: #a5afbb !important;
+  color: #3d4c5e !important;
 }
 .bg-menu-theme .menu-item.open:not(.menu-item-closing) > .menu-toggle,
 .bg-menu-theme .menu-item.active > .menu-link {

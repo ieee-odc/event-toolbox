@@ -42,9 +42,6 @@ const addWorkshop = async (req, res) => {
   }
 };
 
-
-
-
 const editWorkshop = async (req, res) => {
   try {
     const workshopId = req.params.workshopId;
@@ -102,7 +99,7 @@ const getSpaceWorkshops = async (req, res) => {
     const spaceId = req.params.spaceId;
     const workshops = await Workshop.find({ spaceId });
 
-    const workshopsWithCapacity = workshops.map(workshop => {
+    const workshopsWithCapacity = workshops.map((workshop) => {
       const workshopObj = workshop.toObject(); // Convert Mongoose document to plain object
       return {
         ...workshopObj,
@@ -123,60 +120,83 @@ const getSpaceWorkshops = async (req, res) => {
   }
 };
 
-
 const getEventWorkshops = async (req, res) => {
-    try {
-      const eventId = req.params.eventId;
-      const workshops = await Workshop.find({
-        eventId,
-      });
-      const workshopsWithCapacity = workshops.map(workshop => {
-        const workshopObj = workshop.toObject(); // Convert Mongoose document to plain object
-        return {
-          ...workshopObj,
-          capacity: 50,
-        };
-      });
-  
-      return res.status(200).json({
-        status: "success",
-        message: "Workshop retrieved",
-        workshops: workshopsWithCapacity,
-      });
-    } catch (e) {
-      console.error(e);
-      res.status(500).json({
-        message: "Server Error!",
-      });
-    }
-  };
+  try {
+    const eventId = req.params.eventId;
+    const workshops = await Workshop.find({
+      eventId,
+    });
+    const workshopsWithCapacity = workshops.map((workshop) => {
+      const workshopObj = workshop.toObject(); // Convert Mongoose document to plain object
+      return {
+        ...workshopObj,
+        capacity: 50,
+      };
+    });
 
-  const getOrganizerWorkshops = async (req, res) => {
-    try {
-      const organizerId = req.params.organizerId;
-      const workshops = await Workshop.find({
-        organizerId,
-      });
-      const workshopsWithCapacity = workshops.map(workshop => {
-        const workshopObj = workshop.toObject();
-        return {
-          ...workshopObj,
-          capacity: 50,
-        };
-      });
-  
-      return res.status(200).json({
-        status: "success",
-        message: "Workshop retrieved",
-        workshops: workshopsWithCapacity,
-      });
-    } catch (e) {
-      console.error(e);
-      res.status(500).json({
-        message: "Server Error!",
+    return res.status(200).json({
+      status: "success",
+      message: "Workshop retrieved",
+      workshops: workshopsWithCapacity,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
+const getOrganizerWorkshops = async (req, res) => {
+  try {
+    const organizerId = req.params.organizerId;
+    const workshops = await Workshop.find({
+      organizerId,
+    });
+    const workshopsWithCapacity = workshops.map((workshop) => {
+      const workshopObj = workshop.toObject();
+      return {
+        ...workshopObj,
+        capacity: 50,
+      };
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Workshop retrieved",
+      workshops: workshopsWithCapacity,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
+const getOneWorkshop = async (req, res) => {
+  try {
+    const workshopId = req.params.workshopId;
+    console.log(workshopId);
+    const workshop = await Workshop.findOne({ id: workshopId });
+    console.log(workshop);
+    if (!workshop) {
+      return res.status(400).json({
+        message: "Workshop doesn't exist!",
       });
     }
-  };
+    return res.status(200).json({
+      status: "success",
+      message: "Workshop retrieved",
+      workshop,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
 
 module.exports = {
   addWorkshop,
@@ -184,5 +204,6 @@ module.exports = {
   editWorkshop,
   getSpaceWorkshops,
   getEventWorkshops,
-  getOrganizerWorkshops
+  getOrganizerWorkshops,
+  getOneWorkshop,
 };

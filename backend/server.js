@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
   "https://59e0-41-230-216-254.ngrok-free.app",
   "http://localhost:5173",
-  "https://f2ac-41-230-216-254.ngrok-free.app"
+  "https://f2ac-41-230-216-254.ngrok-free.app",
 ];
 
 // Create a function to check if the origin is allowed

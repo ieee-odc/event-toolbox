@@ -8,14 +8,16 @@ import {
   toggleFormModal,
 } from "../../../core/Features/Forms";
 import FormModal from "./FormModal";
+import ShareLinkModal from "./ShareLinkModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
-import CustomButton from "../../../core/components/Button/Button";
+import { useParams } from "react-router-dom";
 
-function FormContainer() {
+function WorkshopFormContainer() {
   const dispatch = useDispatch();
   const userData = UserData();
+  const {workshopId}=useParams();
   const { filteredForms, forms } = useSelector((store) => store.formsStore);
 
   function formatDate(originalDate) {
@@ -34,6 +36,7 @@ function FormContainer() {
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [currentFormId, setCurrentFormId] = useState(null);
+  const [selectedFormId, setSelectedFormId] = useState(null); // New state for selected form
 
   const handleMouseEnter = (iconId) => {
     setHoveredIcon(iconId);
@@ -57,6 +60,24 @@ function FormContainer() {
   const handleShareClick = (formId) => {
     setCurrentFormId(formId);
     setShareModalOpen(true);
+  };
+
+  const handleRadioChange = (form) => {
+    Promise.all([
+        axiosRequest.post(`/form/edit/${form.id}`, {
+          workshopId,
+        }),
+        axiosRequest.post(`/workshop/edit/${workshopId}`, {
+          formId: form.id,
+        }),
+      ])
+        .then(() => {
+            setSelectedFormId(form.id);
+            toast.success(`Selected ${form.name} form`);
+        })
+        .catch((error) => {
+          console.error("Error updating space or workshop:", error);
+        });
   };
 
   return (
@@ -127,37 +148,26 @@ function FormContainer() {
       <div className="card">
         <div className="container-fluid mt-4">
           <div style={{ display: "flex", justifyContent: "end" }}>
-            {/* <button
+            <button
               className="btn btn-primary mb-4"
               onClick={() => {
                 dispatch(toggleFormModal());
-                // dispatch(resetFormModal());
+                dispatch(resetFormModal());
               }}
             >
               <span>
                 <i className="bx bx-plus me-md-1" />
-                <span className="d-md-inline-block d-none">Create Form </span>
+                <span className="d-md-inline-block d-none">Create Form</span>
               </span>
-            </button> */}
-            <CustomButton
-              text="Create Form"
-              iconClass="bx bx-plus me-md-1"
-              backgroundColor="var(--primary-color)"
-              textColor="white"
-              hoverBackgroundColor="#0F205D"
-              hoverTextColor="white"
-              onClick={() => {
-                dispatch(toggleFormModal());
-              }}
-            />
+            </button>
           </div>
           <div className="table-responsive">
             <table className="table table-striped">
               <thead>
                 <tr>
+                  <th scope="col">Select</th>
                   <th scope="col">Name</th>
                   <th>Deadline</th>
-                  <th>Event</th>
                   <th style={{ textAlign: "right" }}></th>
                 </tr>
               </thead>
@@ -165,13 +175,25 @@ function FormContainer() {
                 {filteredForms &&
                   filteredForms.map((form) => (
                     <tr key={form.id}>
-                      <td>
+                      <td style={{cursor:"pointer"}}>
+                        <input
+                          type="radio"
+                          name="selectedForm"
+                          value={form.id}
+                          checked={selectedFormId === form.id}
+                          onChange={() => handleRadioChange(form)}
+                        />
+                      </td>
+                      <td style={{cursor:"pointer"}} onClick={()=>{
+                        handleRadioChange(form)
+                      }}>
                         <a href="">{form.name}</a>
                       </td>
-                      <td>
+                      <td style={{cursor:"pointer"}} onClick={()=>{
+                        handleRadioChange(form)
+                      }}>
                         <a href="">{formatDate(form.deadline)}</a>
                       </td>
-                      <td></td>
                       <td style={{ textAlign: "right" }}>
                         <button
                           className="btn btn-link p-0"
@@ -205,17 +227,20 @@ function FormContainer() {
                             onMouseLeave={handleMouseLeave}
                           ></i>
                         </button>
-                        <button className="btn btn-link p-0">
+                        <button
+                          className="btn btn-link p-0"
+                          onMouseEnter={() =>
+                            handleMouseEnter(`share_${form._id}`)
+                          }
+                          onMouseLeave={handleMouseLeave}
+                          onClick={() => handleShareClick(form.id)}
+                        >
                           <i
                             className={`bx bx-share bx-sm ${
                               hoveredIcon === `share_${form._id}`
                                 ? "transform"
                                 : ""
                             }`}
-                            onMouseEnter={() =>
-                              handleMouseEnter(`share_${form._id}`)
-                            }
-                            onMouseLeave={handleMouseLeave}
                           ></i>
                         </button>
                       </td>
@@ -245,4 +270,4 @@ function FormContainer() {
   );
 }
 
-export default FormContainer;
+export default WorkshopFormContainer;
