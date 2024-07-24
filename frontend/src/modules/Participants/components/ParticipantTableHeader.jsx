@@ -1,10 +1,16 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { toggleParticipantModal } from "../../../core/Features/Participants";
+import {
+  toggleParticipantModal,
+  setParticipantsPerPage,
+} from "../../../core/Features/Participants";
 import CustomButton from "../../../core/components/Button/Button";
 
 function ParticipantTableHeader() {
   const dispatch = useDispatch();
+  const handleParticipantsPerPageChange = (e) => {
+    dispatch(setParticipantsPerPage(Number(e.target.value)));
+  };
   return (
     <div className="row mx-1">
       <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -14,6 +20,7 @@ function ParticipantTableHeader() {
               name="DataTables_Table_0_length"
               aria-controls="DataTables_Table_0"
               className="form-select"
+              onChange={handleParticipantsPerPageChange}
             >
               <option value={10}>10</option>
               <option value={25}>25</option>

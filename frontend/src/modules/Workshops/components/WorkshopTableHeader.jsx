@@ -13,6 +13,9 @@ function WorkshopTableHeader() {
   const handleSearchChange = (event) => {
     dispatch(filterWorkshops(event.target.value));
   };
+  const handleWorkshopsPerPageChange = (e) => {
+    dispatch(setWorkshopsPerPage(Number(e.target.value)));
+  };
   return (
     <div className="row mx-1">
       <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
@@ -22,11 +25,12 @@ function WorkshopTableHeader() {
               name="DataTables_Table_0_length"
               aria-controls="DataTables_Table_0"
               className="form-select"
+              onChange={handleWorkshopsPerPageChange}
             >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
+              <option value={10}>6</option>
+              <option value={25}>9 </option>
+              <option value={50}>12</option>
+              <option value={100}>18</option>
             </select>
           </label>
         </div>

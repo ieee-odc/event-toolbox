@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
-import { UserData } from "./../../../utils/UserData";
+import { UserData } from "../../../utils/UserData";
 import { useDispatch, useSelector } from "react-redux";
 import {
   filterEvents,
@@ -12,6 +12,7 @@ import {
   toggleEventModal,
   selectEvent,
   addEvent,
+  setEventsPerPage, // Ensure you have this action
 } from "../../../core/Features/Events";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -20,19 +21,18 @@ import Pagination from "../../../core/components/Pagination/Pagination";
 
 function EventsList() {
   const dispatch = useDispatch();
-  const { events, filteredEvents, isLoading, filterStatus } = useSelector(
-    (store) => store.eventsStore
-  );
+  const { events, filteredEvents, isLoading, filterStatus, eventsPerPage } =
+    useSelector((store) => store.eventsStore);
 
   const userData = UserData();
   const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 3;
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
   const currentEvents = filteredEvents.slice(
     indexOfFirstEvent,
     indexOfLastEvent
   );
+
   const handleDeleteEvent = async (eventId) => {
     try {
       await axiosRequest.delete(`/events/delete/${eventId}`);
@@ -45,7 +45,6 @@ function EventsList() {
 
   const handleEditClick = (event) => {
     dispatch(selectEvent(event));
-    console.log(event);
     dispatch(toggleEventModal());
   };
 
@@ -53,9 +52,9 @@ function EventsList() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const durationInMilliseconds = end - start;
-    const durationInDays = durationInMilliseconds / (1000 * 60 * 60 * 24);
-    return Math.round(durationInDays);
+    return Math.round(durationInMilliseconds / (1000 * 60 * 60 * 24));
   };
+
   const formatDate = (passedDate) => {
     const dateObj = new Date(passedDate);
     const day = dateObj.getUTCDate().toString().padStart(2, "0");
@@ -63,6 +62,7 @@ function EventsList() {
     const year = dateObj.getUTCFullYear().toString();
     return `${day}/${month}/${year}`;
   };
+
   const getEventStatus = (startDate, endDate) => {
     const currentDate = new Date();
     const start = new Date(startDate);
@@ -94,7 +94,7 @@ function EventsList() {
         toast.success("Event Duplicated Successfully");
       });
     } catch (error) {
-      console.error("Error deleting event:", error);
+      console.error("Error duplicating event:", error);
     }
   };
 
@@ -113,7 +113,12 @@ function EventsList() {
     };
 
     fetchEvents();
-  }, []);
+  }, [dispatch, userData.id]);
+
+  const handleEventsPerPageChange = (e) => {
+    dispatch(setEventsPerPage(Number(e.target.value)));
+    setCurrentPage(1); // Reset to the first page
+  };
 
   return (
     <div className="content-wrapper">
@@ -130,10 +135,33 @@ function EventsList() {
           <div className="card mb-4">
             <div className="card-header d-flex flex-wrap justify-content-between gap-3">
               <div className="card-title mb-0 me-1">
-                <h5 className="mb-1">My Events</h5>
-                <p className="text-muted mb-0">
-                  Total {events && events.length} events
-                </p>
+                <div className="d-flex flex-row align-items-start">
+                  <div
+                    className="dataTables_length"
+                    id="DataTables_Table_0_length"
+                  >
+                    <label>
+                      <select
+                        name="DataTables_Table_0_length"
+                        aria-controls="DataTables_Table_0"
+                        className="form-select"
+                        onChange={handleEventsPerPageChange}
+                        value={eventsPerPage}
+                      >
+                        <option value={6}>6</option>
+                        <option value={9}>9</option>
+                        <option value={12}>12</option>
+                        <option value={18}>18</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="d-flex flex-column align-items-start ms-3">
+                    <h5 className="mb-1">My Events</h5>
+                    <p className="text-muted mb-0">
+                      Total {events && events.length} events
+                    </p>
+                  </div>
+                </div>
               </div>
               <div className="d-flex justify-content-md-end align-items-center gap-3 flex-wrap">
                 <div className="position-relative">
@@ -145,51 +173,13 @@ function EventsList() {
                     tabIndex="-1"
                     aria-hidden="true"
                   >
-                    <option
-                      className="select2-results__option"
-                      id="select2-select2_course_select-result-1rbs-seo"
-                      value=""
-                    >
-                      All Events
-                    </option>
+                    <option value="">All Events</option>
                     <option value="Ongoing">Ongoing</option>
                     <option value="Upcoming">Upcoming</option>
                     <option value="Done">Done</option>
                   </select>
-                  <span
-                    className="select2 select2-container select2-container--default"
-                    dir="ltr"
-                    style={{ width: "126px" }}
-                  >
-                    <span
-                      className="selection"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                      tabIndex="0"
-                      aria-disabled="false"
-                    >
-                      <span
-                        className="select2-selection select2-selection--single"
-                        role="combobox"
-                      >
-                        <span
-                          className="select2-selection__arrow"
-                          role="presentation"
-                        >
-                          <b role="presentation"></b>
-                        </span>
-                      </span>
-                    </span>
-                    <span
-                      className="dropdown-wrapper"
-                      aria-hidden="true"
-                    ></span>
-                  </span>
                 </div>
 
-                {/* <button className="btn btn-primary" onClick={onAddEventClick}>
-                  Add Event
-                </button> */}
                 <CustomButton
                   text="Add Event"
                   backgroundColor="var(--primary-color)"
@@ -208,8 +198,8 @@ function EventsList() {
                 {isLoading ? (
                   <p>Loading events...</p>
                 ) : (
-                  filteredEvents &&
-                  filteredEvents.map((event) => (
+                  currentEvents &&
+                  currentEvents.map((event) => (
                     <div className="col-sm-6 col-lg-4" key={event._id}>
                       <div className="card p-2 h-100 shadow-none border">
                         <div className="rounded-2 text-center mb-3">
@@ -269,7 +259,7 @@ function EventsList() {
                               <span className="text-muted"> (34)</span>
                             </h6> */}
                             </div>
-                            <div className="d-flex align-items-center mb-1">
+                            <div className="d-flex align-items-center mb-3">
                               <p className="h4">{event.name}</p>
                             </div>
                             <div className="d-flex align-items-center mb-1">
@@ -303,10 +293,10 @@ function EventsList() {
                               </p>
                             </div>
                             <div className="d-flex align-items-center mb-1">
-                              <i className="bx bx-calendar"></i>
+                              <i className="bx bx-calendar ms-2"></i>
 
                               <b>
-                                <p className="d-flex align-items-center text mb-0 me-1">
+                                <p className="d-flex align-items-center text mb-0 ">
                                   Dates :
                                 </p>{" "}
                               </b>
@@ -361,7 +351,6 @@ function EventsList() {
                   ))
                 )}
               </div>
-              {/* PAGINATION */}
               <div className="row mx-2" id="pagination-section">
                 <div className="col-sm-12 col-md-6">
                   <div
@@ -378,7 +367,7 @@ function EventsList() {
                 </div>
                 <Pagination
                   unitsPerPage={eventsPerPage}
-                  totalUnits={filterEvents.length}
+                  totalUnits={filteredEvents.length}
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
                 />

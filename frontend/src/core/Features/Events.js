@@ -5,12 +5,13 @@ const EventsSlice = createSlice({
   initialState: {
     isLoading: false,
     events: [],
-    isEdit:false,
+    isEdit: false,
     filteredEvents: [],
     isModalOpen: false,
+    eventsPerPage: 6,
     filterStatus: "",
     selectedEvent: {
-    organizerId:"",
+      organizerId: "",
       name: "",
       description: "",
       location: "",
@@ -55,15 +56,15 @@ const EventsSlice = createSlice({
       state.isLoading = !state.isLoading;
     },
     selectEvent: (state, action) => {
-        state.isEdit=true;
-        const { startDate, endDate, ...otherFields } = action.payload;
-        state.selectedEvent = {
-          ...state.selectedEvent,
-          ...otherFields,
-          startDate: startDate.split("T")[0],
-          endDate: endDate.split("T")[0],
-        };
-      },
+      state.isEdit = true;
+      const { startDate, endDate, ...otherFields } = action.payload;
+      state.selectedEvent = {
+        ...state.selectedEvent,
+        ...otherFields,
+        startDate: startDate.split("T")[0],
+        endDate: endDate.split("T")[0],
+      };
+    },
     setSelectedEvent: (state, action) => {
       state.selectedEvent = action.payload;
     },
@@ -74,19 +75,22 @@ const EventsSlice = createSlice({
         state.selectedEvent.endDate = "";
       }
     },
-    resetEventModal:(state)=>{
-        state.selectedEvent={
-          organizerId: "",
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        };
+    resetEventModal: (state) => {
+      state.selectedEvent = {
+        organizerId: "",
+        name: "",
+        description: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+      };
     },
-    changeFormState:(state,action)=>{
-        state.isEdit=action.payload
-    }
+    changeFormState: (state, action) => {
+      state.isEdit = action.payload;
+    },
+    setEventsPerPage: (state, action) => {
+      state.eventsPerPage = action.payload;
+    },
   },
 });
 
@@ -98,10 +102,12 @@ export const {
   toggleEventModal,
   filterEvents,
   toggleEventsIsLoading,
+  isLoading,
   selectEvent,
   setSelectedEvent,
   updateSelectedEventField,
   resetEventModal,
   changeFormState,
+  setEventsPerPage,
 } = EventsSlice.actions;
 export default EventsSlice.reducer;

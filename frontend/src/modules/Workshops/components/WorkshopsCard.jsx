@@ -20,13 +20,14 @@ import Pagination from "../../../core/components/Pagination/Pagination";
 import Card from "../../../core/components/Card/Card";
 
 const WorkshopsCard = () => {
-  const { filteredWorkshops } = useSelector((state) => state.workshopsStore);
+  const { filteredWorkshops, workshopsPerPage, isLoading } = useSelector(
+    (state) => state.workshopsStore
+  );
   const userData = UserData();
   const dispatch = useDispatch();
   const [dropdownStates, setDropdownStates] = useState({});
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const workshopsPerPage = 3;
 
   const indexOfLastWorkshop = currentPage * workshopsPerPage;
   const indexOfFirstWorkshop = indexOfLastWorkshop - workshopsPerPage;
@@ -108,22 +109,28 @@ const WorkshopsCard = () => {
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
           <WorkshopTableHeader />
-          <div className="row g-4">
-            {currentWorkshops.map((workshop) => (
-              <div className=" col-md-4" key={workshop.id}>
-                <Card
-                  title={workshop.name}
-                  formText="#"
-                  date={formatDateWithNumbers(workshop.endTime)}
-                  endTime={formatTime(workshop.endTime)}
-                  description={workshop.description}
-                  badgeText={renderTag(workshop.startTime)}
-                  personCount={0}
-                  personCapacity={50}
-                  progress={0}
-                />
-              </div>
-            ))}
+
+          <div className="row g-4" style={{ justifyContent: "center" }}>
+            {isLoading ? (
+              <p>Loading workshops...</p>
+            ) : (
+              currentWorkshops &&
+              currentWorkshops.map((workshop) => (
+                <div className=" col-md-4" key={workshop.id}>
+                  <Card
+                    title={workshop.name}
+                    formText="#"
+                    date={formatDateWithNumbers(workshop.endTime)}
+                    endTime={formatTime(workshop.endTime)}
+                    description={workshop.description}
+                    badgeText={renderTag(workshop.startTime)}
+                    personCount={0}
+                    personCapacity={50}
+                    progress={0}
+                  />
+                </div>
+              ))
+            )}
           </div>
           <div className="row mx-2" id="pagination-section">
             <div className="col-sm-12 col-md-6">

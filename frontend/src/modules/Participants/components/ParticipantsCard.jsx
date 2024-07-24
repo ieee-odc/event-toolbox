@@ -15,13 +15,11 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
-  const { participants, filteredParticipants } = useSelector(
-    (store) => store.participantsStore
-  );
+  const { participants, filteredParticipants, participantsPerPage } =
+    useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const participantsPerPage = 6;
 
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
