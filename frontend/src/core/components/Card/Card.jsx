@@ -1,31 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Card.css"; // Assuming you put the provided styles in this CSS file
+import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
+import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
+import axiosRequest from "../../../utils/AxiosConfig";
 
 const Card = ({
   title,
   formText,
   date,
+  startTime,
   endTime,
   description,
   badgeText,
   personCount,
   personCapacity,
   progress,
+  workshop,
 }) => {
+  const toggleDropdown = (workshopId) => {
+    setDropdownStates({
+      ...dropdownStates,
+      [workshopId]: !dropdownStates[workshopId],
+    });
+  };
+  const [dropdownStates, setDropdownStates] = useState({});
+
+  const initializeDropdownStates = (workshops) => {
+    const initialStates = workshops.reduce((acc, workshop) => {
+      acc[workshop.id] = false;
+      return acc;
+    }, {});
+    setDropdownStates(initialStates);
+  };
+  const handleDeleteWorkshop = (workshopId) => {
+    axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
+      dispatch(deleteWorkshop(workshopId));
+      toast.success("Workshop deleted successfully");
+    });
+  };
+
+  // const handleNavigateToForm = (formId) => {
+  //   navigate(/form/${formId});
+  // };
+
   return (
     <div className="custom-card">
       <div className="card-header">
-        <div className="d-flex align-items-center">
-          <div className="d-flex align-items-center">
-            <div className="avatar me-2 d-flex align-items-center">
-              <i className="bx bx-notepad ms-2"></i>{" "}
+        <div className="d-flex align-items-start">
+          <div className="d-flex align-items-center mb-3">
+            <div className="avatar me-3">
+              <img
+                src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/icons/brands/social-label.png"
+                alt="Avatar"
+                className="rounded-circle"
+              />
             </div>
-            <div className="me-1">
-              <span className="mb-0">
-                <h4 style={{ fontSize: "20px" }} className="mb-0">
-                  {title}
-                </h4>
-              </span>
+            <div className="me-2">
+              <h5 className="mb-1 workshop-title">
+                <span className="h5">{workshop.name}</span>
+              </h5>
             </div>
           </div>
           <div className="ms-auto">
@@ -33,37 +66,79 @@ const Card = ({
               <a
                 href="javascript:;"
                 className="btn dropdown-toggle hide-arrow text-body p-0"
+                onClick={() => toggleDropdown(workshop.id)}
+                aria-expanded={dropdownStates[workshop.id]}
               >
-                <i className="bx bx-dots-vertical-rounded"></i>
+                <i className="bx bx-dots-vertical-rounded" />
               </a>
+              {dropdownStates[workshop.id] && (
+                <div
+                  className="dropdown-menu dropdown-menu-end"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <a href="javascript:;" className="dropdown-item">
+                    Download
+                  </a>
+                  <a
+                    onClick={() => {
+                      handleEditWorkshop(workshop);
+                    }}
+                    className="dropdown-item"
+                  >
+                    Edit
+                  </a>
+                  <a href="javascript:;" className="dropdown-item">
+                    Duplicate
+                  </a>
+                  <div className="dropdown-divider" />
+                  <a
+                    onClick={() => {
+                      handleDeleteWorkshop(workshop.id);
+                    }}
+                    style={{ cursor: "pointer" }}
+                    className="dropdown-item delete-record text-danger"
+                  >
+                    Delete
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
       <div className="card-body">
-        <div className="d-flex flex-column align-items-center justify-content-between mb-3">
-          <div className="text-start mt-3 mb-4 ">
-            <div className="d-flex align-items-center flex-wrap">
-              <i className="bx bx-time me-1"></i>
-              <div>
-                <h5 className="mb-0">
-                  Deadline:{" "}
-                  <span className="h5 mt-1 f">
-                    {date} {endTime}
-                  </span>
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div className="bg-lighter p-2 rounded mb-2">
+        <div className="d-flex align-items-center flex-wrap mb-2">
+          <div className="bg-lighter p-2 rounded me-auto mb-3">
             <h6 className="mb-1">
-              <span className="text-body fw-normal">Form</span>
-              <span>{formText}</span>
+              <span className="text-body fw-normal">Form</span>{" "}
+              <span onClick={() => handleNavigateToForm(workshop.formId)}>
+                #{workshop.formId}
+              </span>
+            </h6>
+          </div>
+          <div className="text-start mb-3" id="info-box">
+            <h6 className="mb-2">
+              Starts:{" "}
+              <span className="text-body fw-normal">
+                {formatTime(workshop.startTime)}{" "}
+                {formatDateWithNumbers(workshop.startTime)}
+              </span>
+            </h6>
+            <h6 className="mb-1">
+              Ends: &nbsp;
+              <span className="text-body fw-normal">
+                {" "}
+                {formatTime(workshop.startTime)}{" "}
+                {formatDateWithNumbers(workshop.startTime)}{" "}
+              </span>
             </h6>
           </div>
         </div>
-
-        <h6 style={{ fontSize: "16px" }}>{description}</h6>
+        <h6 style={{ fontSize: "14px" }}>{workshop.description}</h6>
       </div>
       <div className="card-body border-top">
         <div className="d-flex align-items-center mb-3">{badgeText}</div>

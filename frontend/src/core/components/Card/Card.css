@@ -79,11 +79,22 @@
   max-width: 200px; /* Adjust based on your design */
 }
 
-.card-body h5,
-.card-body h6 {
+.card-body h5 {
   max-width: 100%; /* Adjust based on your design */
 }
-
+.card-header .workshop-title {
+  max-width: 200px; /* Adjust based on your design */
+}
+#info-box span {
+  color: var(--text-color) !important;
+  font-size: 1rem !important;
+}
+.card-header h5,
+.card-body h6 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .progress {
   background-color: #e9ecef;
 }

@@ -120,8 +120,10 @@ const WorkshopsCard = () => {
                   <Card
                     title={workshop.name}
                     formText="#"
+                    workshop={workshop}
                     date={formatDateWithNumbers(workshop.endTime)}
                     endTime={formatTime(workshop.endTime)}
+                    startTime={formatTime(workshop.startTime)}
                     description={workshop.description}
                     badgeText={renderTag(workshop.startTime)}
                     personCount={0}
