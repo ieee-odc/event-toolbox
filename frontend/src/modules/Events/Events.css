@@ -143,6 +143,7 @@ body {
   justify-content: center;
   padding: 5px 10px; /* Added horizontal padding for better spacing */
   border-radius: 5px;
+  box-shadow: none !important;
 }
 
 #deleteButton p {

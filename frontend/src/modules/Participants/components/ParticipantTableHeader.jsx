@@ -13,7 +13,10 @@ function ParticipantTableHeader() {
   };
   return (
     <div className="row mx-1">
-      <div className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+      <div
+        id="create-workshop-container"
+        className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3"
+      >
         <div className="dataTables_length" id="DataTables_Table_0_length">
           <label>
             <select

@@ -8,7 +8,8 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   padding: 0.75rem; /* Adjust padding for better alignment */
   white-space: nowrap;
 }
@@ -29,4 +30,25 @@
 .table .dropdown-menu {
   min-width: 100px;
   text-align: left;
+}
+
+/* DatePicker.css */
+
+/* Ensure the modal content takes full width on smaller screens */
+@media (max-width: 576px) {
+  .modal-dialog {
+    width: 100%;
+    margin: 0;
+  }
+  .modal-content {
+    border-radius: 0;
+  }
+}
+
+/* Adjust the input and select elements within the modal */
+@media (max-width: 576px) {
+  .modal-body .form-control,
+  .modal-body .form-select {
+    width: 100%;
+  }
 }

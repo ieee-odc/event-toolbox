@@ -14,7 +14,7 @@ import WorkshopSpaceContainer from "../../Space/component/WorkshopSpaceContainer
 import WorkshopFormContainer from "../../Form/components/WorkshopFormContainer";
 
 function SingleWorkshopPage() {
-  const { workshopId,eventId } = useParams();
+  const { workshopId, eventId } = useParams();
 
   const [activeTab, setActiveTab] = useState("Participants");
   const [workshop, setWorkshop] = useState({});
@@ -26,9 +26,6 @@ function SingleWorkshopPage() {
     });
   }, [workshopId]);
 
-
-
-
   useEffect(() => {
     axiosRequest.get(`/participant/get-workshop/${workshopId}`).then((res) => {
       dispatch(initializeParticipants(res.data.participants));
@@ -37,7 +34,7 @@ function SingleWorkshopPage() {
 
   return (
     <DashboardLayout>
-      <div style={{ padding: 20 }}>
+      <div id="u-container" style={{ padding: 5 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h4 className="py-3 mb-4">
             <span className="text-muted fw-light">{workshop?.name} /</span>{" "}
