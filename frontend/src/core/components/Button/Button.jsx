@@ -18,8 +18,6 @@ const CustomButton = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
-        backgroundColor: backgroundColor,
-        color: textColor,
         backgroundColor: isHovered ? hoverBackgroundColor : backgroundColor,
         color: isHovered ? hoverTextColor : textColor,
       }}
