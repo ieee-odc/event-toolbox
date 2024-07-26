@@ -61,40 +61,6 @@ function SingleEventPage() {
           <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li className="nav-item" role="presentation">
               <button
-                className="nav-link active"
-                id="pills-participant-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#pills-participant"
-                type="button"
-                role="tab"
-                aria-controls="pills-participant"
-                aria-selected="true"
-                onClick={() => {
-                  setActiveTab("Participants");
-                }}
-              >
-                Participants
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className="nav-link"
-                id="pills-workshop-tab"
-                data-bs-toggle="pill"
-                data-bs-target="#pills-workshop"
-                type="button"
-                role="tab"
-                aria-controls="pills-workshop"
-                aria-selected="false"
-                onClick={() => {
-                  setActiveTab("Workshops");
-                }}
-              >
-                Workshops
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
                 className="nav-link"
                 id="pills-form-tab"
                 data-bs-toggle="pill"
@@ -126,7 +92,44 @@ function SingleEventPage() {
               >
                 Venue
               </button>
-            </li>
+              </li>
+
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link active"
+                  id="pills-participant-tab"
+                  data-bs-toggle="pill"
+                  data-bs-target="#pills-participant"
+                  type="button"
+                  role="tab"
+                  aria-controls="pills-participant"
+                  aria-selected="true"
+                  onClick={() => {
+                    setActiveTab("Participants");
+                  }}
+                >
+                  Participants
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link"
+                  id="pills-workshop-tab"
+                  data-bs-toggle="pill"
+                  data-bs-target="#pills-workshop"
+                  type="button"
+                  role="tab"
+                  aria-controls="pills-workshop"
+                  aria-selected="false"
+                  onClick={() => {
+                    setActiveTab("Workshops");
+                  }}
+                >
+                  Workshops
+                </button>
+              </li>
+
+
           </ul>
         </div>
 
@@ -135,24 +138,6 @@ function SingleEventPage() {
           id="pills-tabContent"
           style={{ padding: 0 }}
         >
-          <div
-            className="tab-pane fade show active"
-            id="pills-participant"
-            role="tabpanel"
-            aria-labelledby="pills-participant-tab"
-            tabIndex="0"
-          >
-            <ParticipantsContainer />
-          </div>
-          <div
-            className="tab-pane fade"
-            id="pills-workshop"
-            role="tabpanel"
-            aria-labelledby="pills-workshop-tab"
-            tabIndex="0"
-          >
-            <WorkshopsContainer />
-          </div>
           <div
             className="tab-pane fade"
             id="pills-form"
@@ -171,6 +156,26 @@ function SingleEventPage() {
           >
             <SpaceContainer />
           </div>
+          <div
+            className="tab-pane fade show active"
+            id="pills-participant"
+            role="tabpanel"
+            aria-labelledby="pills-participant-tab"
+            tabIndex="0"
+          >
+            <ParticipantsContainer />
+          </div>
+          <div
+            className="tab-pane fade"
+            id="pills-workshop"
+            role="tabpanel"
+            aria-labelledby="pills-workshop-tab"
+            tabIndex="0"
+          >
+            <WorkshopsContainer />
+          </div>
+
+
         </div>
       </div>
     </DashboardLayout>
