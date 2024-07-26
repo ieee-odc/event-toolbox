@@ -133,9 +133,7 @@ function WorkshopSpaceContainer() {
                 >
                   <span>
                     <i className="bx bx-plus me-md-1" />
-                    <span className="d-md-inline-block d-none">
-                      Create Space
-                    </span>
+                    <span className="d-md-inline-block d-none">Add Venue</span>
                   </span>
                 </button>
               </div>

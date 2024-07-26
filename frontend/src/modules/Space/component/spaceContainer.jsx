@@ -9,6 +9,7 @@ import {
   toggleSpaceModal,
 } from "../../../core/Features/Spaces";
 import SpaceModal from "./SpaceModal";
+import CustomButton from "../../../core/components/Button/Button";
 
 function SpaceContainer() {
   const dispatch = useDispatch();
@@ -100,7 +101,7 @@ function SpaceContainer() {
                 className="card-header border-0 pt-4 pb-2 d-flex justify-content-end"
                 style={{ alignItems: "center" }}
               >
-                <button
+                {/* <button
                   className="btn btn-primary"
                   onClick={() => {
                     dispatch(toggleSpaceModal());
@@ -112,7 +113,18 @@ function SpaceContainer() {
                 Create Space
               </span>
             </span>
-                </button>
+                </button> */}
+                <CustomButton
+                  text="Add Venue"
+                  iconClass="bx bx-plus me-md-1"
+                  backgroundColor="var(--primary-color)"
+                  textColor="white"
+                  hoverBackgroundColor="#0F205D"
+                  hoverTextColor="white"
+                  onClick={() => {
+                    dispatch(toggleSpaceModal());
+                  }}
+                />
               </div>
 
               <div className="card-body p-0 logistics-fleet-sidebar-body ps">
@@ -144,7 +156,7 @@ function SpaceContainer() {
                         <div className="avatar-wrapper">
                           <div className="avatar me-3">
                             <span className="avatar-initial rounded-circle bg-label-secondary">
-                              <i className="bx bxs-truck"></i>
+                              <i className="bx bxs-buildings"></i>
                             </span>
                           </div>
                         </div>
@@ -155,9 +167,7 @@ function SpaceContainer() {
                       </div>
                     </div>
                   ))}
-                  {spaces.length===0&&<div>
-                    No spaces at the moment
-                    </div>}
+                  {spaces.length === 0 && <div>No spaces at the moment</div>}
                 </div>
               </div>
               <div

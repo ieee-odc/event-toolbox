@@ -212,14 +212,15 @@ function Login() {
                   buttonText="Sign in with Google"
                   onSuccess={onGoogleSuccess}
                   onFailure={onGoogleFailure}
-                  action={(data) =>{
-
-                    return axiosRequest.post("/auth/loginwithgoogle", data).then((response) =>{
-                    }).catch((err)=>{
-                      console.log(err)
-                    })
-                  }
-                  }
+                  action={(data) => {
+                    return axiosRequest
+                      .post("/auth/loginwithgoogle", data)
+                      .then((response) => {
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                      });
+                  }}
                 />
               </div>
               <p className="text-center move-down">

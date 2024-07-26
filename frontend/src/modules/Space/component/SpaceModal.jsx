@@ -8,12 +8,14 @@ import { UserData } from '../../../utils/UserData';
 import { useParams } from 'react-router-dom';
 import { initializeWorkshops } from '../../../core/Features/Workshops';
 
+
 function SpaceModal() {
   const dispatch = useDispatch();
   const { eventId } = useParams();
 
   const { isModalOpen, selectedSpace, isEdit } = useSelector((store) => store.spacesStore)
   const { workshops } = useSelector((store) => store.workshopsStore)
+
 
   const modalClassName = isModalOpen ? "modal fade show" : "modal fade";
   const userData = UserData();
@@ -34,10 +36,7 @@ function SpaceModal() {
         dispatch(toggleSpaceModal())
         toast.success("Space deleted successfully");
       });
-
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
 
   const handleInputChange = (e) => {
@@ -74,22 +73,39 @@ function SpaceModal() {
     })
   }
 
+
   return (
     <>
       {isModalOpen && <div className="modal-backdrop fade show"></div>}
-      <div className={modalClassName} id="spaceModal" tabIndex="-1" style={{ display: isModalOpen ? "block" : "none", zIndex: 99999 }} aria-modal="true" role="dialog">
+      <div
+        className={modalClassName}
+        id="spaceModal"
+        tabIndex="-1"
+        style={{ display: isModalOpen ? "block" : "none", zIndex: 99999 }}
+        aria-modal="true"
+        role="dialog"
+      >
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title">{isEdit ? 'Update Space' : 'Create Space'}</h5>
-              <button type="button" className="btn-close" onClick={() => {
-                dispatch(toggleSpaceModal())
-                dispatch(resetSpaceModal())
-              }} aria-label="Close"></button>
+              <h5 className="modal-title">
+                {isEdit ? "Update Venue" : "Add Venue"}
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => {
+                  dispatch(toggleSpaceModal());
+                  dispatch(resetSpaceModal());
+                }}
+                aria-label="Close"
+              ></button>
             </div>
             <div className="modal-body">
               <div className="mb-3">
-                <label htmlFor="spaceName" className="form-label">Space Name</label>
+                <label htmlFor="spaceName" className="form-label">
+                  Space Name
+                </label>
                 <input
                   type="text"
                   id="name"
@@ -101,7 +117,9 @@ function SpaceModal() {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="spaceCapacity" className="form-label">Capacity</label>
+                <label htmlFor="spaceCapacity" className="form-label">
+                  Capacity
+                </label>
                 <input
                   type="number"
                   id="capacity"
@@ -114,15 +132,28 @@ function SpaceModal() {
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-label-secondary" onClick={() => {
-                dispatch(toggleSpaceModal())
-                dispatch(resetSpaceModal())
-              }}>Close</button>
-              <button className="btn btn-primary" onClick={isEdit ? handleEditSpace : handleCreateSpace}>
-                {isEdit ? 'Save Changes' : 'Create'}
+              <button
+                type="button"
+                className="btn btn-label-secondary me-2"
+                onClick={() => {
+                  dispatch(toggleSpaceModal());
+                  dispatch(resetSpaceModal());
+                }}
+              >
+                Close
+              </button>
+              <button
+                className="btn btn-primary ms-2"
+                onClick={isEdit ? handleEditSpace : handleCreateSpace}
+              >
+                {isEdit ? "Save Changes" : "Create"}
               </button>
               {selectedSpace.id && (
-                <button type="button" className="btn btn-danger" onClick={handleDelete}>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={handleDelete}
+                >
                   Delete
                 </button>
               )}

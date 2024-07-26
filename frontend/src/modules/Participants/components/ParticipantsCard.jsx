@@ -4,8 +4,9 @@ import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-import { useDispatch, useSelector } from "react-redux";
 import { deleteParticipant } from "../../../core/Features/Participants";
+import Pagination from "../../../core/components/Pagination/Pagination";
+import { useDispatch, useSelector } from "react-redux";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -14,8 +15,19 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
-const { participants,filteredParticipants}=useSelector((store)=>store.participantsStore)
-const dispatch=useDispatch();
+  const { participants, filteredParticipants, participantsPerPage } =
+    useSelector((store) => store.participantsStore);
+  const dispatch = useDispatch();
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const indexOfLastParticipant = currentPage * participantsPerPage;
+  const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
+  const currentParticipants = filteredParticipants.slice(
+    indexOfFirstParticipant,
+    indexOfLastParticipant
+  );
+
   const getStatusIcon = (status) => {
     switch (status) {
       case ParticipationStatus.PAID:
@@ -29,10 +41,9 @@ const dispatch=useDispatch();
     }
   };
 
-
   const handleDeleteParticipant = (participantId) => {
     axiosRequest.post(`/participant/delete/${participantId}`).then(() => {
-      dispatch(deleteParticipant(participantId))
+      dispatch(deleteParticipant(participantId));
       toast.success("Participant deleted successfully");
     });
   };
@@ -45,7 +56,7 @@ const dispatch=useDispatch();
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <ParticipantTableHeader/>
+          <ParticipantTableHeader />
           <div className="table-responsive">
             <table
               className="invoice-list-table table border-top dataTable no-footer dtr-column"
@@ -121,7 +132,7 @@ const dispatch=useDispatch();
                 </tr>
               </thead>
               <tbody>
-                {filteredParticipants.map((participant, index) => (
+                {currentParticipants.map((participant, index) => (
                   <tr
                     className={`${index % 2 === 0 ? "even" : "odd"}`}
                     key={participant.id}
@@ -203,8 +214,8 @@ const dispatch=useDispatch();
                         </a>
                         <div className="dropdown">
                           <a
-                            href="javascript:;"
                             className="btn dropdown-toggle hide-arrow text-body p-0"
+                            id="three-dots"
                             data-bs-toggle="dropdown"
                           >
                             <i className="bx bx-dots-vertical-rounded" />
@@ -241,7 +252,7 @@ const dispatch=useDispatch();
               </tbody>
             </table>
           </div>
-          <div className="row mx-2">
+          <div className="row mx-2" id="pagination-section">
             <div className="col-sm-12 col-md-6">
               <div
                 className="dataTables_info"
@@ -249,59 +260,21 @@ const dispatch=useDispatch();
                 role="status"
                 aria-live="polite"
               >
-                {`Showing  of ${filteredParticipants.length} entries`}
+                {`Showing ${indexOfFirstParticipant + 1} to ${Math.min(
+                  indexOfLastParticipant,
+                  filteredParticipants.length
+                )} of ${filteredParticipants.length} entries`}
               </div>
             </div>
-            <div className="col-sm-12 col-md-6">
-              <div
-                className="dataTables_paginate paging_simple_numbers"
-                id="DataTables_Table_0_paginate"
-              >
-                <ul className="pagination">
-                  <li
-                    className={`paginate_button page-item previous`}
-                    id="DataTables_Table_0_previous"
-                  >
-                    <a
-                      aria-controls="DataTables_Table_0"
-                      role="link"
-                      tabIndex={-1}
-                      className="page-link"
-                    >
-                      Previous
-                    </a>
-                  </li>
-                    <li
-                      className={`paginate_button page-item active`}
-                    >
-                      <a
-                        href="#"
-                        aria-controls="DataTables_Table_0"
-                        role="link"
-                        tabIndex={0}
-                        className="page-link"
-                      >
-1                      </a>
-                    </li>
-                  <li
-                    className={`paginate_button page-item next`}
-                    id="DataTables_Table_0_next"
-                  >
-                    <a
-                      aria-controls="DataTables_Table_0"
-                      role="link"
-                      tabIndex={0}
-                      className="page-link"
-                    >
-                      Next
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <Pagination
+              unitsPerPage={participantsPerPage}
+              totalUnits={filteredParticipants.length}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
           </div>
 
-          <ParticipantModal/>
+          <ParticipantModal />
         </div>
       </div>
     </div>

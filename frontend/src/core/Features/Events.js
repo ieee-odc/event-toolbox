@@ -5,12 +5,13 @@ const EventsSlice = createSlice({
   initialState: {
     isLoading: false,
     events: [],
-    isEdit:false,
+    isEdit: false,
     filteredEvents: [],
     isModalOpen: false,
+    eventsPerPage: 6,
     filterStatus: "",
     selectedEvent: {
-    organizerId:"",
+      organizerId: "",
       name: "",
       description: "",
       location: "",
@@ -45,25 +46,30 @@ const EventsSlice = createSlice({
     toggleEventModal: (state) => {
       state.isModalOpen = !state.isModalOpen;
     },
-    filterEvents: (state, action) => {
+    filterEvents(state, action) {
       state.filterStatus = action.payload;
-      state.filteredEvents = state.events.filter((event) =>
-        event.status.toLowerCase().includes(action.payload.toLowerCase())
-      );
+      if (action.payload === "") {
+        state.filteredEvents = state.events;
+      } else {
+        state.filteredEvents = state.events.filter((event) => {
+          const status = getEventStatus(event.startDate, event.endDate).status;
+          return status === action.payload;
+        });
+      }
     },
     toggleEventsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
     },
     selectEvent: (state, action) => {
-        state.isEdit=true;
-        const { startDate, endDate, ...otherFields } = action.payload;
-        state.selectedEvent = {
-          ...state.selectedEvent,
-          ...otherFields,
-          startDate: startDate.split("T")[0],
-          endDate: endDate.split("T")[0],
-        };
-      },
+      state.isEdit = true;
+      const { startDate, endDate, ...otherFields } = action.payload;
+      state.selectedEvent = {
+        ...state.selectedEvent,
+        ...otherFields,
+        startDate: startDate.split("T")[0],
+        endDate: endDate.split("T")[0],
+      };
+    },
     setSelectedEvent: (state, action) => {
       state.selectedEvent = action.payload;
     },
@@ -74,21 +80,37 @@ const EventsSlice = createSlice({
         state.selectedEvent.endDate = "";
       }
     },
-    resetEventModal:(state)=>{
-        state.selectedEvent={
-          organizerId: "",
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        };
+    resetEventModal: (state) => {
+      state.selectedEvent = {
+        organizerId: "",
+        name: "",
+        description: "",
+        location: "",
+        startDate: "",
+        endDate: "",
+      };
     },
-    changeFormState:(state,action)=>{
-        state.isEdit=action.payload
-    }
+    changeFormState: (state, action) => {
+      state.isEdit = action.payload;
+    },
+    setEventsPerPage: (state, action) => {
+      state.eventsPerPage = action.payload;
+    },
   },
 });
+const getEventStatus = (startDate, endDate) => {
+  const currentDate = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (currentDate > end) {
+    return { status: "Done", badgeClass: "badge bg-label-success" };
+  } else if (currentDate < start) {
+    return { status: "Upcoming", badgeClass: "badge bg-label-primary" };
+  } else {
+    return { status: "Ongoing", badgeClass: "badge bg-label-warning" };
+  }
+};
 
 export const {
   initializeEvents,
@@ -98,10 +120,12 @@ export const {
   toggleEventModal,
   filterEvents,
   toggleEventsIsLoading,
+  isLoading,
   selectEvent,
   setSelectedEvent,
   updateSelectedEventField,
   resetEventModal,
   changeFormState,
+  setEventsPerPage,
 } = EventsSlice.actions;
 export default EventsSlice.reducer;

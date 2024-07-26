@@ -8,11 +8,12 @@ import {
   toggleFormModal,
 } from "../../../core/Features/Forms";
 import FormModal from "./FormModal";
-import ShareLinkModal from "./ShareLinkModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
 import { initializeWorkshops } from "../../../core/Features/Workshops";
+import CustomButton from "../../../core/components/Button/Button";
+
 
 function FormContainer() {
   const dispatch = useDispatch();
@@ -31,7 +32,6 @@ function FormContainer() {
 
     return formattedDate;
   }
-
 
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
@@ -135,21 +135,22 @@ function FormContainer() {
       </div>
       <div className="card">
         <div className="container-fluid mt-4">
-          <div style={{ display: "flex", justifyContent: "end" }}>
-            <button
-              className="btn btn-primary mb-4"
+          <div
+            className="mb-4"
+            style={{ display: "flex", justifyContent: "end" }}
+          >
+            <CustomButton
+              text="Create Form"
+              iconClass="bx bx-plus me-md-1 mb-2"
+              backgroundColor="var(--primary-color)"
+              textColor="white"
+              hoverBackgroundColor="#0F205D"
+              hoverTextColor="white"
               onClick={() => {
                 dispatch(toggleFormModal());
                 dispatch(resetFormModal());
               }}
-            >
-              <span>
-                <i className="bx bx-plus me-md-1" />
-                <span className="d-md-inline-block d-none">
-                  Create Form              </span>
-              </span>
-
-            </button>
+            />
           </div>
           <div className="table-responsive">
             <table className="table table-striped">
@@ -157,6 +158,7 @@ function FormContainer() {
                 <tr>
                   <th scope="col">Name</th>
                   <th>Deadline</th>
+                  <th>Event</th>
                   <th style={{ textAlign: "right" }}></th>
                 </tr>
               </thead>
@@ -170,6 +172,7 @@ function FormContainer() {
                       <td>
                         <a href="">{formatDate(form.deadline)}</a>
                       </td>
+                      <td></td>
                       <td style={{ textAlign: "right" }}>
                         <button
                           className="btn btn-link p-0"
@@ -201,32 +204,30 @@ function FormContainer() {
                             onMouseLeave={handleMouseLeave}
                           ></i>
                         </button>
-                        <button
-                          className="btn btn-link p-0"
-                          onMouseEnter={() => handleMouseEnter(`share_${form._id}`)}
-                          onMouseLeave={handleMouseLeave}
-                          onClick={() => handleShareClick(form.id)}
-                        >
+                        <button className="btn btn-link p-0">
                           <i
-                            className={`bx bx-share bx-sm ${hoveredIcon === `share_${form._id}`
+                            className={`bx bx-share bx-sm ${
+                              hoveredIcon === `share_${form._id}`
                                 ? "transform"
                                 : ""
-                              }`}
+                            }`}
+                            onMouseEnter={() =>
+                              handleMouseEnter(`share_${form._id}`)
+                            }
+                            onMouseLeave={handleMouseLeave}
                           ></i>
                         </button>
                       </td>
                     </tr>
                   ))}
 
-                {filteredForms &&
-                  filteredForms.length === 0 && (
-                    <tr>
-                      <td colSpan="4" style={{ textAlign: "center" }}>
-                        <span>There is no data currently</span>
-                      </td>
-                    </tr>
-                  )
-                }
+                {filteredForms && filteredForms.length === 0 && (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
+                      <span>There is no data currently</span>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

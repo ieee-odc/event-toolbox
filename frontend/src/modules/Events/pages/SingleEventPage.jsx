@@ -53,7 +53,7 @@ function SingleEventPage() {
   return (
     <DashboardLayout>
       <div style={{ padding: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div className="d-flex flex-column flex-md-row justify-content-between">
           <h4 className="py-3 mb-4">
             <span className="text-muted fw-light">{event?.name} /</span>{" "}
             {activeTab}
@@ -124,7 +124,7 @@ function SingleEventPage() {
                   setActiveTab("Spaces");
                 }}
               >
-                Spaces
+                Venue
               </button>
             </li>
           </ul>
@@ -140,7 +140,7 @@ function SingleEventPage() {
             id="pills-participant"
             role="tabpanel"
             aria-labelledby="pills-participant-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <ParticipantsContainer />
           </div>
@@ -149,7 +149,7 @@ function SingleEventPage() {
             id="pills-workshop"
             role="tabpanel"
             aria-labelledby="pills-workshop-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <WorkshopsContainer />
           </div>
@@ -158,17 +158,16 @@ function SingleEventPage() {
             id="pills-form"
             role="tabpanel"
             aria-labelledby="pills-form-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <FormContainer />
           </div>
-
           <div
             className="tab-pane fade"
             id="pills-space"
             role="tabpanel"
             aria-labelledby="pills-space-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <SpaceContainer />
           </div>

@@ -3,7 +3,6 @@ const Participant = require("../models/ParticipantModel");
 
 const addParticipant = async (req, res) => {
   try {
-
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
@@ -12,7 +11,7 @@ const addParticipant = async (req, res) => {
 
     const participant = new Participant({
       id: counter.seq,
-      status:"Pending",
+      status: "Pending",
       ...req.body,
     });
 
@@ -128,5 +127,5 @@ module.exports = {
   deleteParticipant,
   editParticipant,
   getEventParticipants,
-  getWorkshopParticipants
+  getWorkshopParticipants,
 };

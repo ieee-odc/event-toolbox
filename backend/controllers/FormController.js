@@ -27,7 +27,7 @@ const updateForm = async (req, res) => {
   try {
     const updatedForm = await Form.findOneAndUpdate(
       {
-        id:formId
+        id: formId,
       },
       { $set: { ...req.body } },
       { new: true }
@@ -38,9 +38,9 @@ const updateForm = async (req, res) => {
     }
 
     res.status(200).json({
-        form:updatedForm,
-        message: "Form updated successfully",
-        status: "success"
+      form: updatedForm,
+      message: "Form updated successfully",
+      status: "success",
     });
   } catch (error) {
     console.error("Error updating form:", error.message);
@@ -51,7 +51,7 @@ const updateForm = async (req, res) => {
 const deleteForm = async (req, res) => {
   const { formId } = req.params;
   try {
-    // Find and delete the form
+
     const deletedForm = await Form.findOneAndDelete({ id: formId });
     if (!deletedForm) {
       return res.status(404).json({ error: "Form not found" });
@@ -65,15 +65,14 @@ const deleteForm = async (req, res) => {
 
     res.status(200).json({
       form: deletedForm,
-      message: "Form deleted successfully and related entities updated",
-      status: "success"
+      message: "Form deleted successfully",
+      status: "success",
     });
   } catch (error) {
     console.error("Error deleting form:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const getOrganizerForms = async (req, res) => {
   try {
@@ -112,7 +111,7 @@ const getEventForms = async (req, res) => {
     }
     const forms = await Form.find({ eventId });
 
-   return  res.status(200).json({
+    return res.status(200).json({
       status: "success",
       message: "Forms retrieved successfully",
       forms,
@@ -137,7 +136,7 @@ const getWorkshopForms = async (req, res) => {
     }
     const forms = await Form.find({ workshopId });
 
-   return  res.status(200).json({
+    return res.status(200).json({
       status: "success",
       message: "Forms retrieved successfully",
       forms,
@@ -150,12 +149,11 @@ const getWorkshopForms = async (req, res) => {
   }
 };
 
-
 module.exports = {
   createForm,
   getOrganizerForms,
   updateForm,
   deleteForm,
   getEventForms,
-  getWorkshopForms
+  getWorkshopForms,
 };

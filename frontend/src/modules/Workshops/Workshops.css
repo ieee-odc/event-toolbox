@@ -1,0 +1,12 @@
+@media (max-width: 800px) {
+  .dt-action-buttons {
+    margin-top: 0 !important;
+  }
+  .form-select {
+    min-width: 70px !important;
+  }
+  #create-workshop-container,
+  .form-control {
+    margin-bottom: 10px !important;
+  }
+}
