@@ -1,6 +1,7 @@
 const Space = require('../models/SpaceModel');
 const Counter = require("../models/CounterModel");
 const Organizer = require('../models/OrganizerModel');
+const Workshop = require('../models/WorkshopModel');
 
 // Create a new Space
 const createSpace = async (req, res) => {

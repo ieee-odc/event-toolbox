@@ -28,9 +28,6 @@ const dispatch=useDispatch();
     });
   };
 
-  const handleNavigateToForm = (formId) => {
-    navigate(`/form/${formId}`);
-  };
 
   const renderTag = (startTime) => {
     const workshopDate = new Date(startTime);
@@ -176,18 +173,20 @@ const dispatch=useDispatch();
                         navigate(`/event/${eventId}/workshop/${workshop.id}`)
                       }}>
                         <div className="d-flex align-items-center flex-wrap">
-                          <div className="bg-lighter p-2 rounded me-auto mb-3">
+                          {
+                            <div className="bg-lighter p-2 rounded me-auto mb-3">
                             <h6 className="mb-1">
                               <span className="text-body fw-normal">Form</span>{" "}
-                              <span
-                                onClick={() =>
-                                  handleNavigateToForm(workshop.formId)
-                                }
-                              >
+                              {
+                                workshop.formId?<span>
                                 #{workshop.formId}
+                              </span>:<span>
+                                No selected form
                               </span>
+                              }
                             </h6>
                           </div>
+                          }
                           <div className="text-end mb-3">
                             <h6 className="mb-1">
                               Date:{" "}
@@ -216,7 +215,7 @@ const dispatch=useDispatch();
                           {renderTag(workshop.startTime)}
                         </div>
                         {
-                        workshop&&  workshop.space&&<div>
+                        workshop&&  workshop.space?<div>
                           <div className="d-flex justify-content-between align-items-center mb-1">
                           <small>
                             Person: {workshop.currentParticipants}/
@@ -234,7 +233,9 @@ const dispatch=useDispatch();
                             aria-valuemax={100}
                           />
                         </div>
-                          </div>
+                          </div>:<div>
+                            No selected Space
+                            </div>
                         }
                       </div>
                     </div>

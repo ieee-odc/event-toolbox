@@ -40,7 +40,6 @@ function SingleEventPage() {
 
   useEffect(() => {
     axiosRequest.get(`/workshop/get-event/${eventId}`).then((res) => {
-      console.log(res.data.workshops)
       dispatch(initializeWorkshops(res.data.workshops));
     });
   }, [eventId]);

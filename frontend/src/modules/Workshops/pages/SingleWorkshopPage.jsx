@@ -9,7 +9,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import { initializeForms } from "../../../core/Features/Forms";
 import { initializeParticipants } from "../../../core/Features/Participants";
 import { initializeSpaces } from "../../../core/Features/Spaces";
-import { initializeWorkshops } from "../../../core/Features/Workshops";
+import { initializeWorkshops, setSelectedWorkshop } from "../../../core/Features/Workshops";
 import WorkshopSpaceContainer from "../../Space/component/WorkshopSpaceContainer";
 import WorkshopFormContainer from "../../Form/components/WorkshopFormContainer";
 
@@ -22,7 +22,11 @@ function SingleWorkshopPage() {
   const {selectedWorkshop}=useSelector((store)=>store.workshopsStore)
 
 
-
+  useEffect(() => {
+    axiosRequest.get(`/workshop/${workshopId}`).then((res) => {
+      dispatch(setSelectedWorkshop(res.data.workshop));
+    });
+  }, [workshopId]);
 
 
 
@@ -31,6 +35,19 @@ function SingleWorkshopPage() {
       dispatch(initializeParticipants(res.data.participants));
     });
   }, [workshopId]);
+
+
+  useEffect(() => {
+    axiosRequest.get(`/form/get-event/${eventId}`).then((res) => {
+      dispatch(initializeForms(res.data.forms));
+    });
+  }, [eventId]);
+
+  useEffect(() => {
+    axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
+      dispatch(initializeSpaces(res.data.spaces));
+    });
+  }, [eventId]);
 
   return (
     <DashboardLayout>

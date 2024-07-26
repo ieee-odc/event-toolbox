@@ -6,12 +6,14 @@ import { addSpace, deleteSpace, editSpace, resetSpaceModal, toggleSpaceModal, up
 import toast from 'react-hot-toast';
 import { UserData } from '../../../utils/UserData';
 import { useParams } from 'react-router-dom';
+import { initializeWorkshops } from '../../../core/Features/Workshops';
 
 function SpaceModal() {
   const dispatch = useDispatch();
   const { eventId } = useParams();
 
   const { isModalOpen, selectedSpace, isEdit } = useSelector((store) => store.spacesStore)
+  const { workshops } = useSelector((store) => store.workshopsStore)
 
   const modalClassName = isModalOpen ? "modal fade show" : "modal fade";
   const userData = UserData();
@@ -19,6 +21,15 @@ function SpaceModal() {
   const handleDelete = async () => {
     try {
       axiosRequest.delete(`/space/delete/${selectedSpace.id}`).then((res) => {
+        const updatedWorkshops = workshops.map(workshop => {
+
+          if (workshop.spaceId === selectedSpace.id) {
+            return { ...workshop, spaceId: null,space:null }; // Update the spaceId to null
+          }
+          return workshop;
+        });
+
+        dispatch(initializeWorkshops(updatedWorkshops))
         dispatch(deleteSpace(selectedSpace.id))
         dispatch(toggleSpaceModal())
         toast.success("Space deleted successfully");
