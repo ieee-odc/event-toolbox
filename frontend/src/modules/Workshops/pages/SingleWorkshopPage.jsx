@@ -4,12 +4,12 @@ import ParticipantsContainer from "../../Participants/components/ParticipantsCon
 import FormContainer from "../../Form/components/FormContainer";
 import DashboardLayout from "../../../core/components/DashboardLayout/DashboardLayout";
 import SpaceContainer from "../../Space/component/spaceContainer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { initializeForms } from "../../../core/Features/Forms";
 import { initializeParticipants } from "../../../core/Features/Participants";
 import { initializeSpaces } from "../../../core/Features/Spaces";
-import { initializeWorkshops } from "../../../core/Features/Workshops";
+import { initializeWorkshops, setSelectedWorkshop } from "../../../core/Features/Workshops";
 import WorkshopSpaceContainer from "../../Space/component/WorkshopSpaceContainer";
 import WorkshopFormContainer from "../../Form/components/WorkshopFormContainer";
 
@@ -17,12 +17,14 @@ function SingleWorkshopPage() {
   const { workshopId, eventId } = useParams();
 
   const [activeTab, setActiveTab] = useState("Participants");
-  const [workshop, setWorkshop] = useState({});
   const dispatch = useDispatch();
+
+  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore)
+
 
   useEffect(() => {
     axiosRequest.get(`/workshop/${workshopId}`).then((res) => {
-      setWorkshop(res.data.workshop);
+      dispatch(setSelectedWorkshop(res.data.workshop));
     });
   }, [workshopId]);
 
@@ -32,12 +34,25 @@ function SingleWorkshopPage() {
     });
   }, [workshopId]);
 
+
+  useEffect(() => {
+    axiosRequest.get(`/form/get-event/${eventId}`).then((res) => {
+      dispatch(initializeForms(res.data.forms));
+    });
+  }, [eventId]);
+
+  useEffect(() => {
+    axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
+      dispatch(initializeSpaces(res.data.spaces));
+    });
+  }, [eventId]);
+
   return (
     <DashboardLayout>
       <div id="u-container" style={{ padding: 5 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">{workshop?.name} /</span>{" "}
+            <span className="text-muted fw-light">{selectedWorkshop?.name} /</span>{" "}
             {activeTab}
           </h4>
           <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -126,7 +141,7 @@ function SingleWorkshopPage() {
             aria-labelledby="pills-space-tab"
             tabindex="0"
           >
-            <WorkshopSpaceContainer />
+            <WorkshopSpaceContainer/>
           </div>
         </div>
       </div>

@@ -47,9 +47,6 @@ const FormsSlice = createSlice({
     },
     selectForm: (state, action) => {
       state.isEdit = true;
-
-      console.log("updated is edit to true 2");
-
       const { Data } = action.payload;
       state.selectedForm = {
         ...Data,

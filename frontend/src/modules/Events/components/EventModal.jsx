@@ -60,11 +60,13 @@ function EventModal() {
       if (!validateFields()) {
         return;
       }
-      const response = await axiosRequest.post(`/events/edit/${eventId}`, {
-        organizerId: userData.id,
-        ...selectedEvent,
-      });
-      console.log(response.data.event);
+      const response = await axiosRequest.post(
+       `/events/edit/${eventId}`,
+        {
+          organizerId:userData.id,
+          ...selectedEvent
+        }
+      );
       dispatch(editEvent(response.data.event));
       dispatch(toggleEventModal());
       dispatch(

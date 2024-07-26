@@ -13,6 +13,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
 import { useParams } from "react-router-dom";
+import { updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 
 function WorkshopFormContainer() {
   const dispatch = useDispatch();
@@ -36,7 +37,7 @@ function WorkshopFormContainer() {
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [currentFormId, setCurrentFormId] = useState(null);
-  const [selectedFormId, setSelectedFormId] = useState(null); // New state for selected form
+  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore)
 
   const handleMouseEnter = (iconId) => {
     setHoveredIcon(iconId);
@@ -72,7 +73,7 @@ function WorkshopFormContainer() {
         }),
       ])
         .then(() => {
-            setSelectedFormId(form.id);
+            dispatch(updateSelectedWorkshopField({ id: "formId", value: form.id }));
             toast.success(`Selected ${form.name} form`);
         })
         .catch((error) => {
@@ -180,7 +181,7 @@ function WorkshopFormContainer() {
                           type="radio"
                           name="selectedForm"
                           value={form.id}
-                          checked={selectedFormId === form.id}
+                          checked={selectedWorkshop.formId === form.id}
                           onChange={() => handleRadioChange(form)}
                         />
                       </td>

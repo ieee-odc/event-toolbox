@@ -3,21 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "../../../utils/UserData";
 import {
-  initializeSpaces,
   selectSpace,
-  setSelectedSpace,
   toggleSpaceModal,
 } from "../../../core/Features/Spaces";
 import SpaceModal from "./SpaceModal";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 
 function WorkshopSpaceContainer() {
   const { workshopId } = useParams();
   const dispatch = useDispatch();
   const { spaces, isLoading } = useSelector((store) => store.spacesStore);
-  const userData = UserData();
-  const [selectedSpaceId, setSelectedSpaceId] = useState(null);
+  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore);
 
   const handleSpaceClick = (space) => {
     Promise.all([
@@ -29,7 +27,7 @@ function WorkshopSpaceContainer() {
       }),
     ])
       .then(() => {
-        setSelectedSpaceId(space.id);
+        dispatch(updateSelectedWorkshopField({ id: "spaceId", value: space.id }));
         toast.success(`Selected ${space.name} space`);
       })
       .catch((error) => {
@@ -160,7 +158,7 @@ function WorkshopSpaceContainer() {
                       className={`shadow-none collapsed`}
                       style={{
                         border:
-                          selectedSpaceId === space.id
+                          selectedWorkshop.spaceId === space.id
                             ? "solid 1px black"
                             : "none",
                         display: "flex",

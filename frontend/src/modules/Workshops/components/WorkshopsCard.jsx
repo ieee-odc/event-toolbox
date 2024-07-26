@@ -43,9 +43,6 @@ const WorkshopsCard = () => {
     });
   };
 
-  const handleNavigateToForm = (formId) => {
-    navigate(`/form/${formId}`);
-  };
 
   const renderTag = (startTime) => {
     const workshopDate = new Date(startTime);
@@ -115,23 +112,28 @@ const WorkshopsCard = () => {
               <p>Loading workshops...</p>
             ) : (
               currentWorkshops &&
-              currentWorkshops.map((workshop) => (
-                <div className=" col-md-4" key={workshop.id}>
-                  <Card
-                    title={workshop.name}
-                    formText="#"
-                    workshop={workshop}
-                    date={formatDateWithNumbers(workshop.endTime)}
-                    endTime={formatTime(workshop.endTime)}
-                    startTime={formatTime(workshop.startTime)}
-                    description={workshop.description}
-                    badgeText={renderTag(workshop.startTime)}
-                    personCount={0}
-                    personCapacity={50}
-                    progress={0}
-                  />
-                </div>
-              ))
+              currentWorkshops.map((workshop) => {
+                const progressPercentage =
+                (workshop.currentParticipants / workshop?.space?.capacity) * 100;
+
+                return (
+                  <div className=" col-md-4" key={workshop.id}>
+                    <Card
+                      title={workshop.name}
+                      formText={workshop.formId}
+                      workshop={workshop}
+                      date={formatDateWithNumbers(workshop.endTime)}
+                      endTime={formatTime(workshop.endTime)}
+                      startTime={formatTime(workshop.startTime)}
+                      description={workshop.description}
+                      badgeText={renderTag(workshop.startTime)}
+                      personCount={0}
+                      personCapacity={workshop?.space?.capacity}
+                      progress={progressPercentage}
+                    />
+                  </div>
+                )
+              })
             )}
           </div>
           <div className="row mx-2" id="pagination-section">

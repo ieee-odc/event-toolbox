@@ -11,13 +11,15 @@ import FormModal from "./FormModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
+import { initializeWorkshops } from "../../../core/Features/Workshops";
 import CustomButton from "../../../core/components/Button/Button";
+
 
 function FormContainer() {
   const dispatch = useDispatch();
   const userData = UserData();
   const { filteredForms, forms } = useSelector((store) => store.formsStore);
-
+  const { workshops } = useSelector((store) => store.workshopsStore);
   function formatDate(originalDate) {
     const date = new Date(originalDate);
 
@@ -45,6 +47,13 @@ function FormContainer() {
 
   const handleDeleteForm = (formId) => {
     axiosRequest.delete(`/form/delete/${formId}`).then((res) => {
+      const updatedWorkshops = workshops.map(workshop => {
+        if (workshop.formId === formId) {
+          return { ...workshop, formId: null }; // Update the formId to null
+        }
+        return workshop;
+      });
+      dispatch(initializeWorkshops(updatedWorkshops))
       dispatch(deleteForm(formId));
       toast.success("Form deleted successfully");
     });
@@ -130,18 +139,6 @@ function FormContainer() {
             className="mb-4"
             style={{ display: "flex", justifyContent: "end" }}
           >
-            {/* <button
-              className="btn btn-primary mb-4"
-              onClick={() => {
-                dispatch(toggleFormModal());
-                // dispatch(resetFormModal());
-              }}
-            >
-              <span>
-                <i className="bx bx-plus me-md-1" />
-                <span className="d-md-inline-block d-none">Create Form </span>
-              </span>
-            </button> */}
             <CustomButton
               text="Create Form"
               iconClass="bx bx-plus me-md-1 mb-2"
@@ -151,6 +148,7 @@ function FormContainer() {
               hoverTextColor="white"
               onClick={() => {
                 dispatch(toggleFormModal());
+                dispatch(resetFormModal());
               }}
             />
           </div>
@@ -181,11 +179,10 @@ function FormContainer() {
                           onClick={() => handleEditClick(form)}
                         >
                           <i
-                            className={`bx bx-edit-alt bx-sm ${
-                              hoveredIcon === `edit_${form._id}`
+                            className={`bx bx-edit-alt bx-sm ${hoveredIcon === `edit_${form._id}`
                                 ? "transform"
                                 : ""
-                            }`}
+                              }`}
                             onMouseEnter={() =>
                               handleMouseEnter(`edit_${form._id}`)
                             }
@@ -197,11 +194,10 @@ function FormContainer() {
                           onClick={() => handleDeleteForm(form.id)}
                         >
                           <i
-                            className={`bx bx-trash bx-sm ${
-                              hoveredIcon === `delete_${form._id}`
+                            className={`bx bx-trash bx-sm ${hoveredIcon === `delete_${form._id}`
                                 ? "transform"
                                 : ""
-                            }`}
+                              }`}
                             onMouseEnter={() =>
                               handleMouseEnter(`delete_${form._id}`)
                             }

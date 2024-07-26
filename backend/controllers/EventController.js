@@ -4,6 +4,7 @@ const User = require("../models/OrganizerModel");
 const Space = require("../models/SpaceModel");
 const Workshop = require("../models/WorkshopModel");
 const Form = require("../models/FormModel");
+const Participant = require("../models/ParticipantModel");
 const mongoose = require("mongoose");
 
 const getEvents = async (req, res) => {
@@ -55,18 +56,39 @@ const updateEvent = async (req, res) => {
   }
 };
 const deleteEvent = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
     const { eventId } = req.params;
-    const deletedEvent = await Event.findOneAndDelete({ id: eventId });
+    
+    const deletedEvent = await Event.findOneAndDelete({ id: eventId }).session(session);
     if (!deletedEvent) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ error: "No such item" });
     }
-    res.status(200).json(deletedEvent);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Server Error!",
+
+    await Promise.all([
+      Workshop.deleteMany({ eventId }).session(session),
+      Space.deleteMany({ eventId }).session(session),
+      Participant.deleteMany({ eventId }).session(session),
+      Form.deleteMany({ eventId }).session(session)
+    ]);
+
+    await session.commitTransaction();
+    session.endSession();
+    
+    res.status(200).json({
+      message:"Deleted event successfully",
+      status:"success",
+      event:deletedEvent
     });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(error);
+    res.status(500).json({ message: "Server Error!" });
   }
 };
 

@@ -43,11 +43,11 @@ function EventsList() {
     }
   };
 
-  const handleEditClick = (event) => {
-    dispatch(selectEvent(event));
-    console.log(event);
-    dispatch(toggleEventModal());
-  };
+  const handleEditClick=(event)=>{
+    dispatch(selectEvent(event))
+    dispatch(toggleEventModal())
+  }
+
 
   const calculateDurationInDays = (startDate, endDate) => {
     const start = new Date(startDate);
