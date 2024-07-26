@@ -51,14 +51,22 @@ const updateForm = async (req, res) => {
 const deleteForm = async (req, res) => {
   const { formId } = req.params;
   try {
-    const deletedForm = await Form.findOneAndDelete({id:formId});
+    // Find and delete the form
+    const deletedForm = await Form.findOneAndDelete({ id: formId });
     if (!deletedForm) {
       return res.status(404).json({ error: "Form not found" });
     }
+
+    // Update Events with the deleted formId
+    await Event.updateMany({ formId: formId }, { $set: { formId: null } });
+
+    // Update Workshops with the deleted formId
+    await Workshop.updateMany({ formId: formId }, { $set: { formId: null } });
+
     res.status(200).json({
-        form: deletedForm,
-        message: "Form deleted successfully",
-        status: "success"
+      form: deletedForm,
+      message: "Form deleted successfully and related entities updated",
+      status: "success"
     });
   } catch (error) {
     console.error("Error deleting form:", error.message);

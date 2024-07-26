@@ -22,31 +22,23 @@ const addWorkshop = async (req, res) => {
 
     const space=await Space.findOne({id:spaceId});
 
-    console.log({
-      id: counter.seq,
-      status: "Pending",
-      startTime,
-      endTime,
-      space,
-      spaceId,
-      ...rest,
-    })
     const workshop = new Workshop({
       id: counter.seq,
       status: "Pending",
       startTime,
       endTime,
-      space,
       spaceId,
       ...rest,
     });
 
     await workshop.save();
 
+    const workshopWithSpace = { ...workshop._doc, space };
+
     res.status(201).json({
       status: "success",
       message: "Added Workshop",
-      workshop,
+      workshop: workshopWithSpace,
     });
   } catch (error) {
     console.error(error);
