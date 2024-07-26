@@ -31,7 +31,7 @@ function WorkshopModal() {
     axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
       dispatch(initializeSpaces(res.data.spaces));
       console.log({ id: "spaceId", value: res.data.spaces[0].id })
-      updateSelectedWorkshopField({ id: "spaceId", value: res.data.spaces[0].id })
+      dispatch(updateSelectedWorkshopField({ id: "spaceId", value: res.data.spaces[0].id }))
     });
   }, []);
 
@@ -53,7 +53,7 @@ function WorkshopModal() {
     }
     return true;
   };
-  
+
   const handleChangeTime = (field, value, dispatch, selectedWorkshopField) => {
     let isDelete = selectedWorkshopField.length > value.length;
     if (isDelete) {
@@ -65,18 +65,18 @@ function WorkshopModal() {
       );
       return;
     }
-  
+
     if (value.length >= 6) {
       return;
     }
     if (value.length === 2) {
       value += ":";
     }
-  
+
     if (!validateTime(value, value.length)) {
       return;
     }
-  
+
     dispatch(
       updateSelectedWorkshopField({
         id: field,
@@ -84,11 +84,11 @@ function WorkshopModal() {
       })
     );
   };
-  
+
   const handleChangeStartTime = (e) => {
     handleChangeTime("startTime", e.target.value, dispatch, selectedWorkshop.startTime);
   };
-  
+
   const handleChangeEndTime = (e) => {
     handleChangeTime("endTime", e.target.value, dispatch, selectedWorkshop.endTime);
   };
@@ -114,8 +114,6 @@ function WorkshopModal() {
       spaceId: selectedWorkshop.spaceId,
       eventId,
     };
-
-    // Make the API request
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
@@ -254,28 +252,28 @@ function WorkshopModal() {
                   </div>
                 </div>
                 <div className="row">
-                <div className="col mb-3">
-                  <label htmlFor="emailWithTitle" className="form-label">
-                    Space
-                  </label>
-                  <select
-                    id="spaceId"
-                    className="select2 form-select form-select-md select2-hidden-accessible"
-                    data-allow-clear="true"
-                    data-select2-id="select2Basic"
-                    tabIndex={-1}
-                    aria-hidden="true"
-                    value={selectedWorkshop.spaceId}
-                    onChange={handleInputChange}
-                  >
-                    {spaces.map((space, i) => {
-                      return (
-                        <option value={space.id} data-select2-id={space.id}>
-                          {space.id}{space.name}
-                        </option>
-                      );
-                    })}
-                  </select>
+                  <div className="col mb-3">
+                    <label htmlFor="emailWithTitle" className="form-label">
+                      Space
+                    </label>
+                    <select
+                      id="spaceId"
+                      className="select2 form-select form-select-md select2-hidden-accessible"
+                      data-allow-clear="true"
+                      data-select2-id="select2Basic"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      value={selectedWorkshop.spaceId}
+                      onChange={handleInputChange}
+                    >
+                      {spaces.map((space, i) => {
+                        return (
+                          <option value={space.id} id={"spaceId"}>
+                            {space.id}{space.name}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
                 </div>
                 <div className="row mb-3 g-2">

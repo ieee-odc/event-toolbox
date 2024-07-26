@@ -4,7 +4,7 @@ import ParticipantsContainer from "../../Participants/components/ParticipantsCon
 import FormContainer from "../../Form/components/FormContainer";
 import DashboardLayout from "../../../core/components/DashboardLayout/DashboardLayout";
 import SpaceContainer from "../../Space/component/spaceContainer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { initializeForms } from "../../../core/Features/Forms";
 import { initializeParticipants } from "../../../core/Features/Participants";
@@ -17,14 +17,11 @@ function SingleWorkshopPage() {
   const { workshopId,eventId } = useParams();
 
   const [activeTab, setActiveTab] = useState("Participants");
-  const [workshop, setWorkshop] = useState({});
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    axiosRequest.get(`/workshop/${workshopId}`).then((res) => {
-      setWorkshop(res.data.workshop);
-    });
-  }, [workshopId]);
+  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore)
+
+
 
 
 
@@ -40,7 +37,7 @@ function SingleWorkshopPage() {
       <div style={{ padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">{workshop?.name} /</span>{" "}
+            <span className="text-muted fw-light">{selectedWorkshop?.name} /</span>{" "}
             {activeTab}
           </h4>
           <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -129,7 +126,7 @@ function SingleWorkshopPage() {
             aria-labelledby="pills-space-tab"
             tabindex="0"
           >
-            <WorkshopSpaceContainer />
+            <WorkshopSpaceContainer/>
           </div>
         </div>
       </div>

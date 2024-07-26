@@ -7,7 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteWorkshop, filterWorkshops, initializeWorkshops, setSelectedWorkshop, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import { deleteWorkshop, setSelectedWorkshop, toggleWorkshopModal, updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 import { UserData } from './../../../utils/UserData';
 
 const WorkshopsCard = () => {
@@ -172,6 +172,7 @@ const dispatch=useDispatch();
                         </div>
                       </div>
                       <div className="card-body" style={{cursor:"pointer"}} onClick={()=>{
+                        dispatch(setSelectedWorkshop(workshop))
                         navigate(`/event/${eventId}/workshop/${workshop.id}`)
                       }}>
                         <div className="d-flex align-items-center flex-wrap">
