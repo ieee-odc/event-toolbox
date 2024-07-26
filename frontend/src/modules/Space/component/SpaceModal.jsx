@@ -48,11 +48,6 @@ function SpaceModal() {
   };
 
   const handleCreateSpace = () => {
-    console.log({
-      ...selectedSpace,
-      eventId,
-      organizerId: userData.id
-    })
     axiosRequest.post("/space/add", {
       ...selectedSpace,
       eventId,
@@ -74,7 +69,6 @@ function SpaceModal() {
       dispatch(editSpace(res.data.space))
       dispatch(toggleSpaceModal())
       dispatch(resetSpaceModal())
-      console.log(res.data)
       toast.success("Space edited successfully");
 
     })

@@ -28,8 +28,6 @@ const base64UrlDecode = (str) => {
 const ShareLinkModal = ({ formId, onClose }) => {
   const dispatch = useDispatch();
 const userData=UserData();
-console.log(userData)
-
 
 
 

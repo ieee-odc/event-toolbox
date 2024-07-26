@@ -66,7 +66,6 @@ function EventModal() {
           organizerId:userData.id,
           ...selectedEvent      }
       );
-      console.log(response.data.event)
       dispatch(editEvent(response.data.event));
       dispatch(toggleEventModal());
       dispatch(

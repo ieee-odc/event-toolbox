@@ -30,7 +30,6 @@ function WorkshopModal() {
   useEffect(() => {
     axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
       dispatch(initializeSpaces(res.data.spaces));
-      console.log({ id: "spaceId", value: res.data.spaces[0].id })
       dispatch(updateSelectedWorkshopField({ id: "spaceId", value: res.data.spaces[0].id }))
     });
   }, []);
@@ -152,8 +151,6 @@ function WorkshopModal() {
       eventId: eventId,
       spaceId: selectedWorkshop.spaceId,
     };
-
-    console.log(reqBody);
 
     // Make the API request
     axiosRequest

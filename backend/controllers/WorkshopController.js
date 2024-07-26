@@ -146,7 +146,6 @@ const getEventWorkshops = async (req, res) => {
       };
     }));
 
-    console.log(workshopsWithCapacity)
     res.status(200).json({
       status:"success",
       message:"Retrieved workshops",
@@ -173,7 +172,6 @@ const getOrganizerWorkshops = async (req, res) => {
       };
     }));
 
-    console.log(workshopsWithCapacity)
     res.status(200).json({
       status:"success",
       message:"Retrieved workshops",

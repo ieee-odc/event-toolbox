@@ -214,9 +214,7 @@ function Login() {
                   onFailure={onGoogleFailure}
                   action={(data) =>{
 
-                    console.log(data)
                     return axiosRequest.post("/auth/loginwithgoogle", data).then((response) =>{
-                      console.log(response.data)
                     }).catch((err)=>{
                       console.log(err)
                     })

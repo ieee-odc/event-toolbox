@@ -36,7 +36,6 @@ function EventsList() {
 
   const handleEditClick=(event)=>{
     dispatch(selectEvent(event))
-    console.log(event)
     dispatch(toggleEventModal())
   }
 

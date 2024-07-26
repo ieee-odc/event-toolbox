@@ -8,7 +8,6 @@ import { useParams } from "react-router-dom";
 function ParticipantModal() {
   const dispatch = useDispatch();
   const { eventId,workshopId} = useParams();
-console.log(workshopId)
   const { isParticipantModalOpen, selectedParticipant, isEdit } = useSelector(
     (store) => store.participantsStore
   );
