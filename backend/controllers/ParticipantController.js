@@ -103,9 +103,40 @@ const getEventParticipants = async (req, res) => {
   }
 };
 
+const register = async (req, res) => {
+  try {
+
+    const counter = await Counter.findOneAndUpdate(
+      { id: "autovalParticipant" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const participant = new Participant({
+      id: counter.seq,
+      status:"Pending",
+      ...req.body,
+    });
+
+    await participant.save();
+
+    res.status(201).json({
+      status: "success",
+      message: "Added Participant",
+      participant: participant,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
 module.exports = {
   addParticipant,
   deleteParticipant,
   editParticipant,
   getEventParticipants,
+  register
 };

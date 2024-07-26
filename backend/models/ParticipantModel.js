@@ -5,10 +5,23 @@ const ParticipationStatus = Object.freeze({
     PENDING: 'Pending',
     CANCELED: 'Canceled'
   });
+
+const QuestionAnswerSchema = mongoose.Schema({
+    question: {
+      type: String,
+      required: true,
+    },
+    answer: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
+    }
+});
+
 const ParticipantSchema=mongoose.Schema({
     id:{
         type:Number,
         required:true,
+        unique: true
     },
     fullName:{
         type:String,
@@ -18,6 +31,10 @@ const ParticipantSchema=mongoose.Schema({
         type:String,
         required:true,
     },
+    phoneNumber: {
+        type: String,
+        required: true,
+      },
     status:{
         type:String,
         enum: Object.values(ParticipationStatus),
@@ -26,8 +43,9 @@ const ParticipantSchema=mongoose.Schema({
     eventId:{
         type:Number,
         required:true,
-    }
-    
+    },
+    responses: [QuestionAnswerSchema]
+
 } ,{ timestamps: true })
 
 
