@@ -30,6 +30,8 @@ function WorkshopModal() {
   useEffect(() => {
     axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
       dispatch(initializeSpaces(res.data.spaces));
+      console.log({ id: "spaceId", value: res.data.spaces[0].id })
+      updateSelectedWorkshopField({ id: "spaceId", value: res.data.spaces[0].id })
     });
   }, []);
 
@@ -122,7 +124,6 @@ function WorkshopModal() {
         dispatch(
           addWorkshop({
             ...res.data.workshop,
-            capacity: 50,
           })
         );
       })
@@ -165,7 +166,6 @@ function WorkshopModal() {
         dispatch(
           editWorkshop({
             ...res.data.workshop,
-            capacity: 50,
           })
         );
       })
@@ -271,7 +271,7 @@ function WorkshopModal() {
                     {spaces.map((space, i) => {
                       return (
                         <option value={space.id} data-select2-id={space.id}>
-                          {space.name}
+                          {space.id}{space.name}
                         </option>
                       );
                     })}

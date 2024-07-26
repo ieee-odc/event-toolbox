@@ -96,7 +96,7 @@ const dispatch=useDispatch();
             {filteredWorkshops &&
               filteredWorkshops.map((workshop) => {
                 const progressPercentage =
-                  (workshop.currentParticipants / workshop.capacity) * 100;
+                  (workshop.currentParticipants / workshop?.space?.capacity) * 100;
 
                 return (
                   <div className="col-xl-4 col-lg-6 col-md-6" key={workshop.id}>
@@ -214,10 +214,12 @@ const dispatch=useDispatch();
                         <div className="d-flex align-items-center mb-3">
                           {renderTag(workshop.startTime)}
                         </div>
-                        <div className="d-flex justify-content-between align-items-center mb-1">
+                        {
+                        workshop&&  workshop.space&&<div>
+                          <div className="d-flex justify-content-between align-items-center mb-1">
                           <small>
                             Person: {workshop.currentParticipants}/
-                            {workshop.capacity}
+                            {workshop.space.capacity}
                           </small>
                           <small>{progressPercentage.toFixed(2)}% Full</small>
                         </div>
@@ -231,6 +233,8 @@ const dispatch=useDispatch();
                             aria-valuemax={100}
                           />
                         </div>
+                          </div>
+                        }
                       </div>
                     </div>
                   </div>

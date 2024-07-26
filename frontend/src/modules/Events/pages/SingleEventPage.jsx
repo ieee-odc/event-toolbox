@@ -28,7 +28,6 @@ function SingleEventPage() {
 
   useEffect(() => {
     axiosRequest.get(`/form/get-event/${eventId}`).then((res) => {
-      console.log(res.data.forms);
       dispatch(initializeForms(res.data.forms));
     });
   }, [eventId]);
@@ -41,6 +40,7 @@ function SingleEventPage() {
 
   useEffect(() => {
     axiosRequest.get(`/workshop/get-event/${eventId}`).then((res) => {
+      console.log(res.data.workshops)
       dispatch(initializeWorkshops(res.data.workshops));
     });
   }, [eventId]);
