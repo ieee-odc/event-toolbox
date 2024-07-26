@@ -2,23 +2,23 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Define the schema for the objects in the data array
-const DataItemSchema = new Schema({
-  type: {
-    type: String,
-    required: true,
-    enum: ["multi-select", "input", "select"], // Define allowed values
-  },
-  question: {
-    type: String,
-    required: true,
-  },
-  options: {
-    type: [String],
-    required: function () {
-      return this.type === "multi-select" || this.type === "select";
+const DataItemSchema = new Schema(
+  {
+    type: {
+      type: String,
+      required: true,
+      enum: ["input", "checkbox", "radio", "file", "dropdown", "date", "time"], 
+    },
+    question: {
+      type: String,
+      required: true,
+    },
+    options: {
+      type: [String],
     },
   },
-}, { _id: false }); // No need for _id in subdocuments
+  { _id: false }
+); // No need for _id in subdocuments
 
 const FormSchema = new Schema({
   id: {
