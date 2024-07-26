@@ -36,7 +36,7 @@ function EventModal() {
       }
       const response = await axiosRequest.post("/events/add", {
         ...selectedEvent,
-        organizerId:userData.id
+        organizerId: userData.id,
       });
       dispatch(addEvent(response.data));
       dispatch(toggleEventModal());
@@ -60,13 +60,11 @@ function EventModal() {
       if (!validateFields()) {
         return;
       }
-      const response = await axiosRequest.post(
-       `/events/edit/${eventId}`,
-        {
-          organizerId:userData.id,
-          ...selectedEvent      }
-      );
-      console.log(response.data.event)
+      const response = await axiosRequest.post(`/events/edit/${eventId}`, {
+        organizerId: userData.id,
+        ...selectedEvent,
+      });
+      console.log(response.data.event);
       dispatch(editEvent(response.data.event));
       dispatch(toggleEventModal());
       dispatch(
@@ -121,8 +119,8 @@ function EventModal() {
                 className="btn-close"
                 onClick={() => {
                   dispatch(resetEventModal());
-                  if(isEdit){
-                    dispatch(changeFormState(false))
+                  if (isEdit) {
+                    dispatch(changeFormState(false));
                   }
                   dispatch(toggleEventModal());
                 }}
@@ -199,7 +197,7 @@ function EventModal() {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-label-secondary"
+                className="btn btn-label-secondary me-2"
                 onClick={() => {
                   dispatch(resetEventModal());
                   dispatch(toggleEventModal());

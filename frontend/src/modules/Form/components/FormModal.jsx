@@ -328,7 +328,7 @@ function FormModal() {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-label-secondary"
+                className="btn btn-label-secondary me-2"
                 onClick={() => {
                   dispatch(toggleFormModal());
                 }}

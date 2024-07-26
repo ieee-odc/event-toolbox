@@ -112,10 +112,10 @@ function ParticipantModal() {
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn btn-label-secondary"
+                  className="btn btn-label-secondary me-2"
                   data-bs-dismiss="modal"
                   onClick={() => {
-                    setIsModalOpen(false);
+                    dispatch(toggleParticipantModal());
                   }}
                 >
                   Close

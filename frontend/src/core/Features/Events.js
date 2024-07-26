@@ -46,11 +46,16 @@ const EventsSlice = createSlice({
     toggleEventModal: (state) => {
       state.isModalOpen = !state.isModalOpen;
     },
-    filterEvents: (state, action) => {
+    filterEvents(state, action) {
       state.filterStatus = action.payload;
-      state.filteredEvents = state.events.filter((event) =>
-        event.status.toLowerCase().includes(action.payload.toLowerCase())
-      );
+      if (action.payload === "") {
+        state.filteredEvents = state.events;
+      } else {
+        state.filteredEvents = state.events.filter((event) => {
+          const status = getEventStatus(event.startDate, event.endDate).status;
+          return status === action.payload;
+        });
+      }
     },
     toggleEventsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
@@ -93,6 +98,19 @@ const EventsSlice = createSlice({
     },
   },
 });
+const getEventStatus = (startDate, endDate) => {
+  const currentDate = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (currentDate > end) {
+    return { status: "Done", badgeClass: "badge bg-label-success" };
+  } else if (currentDate < start) {
+    return { status: "Upcoming", badgeClass: "badge bg-label-primary" };
+  } else {
+    return { status: "Ongoing", badgeClass: "badge bg-label-warning" };
+  }
+};
 
 export const {
   initializeEvents,

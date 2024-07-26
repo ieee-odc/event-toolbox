@@ -214,7 +214,6 @@ const ParticipantsCard = () => {
                         </a>
                         <div className="dropdown">
                           <a
-                            href="javascript:;"
                             className="btn dropdown-toggle hide-arrow text-body p-0"
                             id="three-dots"
                             data-bs-toggle="dropdown"
