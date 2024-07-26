@@ -2,20 +2,23 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Define the schema for the objects in the data array
-const DataItemSchema = new Schema({
-  type: {
-    type: String,
-    required: true,
-    enum: ["input", "checkbox","radio","file","dropdown","date","time"], // Define allowed values
+const DataItemSchema = new Schema(
+  {
+    type: {
+      type: String,
+      required: true,
+      enum: ["input", "checkbox", "radio", "file", "dropdown", "date", "time"], // Define allowed values
+    },
+    question: {
+      type: String,
+      required: true,
+    },
+    options: {
+      type: [String],
+    },
   },
-  question: {
-    type: String,
-    required: true,
-  },
-  options: {
-    type: [String],
-  },
-}, { _id: false }); // No need for _id in subdocuments
+  { _id: false }
+); // No need for _id in subdocuments
 
 const FormSchema = new Schema({
   id: {
@@ -52,12 +55,12 @@ const FormSchema = new Schema({
   },
 });
 
-FormSchema.path('eventId').validate(function(value) {
+FormSchema.path("eventId").validate(function (value) {
   return this.eventId != null || this.workshopId != null;
-}, 'Either eventId or workshopId must be provided.');
+}, "Either eventId or workshopId must be provided.");
 
-FormSchema.path('workshopId').validate(function(value) {
+FormSchema.path("workshopId").validate(function (value) {
   return this.eventId != null || this.workshopId != null;
-}, 'Either eventId or workshopId must be provided.');
+}, "Either eventId or workshopId must be provided.");
 
 module.exports = mongoose.model("Form", FormSchema);

@@ -40,18 +40,25 @@ function WorkshopModal() {
       const firstChar = value.charAt(0);
       if (firstChar === "2") {
         const secondChar = value.charAt(1);
-        return secondChar === "0" || secondChar === "1" || secondChar === "2" || secondChar === "3";
+        return (
+          secondChar === "0" ||
+          secondChar === "1" ||
+          secondChar === "2" ||
+          secondChar === "3"
+        );
       }
     } else if (length === 4) {
       const minutesFirstChar = value.charAt(3);
       return ["0", "1", "2", "3", "4", "5"].includes(minutesFirstChar);
     } else if (length === 5) {
       const minutesSecondChar = value.charAt(4);
-      return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(minutesSecondChar);
+      return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(
+        minutesSecondChar
+      );
     }
     return true;
   };
-  
+
   const handleChangeTime = (field, value, dispatch, selectedWorkshopField) => {
     let isDelete = selectedWorkshopField.length > value.length;
     if (isDelete) {
@@ -63,18 +70,18 @@ function WorkshopModal() {
       );
       return;
     }
-  
+
     if (value.length >= 6) {
       return;
     }
     if (value.length === 2) {
       value += ":";
     }
-  
+
     if (!validateTime(value, value.length)) {
       return;
     }
-  
+
     dispatch(
       updateSelectedWorkshopField({
         id: field,
@@ -82,13 +89,23 @@ function WorkshopModal() {
       })
     );
   };
-  
+
   const handleChangeStartTime = (e) => {
-    handleChangeTime("startTime", e.target.value, dispatch, selectedWorkshop.startTime);
+    handleChangeTime(
+      "startTime",
+      e.target.value,
+      dispatch,
+      selectedWorkshop.startTime
+    );
   };
-  
+
   const handleChangeEndTime = (e) => {
-    handleChangeTime("endTime", e.target.value, dispatch, selectedWorkshop.endTime);
+    handleChangeTime(
+      "endTime",
+      e.target.value,
+      dispatch,
+      selectedWorkshop.endTime
+    );
   };
 
   const handleAddWorkshop = (workshop) => {
@@ -254,28 +271,28 @@ function WorkshopModal() {
                   </div>
                 </div>
                 <div className="row">
-                <div className="col mb-3">
-                  <label htmlFor="emailWithTitle" className="form-label">
-                    Space
-                  </label>
-                  <select
-                    id="spaceId"
-                    className="select2 form-select form-select-md select2-hidden-accessible"
-                    data-allow-clear="true"
-                    data-select2-id="select2Basic"
-                    tabIndex={-1}
-                    aria-hidden="true"
-                    value={selectedWorkshop.spaceId}
-                    onChange={handleInputChange}
-                  >
-                    {spaces.map((space, i) => {
-                      return (
-                        <option value={space.id} data-select2-id={space.id}>
-                          {space.name}
-                        </option>
-                      );
-                    })}
-                  </select>
+                  <div className="col mb-3">
+                    <label htmlFor="emailWithTitle" className="form-label">
+                      Space
+                    </label>
+                    <select
+                      id="spaceId"
+                      className="select2 form-select form-select-md select2-hidden-accessible"
+                      data-allow-clear="true"
+                      data-select2-id="select2Basic"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      value={selectedWorkshop.spaceId}
+                      onChange={handleInputChange}
+                    >
+                      {spaces.map((space, i) => {
+                        return (
+                          <option value={space.id} data-select2-id={space.id}>
+                            {space.name}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
                 </div>
                 <div className="row mb-3 g-2">
@@ -332,7 +349,7 @@ function WorkshopModal() {
               <div className="modal-footer">
                 <button
                   type="button"
-                  className="btn btn-label-secondary"
+                  className="btn btn-label-secondary me-2"
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());

@@ -128,6 +128,62 @@ body {
   transform: translateY(50px) scale(0.8);
 }
 
+#button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#deleteButton {
+  color: white;
+  border: transparent 1px solid; /* Combined border property */
+  background-color: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px; /* Added horizontal padding for better spacing */
+  border-radius: 5px;
+  box-shadow: none !important;
+}
+
+#deleteButton p {
+  padding: 0;
+  margin: 0;
+  display: flex; /* Ensure the text aligns well with the icon */
+  align-items: center; /* Center the text vertically */
+}
+#editButton {
+  color: white;
+  border: 0px; /* Combined border property */
+  background: none;
+  border: var(--text-color) 1px solid; /* Combined border property */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px; /* Added horizontal padding for better spacing */
+  border-radius: 5px;
+}
+
+#editButton p {
+  padding: 0;
+  margin: 0;
+  display: flex; /* Ensure the text aligns well with the icon */
+  align-items: center; /* Center the text vertically */
+}
+#editButton {
+  color: var(--text-color);
+}
+#deleteButton:hover {
+  background-color: #ba0c2f;
+}
+#editButton:hover {
+  background-color: #454b53;
+  color: white;
+}
+#eventCardBody {
+  color: var(--text-color);
+}
 @media (max-width: 760px) {
   #deleteButton,
   #editButton {
@@ -155,3 +211,25 @@ body {
   display: flex;
   flex-direction: column;
 } */
+
+.d-flex {
+  display: flex;
+  align-items: center;
+}
+.d-flex b {
+  font-size: 18px;
+}
+
+.dates-span {
+  display: flex;
+  align-items: center;
+}
+
+.date-separator {
+  margin: 0 5px; /* Adjust space between dates as needed */
+  color: #6c757d; /* Optional: styling for separator */
+}
+
+input {
+  height: 40px;
+}

@@ -28,7 +28,7 @@ import { useParams } from "react-router-dom";
 function FormModal() {
   const dispatch = useDispatch();
   const userData = UserData();
-  const { eventId,workshopId } = useParams();
+  const { eventId, workshopId } = useParams();
 
   const { events } = useSelector((store) => store.eventsStore);
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
@@ -208,11 +208,11 @@ function FormModal() {
                     <label htmlFor={index} className="form-label">
                       Question {index + 1}:
                     </label>
-                    <div className="d-flex">
+                    <div className="d-flex justify-content-center flex-wrap">
                       <input
                         type="text"
                         id={`data.${index}`}
-                        className="form-control"
+                        className="form-control me-2 mb-2"
                         placeholder={`Enter Question ${index + 1}`}
                         value={element.question || ""}
                         onChange={(e) => {
@@ -226,7 +226,7 @@ function FormModal() {
                       />
                       <select
                         id="select2_course_select"
-                        className="select2 form-select select2-hidden-accessible"
+                        className="select2 form-select me-2  mb-2"
                         data-placeholder="All Courses"
                         onChange={(e) => {
                           dispatch(
@@ -250,7 +250,8 @@ function FormModal() {
                       </select>
                       <button
                         type="button"
-                        className="btn btn-danger ms-2"
+                        id="deleteButton"
+                        className="btn btn-danger mb-2"
                         onClick={() => dispatch(removeField(index))}
                       >
                         Remove
@@ -283,10 +284,14 @@ function FormModal() {
                             value={option || ""}
                             onKeyDown={(e) => {
                               if (e.key === "Enter") {
-                                dispatch(addOption(index));
+                                handleOptionChange(
+                                  index,
+                                  optionIndex,
+                                  e.target.value
+                                );
                               }
                             }}
-                            onChange={(e) =>
+                            onBlur={(e) =>
                               handleOptionChange(
                                 index,
                                 optionIndex,
@@ -294,10 +299,10 @@ function FormModal() {
                               )
                             }
                           />
-
                           <button
                             type="button"
-                            className="btn btn-danger ms-2"
+                            id="deleteButton"
+                            className="btn btn-danger"
                             onClick={() =>
                               dispatch(
                                 removeOption({
@@ -311,32 +316,52 @@ function FormModal() {
                           </button>
                         </div>
                       ))}
+
+                    {element.type !== "input" && element.type !== "file" && (
+                      <button
+                        type="button"
+                        id="addOption"
+                        className="btn btn-primary mt-3"
+                        onClick={() => dispatch(addOption(index))}
+                      >
+                        Add Option
+                      </button>
+                    )}
                   </div>
                 ))}
               </>
-
-              <div className="d-flex justify-content-center mb-3">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleAddField}
-                >
-                  Add Field
-                </button>
-              </div>
+              <button
+                type="button"
+                id="addQuestion"
+                className="btn btn-primary mt-3"
+                onClick={handleAddField}
+              >
+                Add Question
+              </button>
             </div>
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-label-secondary"
+                id="closeButton"
+                className="btn me-2 btn-outline-secondary"
                 onClick={() => {
+                  dispatch(resetFormModal());
+                  if (isEdit) {
+                    console.log("is edit");
+                    dispatch(changeFormState(false));
+                  }
                   dispatch(toggleFormModal());
                 }}
               >
                 Close
               </button>
-              <button className="btn btn-primary" onClick={handleSubmit}>
-                {isEdit ? "Save" : "Create"}
+              <button
+                type="button"
+                id="saveButton"
+                className="btn btn-primary"
+                onClick={handleSubmit}
+              >
+                Save changes
               </button>
             </div>
           </div>

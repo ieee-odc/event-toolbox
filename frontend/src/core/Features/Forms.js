@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-
 const FormsSlice = createSlice({
   name: "Forms",
   initialState: {
@@ -72,7 +71,6 @@ const FormsSlice = createSlice({
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedForm.data;
       state.selectedForm.data = newData;
-
     },
     resetFormModal: (state) => {
       state.isEdit = false;
@@ -97,13 +95,14 @@ const FormsSlice = createSlice({
       const { index, newType } = action.payload;
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].type = newType;
-        const optionsArray=["checkbox","radio","dropdown"]
-        if(optionsArray.includes(newType)){
-          state.selectedForm.data[index].options=[
-            "First Option","Second Option"
-          ]
-        }else{
-          state.selectedForm.data[index].options=[]
+        const optionsArray = ["checkbox", "radio", "dropdown"];
+        if (optionsArray.includes(newType)) {
+          state.selectedForm.data[index].options = [
+            "First Option",
+            "Second Option",
+          ];
+        } else {
+          state.selectedForm.data[index].options = [];
         }
       }
     },
@@ -115,7 +114,10 @@ const FormsSlice = createSlice({
     },
     removeOption: (state, action) => {
       const { questionIndex, optionIndex } = action.payload;
-      if (questionIndex >= 0 && questionIndex < state.selectedForm.data.length) {
+      if (
+        questionIndex >= 0 &&
+        questionIndex < state.selectedForm.data.length
+      ) {
         state.selectedForm.data[questionIndex].options.splice(optionIndex, 1);
       }
     },
@@ -132,7 +134,6 @@ const FormsSlice = createSlice({
       state.isEdit = action.payload;
     },
   },
-  
 });
 
 export const {
@@ -153,6 +154,6 @@ export const {
   switchQuestionType,
   updateQuestionOptions,
   removeOption,
-  addOption
+  addOption,
 } = FormsSlice.actions;
 export default FormsSlice.reducer;
