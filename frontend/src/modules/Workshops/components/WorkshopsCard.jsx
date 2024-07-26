@@ -120,7 +120,7 @@ const WorkshopsCard = () => {
                   <div className=" col-md-4" key={workshop.id}>
                     <Card
                       title={workshop.name}
-                      formText={workshop.formId??"No selected form"}
+                      formText={workshop.formId}
                       workshop={workshop}
                       date={formatDateWithNumbers(workshop.endTime)}
                       endTime={formatTime(workshop.endTime)}
@@ -128,7 +128,7 @@ const WorkshopsCard = () => {
                       description={workshop.description}
                       badgeText={renderTag(workshop.startTime)}
                       personCount={0}
-                      personCapacity={workshop.space.capacity}
+                      personCapacity={workshop?.space?.capacity}
                       progress={progressPercentage}
                     />
                   </div>

@@ -3,6 +3,9 @@ import "./Card.css"; // Assuming you put the provided styles in this CSS file
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import axiosRequest from "../../../utils/AxiosConfig";
+import { setSelectedWorkshop } from "../../Features/Workshops";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const Card = ({
   title,
@@ -17,6 +20,8 @@ const Card = ({
   progress,
   workshop,
 }) => {
+  const { eventId } = useParams();
+
   const toggleDropdown = (workshopId) => {
     setDropdownStates({
       ...dropdownStates,
@@ -39,10 +44,8 @@ const Card = ({
     });
   };
 
-  // const handleNavigateToForm = (formId) => {
-  //   navigate(/form/${formId});
-  // };
-
+  const navigate = useNavigate();
+const dispatch=useDispatch();
   return (
     <div className="custom-card">
       <div className="card-header">
@@ -110,14 +113,19 @@ const Card = ({
         </div>
       </div>
 
-      <div className="card-body">
-        <div className="d-flex align-items-center flex-wrap mb-2">
+      <div className="card-body" style={{ cursor: "pointer" }} onClick={() => {
+        dispatch(setSelectedWorkshop(workshop))
+        navigate(`/event/${eventId}/workshop/${workshop.id}`)
+      }}>
+        <div className="d-flex align-items-start flex-wrap mb-2" style={{
+          flexDirection:"column"
+        }}>
           <div className="bg-lighter p-2 rounded me-auto mb-3">
             <h6 className="mb-1">
-              <span className="text-body fw-normal">Form</span>{" "}
-              <span onClick={() => handleNavigateToForm(workshop.formId)}>
+              <span className="text-body fw-normal">{workshop.formId?`Form`:"No form"}</span>{" "}
+              {workshop.formId&&<span>
                 #{workshop.formId}
-              </span>
+              </span>}
             </h6>
           </div>
           <div className="text-start mb-3" id="info-box">
@@ -142,22 +150,26 @@ const Card = ({
       </div>
       <div className="card-body border-top">
         <div className="d-flex align-items-center mb-3">{badgeText}</div>
-        <div className="d-flex justify-content-between align-items-center mb-1">
-          <small>
-            Capacity: {personCount}/{personCapacity}
-          </small>
-          <small>{progress}% Full</small>
-        </div>
-        <div className="progress mb-3" style={{ height: 8 }}>
-          <div
-            className="progress-bar"
-            role="progressbar"
-            style={{ width: `${progress}%` }}
-            aria-valuenow={progress}
-            aria-valuemin="0"
-            aria-valuemax="100"
-          ></div>
-        </div>
+        { workshop.space?
+          <div>
+          <div className="d-flex justify-content-between align-items-center mb-1">
+            <small>
+              Capacity: {personCount}/{personCapacity}
+            </small>
+            <small>{progress}% Full</small>
+          </div>
+          <div className="progress mb-3" style={{ height: 8 }}>
+            <div
+              className="progress-bar"
+              role="progressbar"
+              style={{ width: `${progress}%` }}
+              aria-valuenow={progress}
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </div>:<div>No space assigned</div>
+        }
       </div>
     </div>
   );
