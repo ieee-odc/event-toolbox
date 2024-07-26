@@ -92,7 +92,7 @@ function SpaceModal() {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">
-                {isEdit ? "Update Space" : "Create Space"}
+                {isEdit ? "Update Venue" : "Add Venue"}
               </h5>
               <button
                 type="button"
@@ -146,7 +146,7 @@ function SpaceModal() {
                 Close
               </button>
               <button
-                className="btn btn-primary"
+                className="btn btn-primary ms-2"
                 onClick={isEdit ? handleEditSpace : handleCreateSpace}
               >
                 {isEdit ? "Save Changes" : "Create"}

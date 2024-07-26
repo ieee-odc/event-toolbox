@@ -115,7 +115,7 @@ function SpaceContainer() {
             </span>
                 </button> */}
                 <CustomButton
-                  text="Create Space"
+                  text="Add Venue"
                   iconClass="bx bx-plus me-md-1"
                   backgroundColor="var(--primary-color)"
                   textColor="white"
@@ -156,7 +156,7 @@ function SpaceContainer() {
                         <div className="avatar-wrapper">
                           <div className="avatar me-3">
                             <span className="avatar-initial rounded-circle bg-label-secondary">
-                              <i className="bx bxs-truck"></i>
+                              <i className="bx bxs-buildings"></i>
                             </span>
                           </div>
                         </div>

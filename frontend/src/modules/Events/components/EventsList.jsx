@@ -259,11 +259,11 @@ function EventsList() {
                               <span className="text-muted"> (34)</span>
                             </h6> */}
                             </div>
-                            <div className="d-flex align-items-center mb-3">
+                            <div className="d-flex align-items-center ms-1 mb-3">
                               <p className="h4">{event.name}</p>
                             </div>
                             <div className="d-flex align-items-center mb-1">
-                              <i className="bx bx-location-plus ms-2"></i>
+                              <i className="bx bx-location-plus me-2"></i>
 
                               <b>
                                 {" "}
@@ -277,7 +277,7 @@ function EventsList() {
                             </div>
 
                             <div className="d-flex align-items-center mb-1">
-                              <i className="bx bx-time-five ms-2"></i>
+                              <i className="bx bx-time-five me-2"></i>
                               <b>
                                 <p className="d-flex align-items-center text mb-0">
                                   Duration :
@@ -293,7 +293,7 @@ function EventsList() {
                               </p>
                             </div>
                             <div className="d-flex align-items-center mb-1 date-container">
-                              <i className="bx bx-calendar ms-2 date-icon"></i>
+                              <i className="bx bx-calendar me-2 date-icon"></i>
                               <b>
                                 <span className="text mb-0">Dates:</span>
                               </b>
