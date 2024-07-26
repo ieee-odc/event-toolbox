@@ -33,6 +33,9 @@ const EventSchema = mongoose.Schema(
     organizerId:{
       type: Number,
       required: true,
+    },
+    formId:{
+      type:Number,
     }
   },
   { timestamps: true }
