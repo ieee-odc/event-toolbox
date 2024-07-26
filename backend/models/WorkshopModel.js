@@ -28,7 +28,6 @@ const WorkshopSchema=mongoose.Schema({
     },
     spaceId:{
         type:Number,
-        required:true,
     },
     eventId:{
         type:Number,
