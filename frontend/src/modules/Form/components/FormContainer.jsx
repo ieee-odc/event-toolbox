@@ -12,12 +12,13 @@ import ShareLinkModal from "./ShareLinkModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
+import { initializeWorkshops } from "../../../core/Features/Workshops";
 
 function FormContainer() {
   const dispatch = useDispatch();
   const userData = UserData();
   const { filteredForms, forms } = useSelector((store) => store.formsStore);
-
+  const { workshops } = useSelector((store) => store.workshopsStore);
   function formatDate(originalDate) {
     const date = new Date(originalDate);
 
@@ -31,7 +32,7 @@ function FormContainer() {
     return formattedDate;
   }
 
-  
+
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [currentFormId, setCurrentFormId] = useState(null);
@@ -46,6 +47,13 @@ function FormContainer() {
 
   const handleDeleteForm = (formId) => {
     axiosRequest.delete(`/form/delete/${formId}`).then((res) => {
+      const updatedWorkshops = workshops.map(workshop => {
+        if (workshop.formId === formId) {
+          return { ...workshop, formId: null }; // Update the formId to null
+        }
+        return workshop;
+      });
+      dispatch(initializeWorkshops(updatedWorkshops))
       dispatch(deleteForm(formId));
       toast.success("Form deleted successfully");
     });
@@ -62,7 +70,7 @@ function FormContainer() {
 
   return (
     <div className="flex-grow-1">
-      {isShareModalOpen&&<div className="modal-backdrop fade show"></div>}
+      {isShareModalOpen && <div className="modal-backdrop fade show"></div>}
       <div className="card mb-4">
         <div className="card-widget-separator-wrapper">
           <div className="card-body card-widget-separator">
@@ -127,21 +135,21 @@ function FormContainer() {
       </div>
       <div className="card">
         <div className="container-fluid mt-4">
-          <div style={{display:"flex",justifyContent:"end"}}>
-          <button
-            className="btn btn-primary mb-4"
-            onClick={() => {
-              dispatch(toggleFormModal());
-              dispatch(resetFormModal());
-            }}
-          >
-            <span>
-              <i className="bx bx-plus me-md-1" />
-              <span className="d-md-inline-block d-none">
-              Create Form              </span>
-            </span>
-            
-          </button>
+          <div style={{ display: "flex", justifyContent: "end" }}>
+            <button
+              className="btn btn-primary mb-4"
+              onClick={() => {
+                dispatch(toggleFormModal());
+                dispatch(resetFormModal());
+              }}
+            >
+              <span>
+                <i className="bx bx-plus me-md-1" />
+                <span className="d-md-inline-block d-none">
+                  Create Form              </span>
+              </span>
+
+            </button>
           </div>
           <div className="table-responsive">
             <table className="table table-striped">
@@ -168,11 +176,10 @@ function FormContainer() {
                           onClick={() => handleEditClick(form)}
                         >
                           <i
-                            className={`bx bx-edit-alt bx-sm ${
-                              hoveredIcon === `edit_${form._id}`
+                            className={`bx bx-edit-alt bx-sm ${hoveredIcon === `edit_${form._id}`
                                 ? "transform"
                                 : ""
-                            }`}
+                              }`}
                             onMouseEnter={() =>
                               handleMouseEnter(`edit_${form._id}`)
                             }
@@ -184,11 +191,10 @@ function FormContainer() {
                           onClick={() => handleDeleteForm(form.id)}
                         >
                           <i
-                            className={`bx bx-trash bx-sm ${
-                              hoveredIcon === `delete_${form._id}`
+                            className={`bx bx-trash bx-sm ${hoveredIcon === `delete_${form._id}`
                                 ? "transform"
                                 : ""
-                            }`}
+                              }`}
                             onMouseEnter={() =>
                               handleMouseEnter(`delete_${form._id}`)
                             }
@@ -196,42 +202,41 @@ function FormContainer() {
                           ></i>
                         </button>
                         <button
-                      className="btn btn-link p-0"
-                      onMouseEnter={() => handleMouseEnter(`share_${form._id}`)}
-                      onMouseLeave={handleMouseLeave}
-                      onClick={() => handleShareClick(form.id)}
-                    >
-                      <i
-                        className={`bx bx-share bx-sm ${
-                          hoveredIcon === `share_${form._id}`
-                            ? "transform"
-                            : ""
-                        }`}
-                      ></i>
-                    </button>
+                          className="btn btn-link p-0"
+                          onMouseEnter={() => handleMouseEnter(`share_${form._id}`)}
+                          onMouseLeave={handleMouseLeave}
+                          onClick={() => handleShareClick(form.id)}
+                        >
+                          <i
+                            className={`bx bx-share bx-sm ${hoveredIcon === `share_${form._id}`
+                                ? "transform"
+                                : ""
+                              }`}
+                          ></i>
+                        </button>
                       </td>
                     </tr>
                   ))}
 
-                  {filteredForms&&
-                    filteredForms.length===0&& (
-                      <tr>
+                {filteredForms &&
+                  filteredForms.length === 0 && (
+                    <tr>
                       <td colSpan="4" style={{ textAlign: "center" }}>
                         <span>There is no data currently</span>
                       </td>
                     </tr>
-                    )
-                  }
+                  )
+                }
               </tbody>
             </table>
           </div>
           <FormModal />
           {isShareModalOpen && (
-        <ShareLinkModal
-          formId={currentFormId}
-          onClose={() => setShareModalOpen(false)}
-        />
-      )}
+            <ShareLinkModal
+              formId={currentFormId}
+              onClose={() => setShareModalOpen(false)}
+            />
+          )}
         </div>
       </div>
     </div>
