@@ -5,6 +5,7 @@ import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
 import "./RegistrationForm.css";
+import { Modal } from 'react-bootstrap'; // Ensure you have react-bootstrap installed
 
 const base64UrlDecode = (str) => {
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -23,6 +24,8 @@ const RegistrationForm = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [eventId, setEventId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [validated, setValidated] = useState(false);
   let tokenData;
 
   try {
@@ -39,12 +42,13 @@ const RegistrationForm = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [dispatch, tokenData.formId]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     dispatch(updateFormData({ field: id, value }));
   };
+
   const handleCheckboxChange = (e, field) => {
     const { value, checked } = e.target;
     const currentValues = formData[field.question] || [];
@@ -66,6 +70,13 @@ const RegistrationForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
+
     const responses = formFields.map(field => ({
       question: field.question,
       answer: formData[field.question] || ""
@@ -84,6 +95,7 @@ const RegistrationForm = () => {
       const response = await axiosRequest.post("/participant/submit", submissionData);
       console.log("Form data submitted: ", response.data);
       dispatch(resetFormData());
+      setShowModal(true);
     } catch (error) {
       console.error("Error submitting form data: ", error);
     }
@@ -98,26 +110,26 @@ const RegistrationForm = () => {
         <div className="col-md-6">
           <div className="card h-100 border-0">
             <div className="card-body">
-              <h4 className="mb-2">Registration Form</h4>
+              <h4 className="form-title mb-2">Registration Form</h4>
               {formData.name && (
-                <div className="mb-3">
-                  <label className="form-label">Name</label>
-                  <p>{formData.name}</p>
+                <div className="form-section">
+                  <div className="form-section-header">Name</div>
+                  <p className="form-section-content">{formData.name}</p>
                 </div>
               )}
               {formData.description && (
-                <div className="mb-3">
-                  <label className="form-label">Description</label>
-                  <p>{formData.description}</p>
+                <div className="form-section">
+                  <div className="form-section-header">Description</div>
+                  <p className="form-section-content">{formData.description}</p>
                 </div>
               )}
               {formData.deadline && (
-                <div className="mb-3">
-                  <label className="form-label">Deadline</label>
-                  <p>{new Date(formData.deadline).toLocaleString()}</p>
+                <div className="form-section">
+                  <div className="form-section-header">Deadline</div>
+                  <p className="form-section-content">{new Date(formData.deadline).toLocaleString()}</p>
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="needs-validation" noValidate>
+              <form onSubmit={handleSubmit} className={`needs-validation ${validated ? 'was-validated' : ''}`} noValidate>
                 <div className="mb-3">
                   <label className="form-label" htmlFor="fullName">Full Name</label>
                   <input
@@ -128,6 +140,7 @@ const RegistrationForm = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     required
                   />
+                  <div className="invalid-feedback">Full Name is required.</div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label" htmlFor="email">Email</label>
@@ -139,6 +152,7 @@ const RegistrationForm = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
+                  <div className="invalid-feedback">Email is required.</div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label" htmlFor="phoneNumber">Phone Number</label>
@@ -150,6 +164,7 @@ const RegistrationForm = () => {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     required
                   />
+                  <div className="invalid-feedback">Phone Number is required.</div>
                 </div>
                 {formFields && formFields.length > 0 ? (
                   formFields.map((field, index) => (
@@ -178,10 +193,12 @@ const RegistrationForm = () => {
                                 value={option}
                                 checked={formData[field.question]?.includes(option) || false}
                                 onChange={(e) => handleCheckboxChange(e, field)}
+                                required
                               />
                               <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
                                 {option}
                               </label>
+                              <div className="invalid-feedback">{field.question} is required.</div>
                             </div>
                           ))}
                         </div>
@@ -198,10 +215,12 @@ const RegistrationForm = () => {
                                 value={option}
                                 checked={formData[field.question] === option}
                                 onChange={(e) => handleRadioChange(e, field)}
+                                required
                               />
                               <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
                                 {option}
                               </label>
+                              <div className="invalid-feedback">{field.question} is required.</div>
                             </div>
                           ))}
                         </div>
@@ -212,6 +231,7 @@ const RegistrationForm = () => {
                           className="form-control"
                           id={field.question}
                           onChange={handleFileChange}
+                          required
                         />
                       )}
                       {field.type === "dropdown" && (
@@ -237,6 +257,7 @@ const RegistrationForm = () => {
                           onChange={(date) => dispatch(updateFormData({ field: field.question, value: date[0] }))}
                           options={{ dateFormat: 'Y-m-d' }}
                           className="form-control"
+                          required
                         />
                       )}
                       {field.type === "time" && (
@@ -246,6 +267,7 @@ const RegistrationForm = () => {
                           onChange={(time) => dispatch(updateFormData({ field: field.question, value: time[0] }))}
                           options={{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }}
                           className="form-control"
+                          required
                         />
                       )}
                     </div>
@@ -257,6 +279,15 @@ const RegistrationForm = () => {
                   Submit
                 </button>
               </form>
+              <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Registration Successful</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Thank you, {fullName}! Your registration is successful.</Modal.Body>
+                <Modal.Footer>
+                  <button className="btn btn-primary" onClick={() => setShowModal(false)}>Close</button>
+                </Modal.Footer>
+              </Modal>
             </div>
           </div>
         </div>
