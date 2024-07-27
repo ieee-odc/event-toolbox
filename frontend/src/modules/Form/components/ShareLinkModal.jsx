@@ -25,7 +25,7 @@ const base64UrlDecode = (str) => {
   return atob(base64);
 };
 
-const ShareLinkModal = ({ formId, onClose }) => {
+const ShareLinkModal = ({formId, onClose }) => {
   const dispatch = useDispatch();
 const userData=UserData();
 

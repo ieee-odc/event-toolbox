@@ -8,6 +8,7 @@ import {
   toggleFormModal,
 } from "../../../core/Features/Forms";
 import FormModal from "./FormModal";
+import ShareLinkModal from "./ShareLinkModal";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
@@ -215,6 +216,7 @@ function FormContainer() {
                               handleMouseEnter(`share_${form._id}`)
                             }
                             onMouseLeave={handleMouseLeave}
+                            onClick={() => handleShareClick(form.id)}
                           ></i>
                         </button>
                       </td>

@@ -139,7 +139,7 @@ const getWorkshopForms = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Forms retrieved successfully",
-      forms,
+      forms
     });
   } catch (e) {
     console.error(e);
@@ -149,11 +149,33 @@ const getWorkshopForms = async (req, res) => {
   }
 };
 
+const getFormById = async (req, res) => {
+  const { formId } = req.params;
+
+  try {
+    const form = await Form.findOne({
+      id:formId
+    });
+    if (!form) {
+      return res.status(404).json({ message: "Form not found" });
+    }
+    res.status(200).json({
+      status:"success",
+      message:"Retrived form",
+      form
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   createForm,
   getOrganizerForms,
   updateForm,
   deleteForm,
   getEventForms,
+  getFormById,
   getWorkshopForms,
 };
