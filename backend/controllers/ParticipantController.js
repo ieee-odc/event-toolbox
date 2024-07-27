@@ -3,7 +3,6 @@ const Participant = require("../models/ParticipantModel");
 
 const addParticipant = async (req, res) => {
   try {
-
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
@@ -12,7 +11,7 @@ const addParticipant = async (req, res) => {
 
     const participant = new Participant({
       id: counter.seq,
-      status:"Pending",
+      status: "Pending",
       ...req.body,
     });
 
@@ -126,7 +125,23 @@ const register = async (req, res) => {
       participant: participant,
     });
   } catch (error) {
-    console.error(error);
+    console.error(error);} }
+
+    
+const getWorkshopParticipants = async (req, res) => {
+  try {
+    const workshopId = req.params.workshopId;
+    const participants = await Participant.find({
+      workshopId,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Participant retrieved",
+      participants,
+    });
+  } catch (e) {
+    console.error(e);
     res.status(500).json({
       message: "Server Error!",
     });
@@ -138,5 +153,5 @@ module.exports = {
   deleteParticipant,
   editParticipant,
   getEventParticipants,
-  register
-};
+  register,
+  getWorkshopParticipants,};

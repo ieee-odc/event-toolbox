@@ -1,20 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "../../../utils/UserData";
 import {
-  initializeSpaces,
   selectSpace,
-  setSelectedSpace,
   toggleSpaceModal,
 } from "../../../core/Features/Spaces";
 import SpaceModal from "./SpaceModal";
-import CustomButton from "../../../core/components/Button/Button";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import { updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 
-function SpaceContainer() {
+function WorkshopSpaceContainer() {
+  const { workshopId } = useParams();
   const dispatch = useDispatch();
   const { spaces, isLoading } = useSelector((store) => store.spacesStore);
-  const userData = UserData();
+  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore);
+
+  const handleSpaceClick = (space) => {
+    Promise.all([
+      axiosRequest.post(`/space/edit/${space.id}`, {
+        workshopId,
+      }),
+      axiosRequest.post(`/workshop/edit/${workshopId}`, {
+        spaceId: space.id,
+      }),
+    ])
+      .then(() => {
+        dispatch(updateSelectedWorkshopField({ id: "spaceId", value: space.id }));
+        toast.success(`Selected ${space.name} space`);
+      })
+      .catch((error) => {
+        console.error("Error updating space or workshop:", error);
+      });
+  };
+
+  const handleOpenEditModal = (space) => {
+    dispatch(selectSpace(space));
+    dispatch(toggleSpaceModal());
+  };
 
   return (
     <div className="flex-grow-1">
@@ -101,30 +125,17 @@ function SpaceContainer() {
                 className="card-header border-0 pt-4 pb-2 d-flex justify-content-end"
                 style={{ alignItems: "center" }}
               >
-                {/* <button
+                <button
                   className="btn btn-primary"
                   onClick={() => {
                     dispatch(toggleSpaceModal());
                   }}
                 >
-                   <span>
-              <i className="bx bx-plus me-md-1" />
-              <span className="d-md-inline-block d-none">
-                Create Space
-              </span>
-            </span>
-                </button> */}
-                <CustomButton
-                  text="Add Venue"
-                  iconClass="bx bx-plus me-md-1"
-                  backgroundColor="var(--primary-color)"
-                  textColor="white"
-                  hoverBackgroundColor="#0F205D"
-                  hoverTextColor="white"
-                  onClick={() => {
-                    dispatch(toggleSpaceModal());
-                  }}
-                />
+                  <span>
+                    <i className="bx bx-plus me-md-1" />
+                    <span className="d-md-inline-block d-none">Add Venue</span>
+                  </span>
+                </button>
               </div>
 
               <div className="card-body p-0 logistics-fleet-sidebar-body ps">
@@ -144,30 +155,55 @@ function SpaceContainer() {
                     <div
                       key={space.id}
                       role="button"
-                      className="accordion-button shadow-none collapsed"
+                      className={`shadow-none collapsed`}
+                      style={{
+                        border:
+                          selectedWorkshop.spaceId === space.id
+                            ? "solid 1px black"
+                            : "none",
+                        display: "flex",
+                        padding: "5px 10px",
+                        justifyContent: "space-between",
+                        borderRadius: 10,
+                      }}
                       data-bs-toggle="collapse"
                       aria-expanded="false"
-                      onClick={() => {
-                        dispatch(selectSpace(space));
-                        dispatch(toggleSpaceModal());
-                      }}
                     >
-                      <div className="d-flex align-items-center">
+                      <div
+                        className="d-flex align-items-center"
+                        style={{ width: "100%" }}
+                        onClick={() => handleSpaceClick(space)}
+                      >
                         <div className="avatar-wrapper">
                           <div className="avatar me-3">
                             <span className="avatar-initial rounded-circle bg-label-secondary">
-                              <i className="bx bxs-buildings"></i>
+                              <i className="bx bxs-truck"></i>
                             </span>
                           </div>
                         </div>
-                        <span className="d-flex flex-column">
-                          <span className="h6 mb-0">{space.name}</span>
+                        <span
+                          className="d-flex flex-column"
+                          style={{
+                            width: "100%",
+                            textOverflow: "ellipsis",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <span className="h6 mb-0" style={{}}>
+                            {space.name}
+                          </span>
                           <span className="text-muted">{space.capacity}</span>
                         </span>
                       </div>
+                      <div
+                        onClick={() => {
+                          handleOpenEditModal(space);
+                        }}
+                      >
+                        edit
+                      </div>
                     </div>
                   ))}
-                  {spaces.length === 0 && <div>No spaces at the moment</div>}
                 </div>
               </div>
               <div
@@ -197,4 +233,4 @@ function SpaceContainer() {
   );
 }
 
-export default SpaceContainer;
+export default WorkshopSpaceContainer;

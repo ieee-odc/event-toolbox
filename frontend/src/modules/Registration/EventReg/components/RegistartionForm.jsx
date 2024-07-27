@@ -1,5 +1,3 @@
-// RegistrationForm.js
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFormData, resetFormData, fetchFormData } from "../../../../core/Features/Registration";
@@ -47,14 +45,23 @@ const RegistrationForm = () => {
     const { id, value } = e.target;
     dispatch(updateFormData({ field: id, value }));
   };
-
-  const handleMultiSelectChange = (e, field) => {
+  const handleCheckboxChange = (e, field) => {
     const { value, checked } = e.target;
     const currentValues = formData[field.question] || [];
     const newValues = checked
       ? [...currentValues, value]
       : currentValues.filter((val) => val !== value);
     dispatch(updateFormData({ field: field.question, value: newValues }));
+  };
+
+  const handleRadioChange = (e, field) => {
+    const { value } = e.target;
+    dispatch(updateFormData({ field: field.question, value }));
+  };
+
+  const handleFileChange = (e) => {
+    const { id, files } = e.target;
+    dispatch(updateFormData({ field: id, value: files[0] }));
   };
 
   const handleSubmit = async (e) => {
@@ -170,7 +177,7 @@ const RegistrationForm = () => {
                                 id={`${field.question}-${idx}`}
                                 value={option}
                                 checked={formData[field.question]?.includes(option) || false}
-                                onChange={(e) => handleMultiSelectChange(e, field)}
+                                onChange={(e) => handleCheckboxChange(e, field)}
                               />
                               <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
                                 {option}
@@ -190,7 +197,7 @@ const RegistrationForm = () => {
                                 id={`${field.question}-${idx}`}
                                 value={option}
                                 checked={formData[field.question] === option}
-                                onChange={handleInputChange}
+                                onChange={(e) => handleRadioChange(e, field)}
                               />
                               <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
                                 {option}
@@ -204,7 +211,7 @@ const RegistrationForm = () => {
                           type="file"
                           className="form-control"
                           id={field.question}
-                          onChange={handleInputChange}
+                          onChange={handleFileChange}
                         />
                       )}
                       {field.type === "dropdown" && (
@@ -225,20 +232,20 @@ const RegistrationForm = () => {
                       )}
                       {field.type === "date" && (
                         <Flatpickr
-                          className="form-control"
                           id={field.question}
                           value={formData[field.question] || ""}
-                          onChange={(date) => handleInputChange({ target: { id: field.question, value: date[0] } })}
-                          options={{ dateFormat: "Y-m-d" }}
+                          onChange={(date) => dispatch(updateFormData({ field: field.question, value: date[0] }))}
+                          options={{ dateFormat: 'Y-m-d' }}
+                          className="form-control"
                         />
                       )}
                       {field.type === "time" && (
                         <Flatpickr
-                          className="form-control"
                           id={field.question}
                           value={formData[field.question] || ""}
-                          onChange={(time) => handleInputChange({ target: { id: field.question, value: time[0] } })}
-                          options={{ enableTime: true, noCalendar: true, dateFormat: "H:i" }}
+                          onChange={(time) => dispatch(updateFormData({ field: field.question, value: time[0] }))}
+                          options={{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }}
+                          className="form-control"
                         />
                       )}
                     </div>

@@ -1,6 +1,7 @@
 const Space = require('../models/SpaceModel');
 const Counter = require("../models/CounterModel");
 const Organizer = require('../models/OrganizerModel');
+const Workshop = require('../models/WorkshopModel');
 
 // Create a new Space
 const createSpace = async (req, res) => {
@@ -72,18 +73,25 @@ const updateSpaceById = async (req, res) => {
 const deleteSpaceById = async (req, res) => {
     const { spaceId } = req.params;
     try {
-        const deletedSpace = await Space.findOneAndDelete({
-            id:spaceId
-        });
-        if (!deletedSpace) {
-            return res.status(404).json({ error: 'Space not found' });
-        }
-        res.json(deletedSpace);
+      // Find and delete the space
+      const deletedSpace = await Space.findOneAndDelete({ id: spaceId });
+      if (!deletedSpace) {
+        return res.status(404).json({ error: 'Space not found' });
+      }
+  
+      // Update Workshops with the deleted spaceId
+      await Workshop.updateMany({ spaceId: spaceId }, { $set: { spaceId: null } });
+  
+      res.status(200).json({
+        space: deletedSpace,
+        message: "Space deleted successfully and related workshops updated",
+        status: "success"
+      });
     } catch (error) {
-        console.error('Error in deleteSpaceById controller:', error.message);
-        res.status(500).json({ error: 'Internal server error' });
+      console.error('Error in deleteSpaceById controller:', error.message);
+      res.status(500).json({ error: 'Internal server error' });
     }
-};
+  };
 
 const getEventSpaces = async (req, res) => {
     try {

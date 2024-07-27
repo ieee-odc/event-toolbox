@@ -7,7 +7,7 @@ const DataItemSchema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ["input", "checkbox", "radio", "file", "dropdown", "date", "time"], 
+      enum: ["input", "checkbox", "radio", "file", "dropdown", "date", "time"], // Define allowed values
     },
     question: {
       type: String,
@@ -49,6 +49,18 @@ const FormSchema = new Schema({
     type: Number,
     required: false,
   },
+  workshopId: {
+    type: Number,
+    required: false,
+  },
 });
+
+FormSchema.path("eventId").validate(function (value) {
+  return this.eventId != null || this.workshopId != null;
+}, "Either eventId or workshopId must be provided.");
+
+FormSchema.path("workshopId").validate(function (value) {
+  return this.eventId != null || this.workshopId != null;
+}, "Either eventId or workshopId must be provided.");
 
 module.exports = mongoose.model("Form", FormSchema);

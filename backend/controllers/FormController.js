@@ -2,6 +2,7 @@ const Form = require("../models/FormModel");
 const User = require("../models/OrganizerModel");
 const Counter = require("../models/CounterModel");
 const Event = require("../models/EventModel");
+const Workshop = require("../models/WorkshopModel");
 
 const createForm = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ const updateForm = async (req, res) => {
   try {
     const updatedForm = await Form.findOneAndUpdate(
       {
-        id:formId
+        id: formId,
       },
       { $set: { ...req.body } },
       { new: true }
@@ -37,9 +38,9 @@ const updateForm = async (req, res) => {
     }
 
     res.status(200).json({
-        form:updatedForm,
-        message: "Form updated successfully",
-        status: "success"
+      form: updatedForm,
+      message: "Form updated successfully",
+      status: "success",
     });
   } catch (error) {
     console.error("Error updating form:", error.message);
@@ -50,21 +51,28 @@ const updateForm = async (req, res) => {
 const deleteForm = async (req, res) => {
   const { formId } = req.params;
   try {
-    const deletedForm = await Form.findOneAndDelete({id:formId});
+
+    const deletedForm = await Form.findOneAndDelete({ id: formId });
     if (!deletedForm) {
       return res.status(404).json({ error: "Form not found" });
     }
+
+    // Update Events with the deleted formId
+    await Event.updateMany({ formId: formId }, { $set: { formId: null } });
+
+    // Update Workshops with the deleted formId
+    await Workshop.updateMany({ formId: formId }, { $set: { formId: null } });
+
     res.status(200).json({
-        form: deletedForm,
-        message: "Form deleted successfully",
-        status: "success"
+      form: deletedForm,
+      message: "Form deleted successfully",
+      status: "success",
     });
   } catch (error) {
     console.error("Error deleting form:", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const getOrganizerForms = async (req, res) => {
   try {
@@ -103,7 +111,32 @@ const getEventForms = async (req, res) => {
     }
     const forms = await Form.find({ eventId });
 
-   return  res.status(200).json({
+    return res.status(200).json({
+      status: "success",
+      message: "Forms retrieved successfully",
+      forms,
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
+const getWorkshopForms = async (req, res) => {
+  try {
+    const { workshopId } = req.params;
+
+    const workshop = await Workshop.findOne({ id: workshopId });
+    if (!workshop) {
+      return res.status(400).json({
+        message: "Workshop doesn't exist!",
+      });
+    }
+    const forms = await Form.find({ workshopId });
+
+    return res.status(200).json({
       status: "success",
       message: "Forms retrieved successfully",
       forms
@@ -143,5 +176,6 @@ module.exports = {
   updateForm,
   deleteForm,
   getEventForms,
-  getFormById
+  getFormById,
+  getWorkshopForms,
 };

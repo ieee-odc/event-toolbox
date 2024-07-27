@@ -1,14 +1,24 @@
-.menu-item.open:not(.menu-item-closing)>.menu-toggle::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    display: block;
-    width: .42em;
-    height: .42em;
-    border: 1px solid;
-    border-bottom: 0;
-    border-left: 0;
-    transform: translateY(-50%) rotate(135deg); /* Rotate the arrow */
-    transition-duration: .3s;
-  }
-  
+.menu-item.open:not(.menu-item-closing) > .menu-toggle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  display: block;
+  width: 0.42em;
+  height: 0.42em;
+  border: 1px solid;
+  border-bottom: 0;
+  border-left: 0;
+  transform: translateY(-50%) rotate(135deg); /* Rotate the arrow */
+  transition-duration: 0.3s;
+}
+#layout-menu {
+  background-color: var(--primary-color) !important;
+}
+
+.menu-link {
+  color: white !important;
+  font-size: medium !important;
+}
+.app-brand-link span {
+  color: white !important;
+}

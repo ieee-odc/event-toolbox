@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import "./App.css";
 import { Route, Routes, Navigate } from "react-router-dom";
@@ -11,12 +10,13 @@ import ForgetPassword from "./modules/ForgetPass/pages/ForgetPassword";
 import ResetPassword from "./modules/ForgetPass/pages/ResetPassword";
 
 import EventsPage from "./modules/Events/pages/EventsPage";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import Workshops from "./modules/Workshops/pages/Workshops";
 import Spaces from "./modules/Space/page/Spaces";
 import Forms from "./modules/Form/pages/Forms";
 import SingleEventPage from "./modules/Events/pages/SingleEventPage";
-import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm"
+import SingleWorkshopPage from "./modules/Workshops/pages/SingleWorkshopPage";
+import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
 
 function App() {
   return (
@@ -36,7 +36,14 @@ function App() {
         <Route path="/spaces" element={<PrivateRoute><Spaces/></PrivateRoute>} />
         <Route path="/forms" element={<PrivateRoute><Forms/></PrivateRoute>} />
         <Route path="/form/:token" element={<RegistartionForm />} />
-
+        <Route
+          path="/event/:eventId/workshop/:workshopId"
+          element={
+            <PrivateRoute>
+              <SingleWorkshopPage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </div>
   );

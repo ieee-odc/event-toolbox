@@ -13,12 +13,13 @@ const WorkshopsSlice = createSlice({
       description: "",
       startTime: "",
       endTime: "",
-      currentParticipants: 50,
-      spaceId: "1",
-      eventId: "1",
       organizerId: "",
+      spaceId:"",
+      formId:"",
       date: new Date()
-    }
+    },
+    workshopsPerPage: 6,
+
   },
   reducers: {
     initializeWorkshops: (state, action) => {
@@ -30,24 +31,33 @@ const WorkshopsSlice = createSlice({
       state.filteredWorkshops.push(action.payload);
     },
     editWorkshop: (state, action) => {
-      const index = state.workshops.findIndex((workshop) => workshop.id === action.payload.id);
+      const index = state.workshops.findIndex(
+        (workshop) => workshop.id === action.payload.id
+      );
       state.workshops[index] = action.payload;
       state.filteredWorkshops[index] = action.payload;
       state.isEdit = false;
     },
     deleteWorkshop: (state, action) => {
-      state.workshops = state.workshops.filter((workshop) => workshop.id !== action.payload);
-      state.filteredWorkshops = state.filteredWorkshops.filter((workshop) => workshop.id !== action.payload);
+      state.workshops = state.workshops.filter(
+        (workshop) => workshop.id !== action.payload
+      );
+      state.filteredWorkshops = state.filteredWorkshops.filter(
+        (workshop) => workshop.id !== action.payload
+      );
     },
     toggleWorkshopModal: (state) => {
       state.isModalOpen = !state.isModalOpen;
     },
     filterWorkshops: (state, action) => {
-      state.filteredWorkshops = state.workshops.filter((workshop) => workshop.name.toLowerCase().includes(action.payload.toLowerCase()));
+      state.filteredWorkshops = state.workshops.filter((workshop) =>
+        workshop.name.toLowerCase().includes(action.payload.toLowerCase())
+      );
     },
     setSelectedWorkshop: (state, action) => {
       state.isEdit = true;
       state.selectedWorkshop = action.payload;
+
     },
     updateSelectedWorkshopField: (state, action) => {
       const { id, value } = action.payload;
@@ -58,18 +68,22 @@ const WorkshopsSlice = createSlice({
     },
     resetWorkshopModal: (state) => {
       state.isEdit = false;
-      state.selectedWorkshop = {
+      const newSelectedSpace={
+        ...state.selectedWorkshop,
         name: "",
         description: "",
         startTime: "",
         endTime: "",
-        currentParticipants: 50,
-        spaceId: "1",
-        eventId: "1",
         organizerId: "",
-      };
+      }
+      state.selectedWorkshop = newSelectedSpace;
     },
-
+    setWorkshopsPerPage: (state, action) => {
+      state.workshopsPerPage = action.payload;
+    },
+    toggleWorkshopsIsLoading: (state) => {
+      state.isLoading = !state.isLoading;
+    },
   },
 });
 
@@ -82,6 +96,9 @@ export const {
   resetWorkshopModal,
   filterWorkshops,
   updateSelectedWorkshopField,
-  setSelectedWorkshop
+  setSelectedWorkshop,
+  setWorkshopsPerPage,
+  toggleWorkshopsIsLoading,
+  isLoading,
 } = WorkshopsSlice.actions;
 export default WorkshopsSlice.reducer;

@@ -1,4 +1,4 @@
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 
 const ParticipationStatus = Object.freeze({
     PAID: 'Paid',
@@ -23,13 +23,13 @@ const ParticipantSchema=mongoose.Schema({
         required:true,
         unique: true
     },
-    fullName:{
-        type:String,
-        required:true,
+    fullName: {
+      type: String,
+      required: true,
     },
-    email:{
-        type:String,
-        required:true,
+    email: {
+      type: String,
+      required: true,
     },
     phoneNumber: {
         type: String,
@@ -44,11 +44,13 @@ const ParticipantSchema=mongoose.Schema({
         type:Number,
         required:true,
     },
+    workshopId: {
+        type: Number,
+      },
     responses: [QuestionAnswerSchema]
 
 } ,{ timestamps: true })
 
+const Participant = mongoose.model("Participant", ParticipantSchema);
 
-const Participant=mongoose.model("Participant",ParticipantSchema)
-
-module.exports=Participant;
+module.exports = Participant;

@@ -177,18 +177,9 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
             Event Box
           </span>
         </span>
-        <span
-          className="layout-menu-toggle menu-link text-large ms-auto"
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            toggleSideBar();
-          }}
-        >
-          <i className="bx bx-chevron-left bx-sm align-middle" />
-        </span>
       </div>
       <div className="menu-inner-shadow" style={{ display: "none" }} />
-      <ul className="menu-inner py-1 ps ps--active-y">
+      <ul className="menu-inner py-1 ps ps--active-y" id="menu-list">
         {routes.map((route, index) => (
           <li
             key={index}
@@ -205,7 +196,6 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
               <i className={`menu-icon tf-icons ${route.icon}`} />
               <div className="text-truncate">{route.name}</div>
             </a>
-
           </li>
         ))}
       </ul>

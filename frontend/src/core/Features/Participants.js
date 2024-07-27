@@ -10,6 +10,7 @@ const ParticipantsSlice = createSlice({
     filterStatus: "",
     filteredParticipants: [],
     selectedParticipant: {},
+    participantsPerPage: 10,
   },
   reducers: {
     initializeParticipants: (state, action) => {
@@ -18,10 +19,15 @@ const ParticipantsSlice = createSlice({
     },
     addParticipant: (state, action) => {
       state.participants = [...state.participants, action.payload];
-      state.filteredParticipants = [...state.filteredParticipants, action.payload];
+      state.filteredParticipants = [
+        ...state.filteredParticipants,
+        action.payload,
+      ];
     },
     deleteParticipant: (state, action) => {
-      state.participants = state.participants.filter((participant) => participant.id !== action.payload);
+      state.participants = state.participants.filter(
+        (participant) => participant.id !== action.payload
+      );
       state.filteredParticipants = state.filteredParticipants.filter(
         (participant) => participant.id !== action.payload
       );
@@ -55,7 +61,7 @@ const ParticipantsSlice = createSlice({
       state.selectedParticipant[id] = value;
     },
     updateData: (state, action) => {
-      state.selectedParticipant.data = action.payload
+      state.selectedParticipant.data = action.payload;
     },
 
     removeField: (state, action) => {
@@ -71,14 +77,19 @@ const ParticipantsSlice = createSlice({
       state.isEdit = action.payload;
     },
     addField: (state, action) => {
-      state.selectedParticipant.data=[...state.selectedParticipant.data,action.payload]
+      state.selectedParticipant.data = [
+        ...state.selectedParticipant.data,
+        action.payload,
+      ];
     },
     removeField: (state, action) => {
       state.selectedParticipant.data.splice(action.payload, 1); // Just splice, don't reassign
-      
     },
     changeParticipantState: (state, action) => {
       state.isEdit = action.payload;
+    },
+    setParticipantsPerPage: (state, action) => {
+      state.participantsPerPage = action.payload;
     },
   },
 });
@@ -98,5 +109,6 @@ export const {
   removeField,
   resetParticipantModal,
   changeParticipantState,
+  setParticipantsPerPage,
 } = ParticipantsSlice.actions;
 export default ParticipantsSlice.reducer;

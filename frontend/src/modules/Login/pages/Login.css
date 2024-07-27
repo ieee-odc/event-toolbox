@@ -1,25 +1,27 @@
 .app-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center; /* Center the brand horizontally */
-    margin-bottom: 20px; /* Space between brand and welcome message */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the brand horizontally */
+  margin-bottom: 20px; /* Space between brand and welcome message */
 }
-.move-down{
-    position: relative;
-    top: 30px;
+.move-down {
+  position: relative;
+  top: 30px;
 }
 
-.space-right{
-    margin-right: 5px;
+.space-right {
+  margin-right: 5px;
 }
 .form-control {
-    width: 100%; /* Makes the input full-width */
+  width: 100%; /* Makes the input full-width */
 }
-.col-form-label{
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: start;
+.col-form-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
 }
 
-
+.text-center {
+  color: white;
+}
