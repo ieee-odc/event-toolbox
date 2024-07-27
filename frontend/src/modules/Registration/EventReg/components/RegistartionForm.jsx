@@ -26,6 +26,7 @@ const RegistrationForm = () => {
   const [eventId, setEventId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
+  const [checkboxValidation, setCheckboxValidation] = useState({});
   let tokenData;
 
   try {
@@ -56,6 +57,12 @@ const RegistrationForm = () => {
       ? [...currentValues, value]
       : currentValues.filter((val) => val !== value);
     dispatch(updateFormData({ field: field.question, value: newValues }));
+
+    // Update checkbox validation state
+    setCheckboxValidation((prevState) => ({
+      ...prevState,
+      [field.question]: newValues.length > 0,
+    }));
   };
 
   const handleRadioChange = (e, field) => {
@@ -71,7 +78,20 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    if (form.checkValidity() === false) {
+    
+    // Validate checkbox groups
+    let valid = true;
+    const newCheckboxValidation = {};
+    formFields.forEach(field => {
+      if (field.type === 'checkbox') {
+        const isValid = formData[field.question] && formData[field.question].length > 0;
+        newCheckboxValidation[field.question] = isValid;
+        if (!isValid) valid = false;
+      }
+    });
+    setCheckboxValidation(newCheckboxValidation);
+
+    if (form.checkValidity() === false || !valid) {
       e.stopPropagation();
       setValidated(true);
       return;
@@ -94,7 +114,18 @@ const RegistrationForm = () => {
     try {
       const response = await axiosRequest.post("/participant/submit", submissionData);
       console.log("Form data submitted: ", response.data);
+      // Clear all form data except for name, description, and deadline
+      const { name, description, deadline } = formData;
       dispatch(resetFormData());
+      dispatch(updateFormData({ field: 'name', value: name }));
+      dispatch(updateFormData({ field: 'description', value: description }));
+      dispatch(updateFormData({ field: 'deadline', value: deadline }));
+
+      setFullName('');
+      setEmail('');
+      setPhoneNumber('');
+      setCheckboxValidation({});
+      setValidated(false);
       setShowModal(true);
     } catch (error) {
       console.error("Error submitting form data: ", error);
@@ -193,14 +224,15 @@ const RegistrationForm = () => {
                                 value={option}
                                 checked={formData[field.question]?.includes(option) || false}
                                 onChange={(e) => handleCheckboxChange(e, field)}
-                                required
                               />
                               <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
                                 {option}
                               </label>
-                              <div className="invalid-feedback">{field.question} is required.</div>
                             </div>
                           ))}
+                          <div className="invalid-feedback" style={{ display: validated && !checkboxValidation[field.question] ? 'block' : 'none' }}>
+                            {field.question} is required.
+                          </div>
                         </div>
                       )}
                       {field.type === "radio" && (
@@ -220,9 +252,9 @@ const RegistrationForm = () => {
                               <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
                                 {option}
                               </label>
-                              <div className="invalid-feedback">{field.question} is required.</div>
                             </div>
                           ))}
+                          <div className="invalid-feedback">{field.question} is required.</div>
                         </div>
                       )}
                       {field.type === "file" && (
@@ -283,7 +315,7 @@ const RegistrationForm = () => {
                 <Modal.Header closeButton>
                   <Modal.Title>Registration Successful</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Thank you, {fullName}! Your registration is successful.</Modal.Body>
+                <Modal.Body>Thank you! Your registration is successful.</Modal.Body>
                 <Modal.Footer>
                   <button className="btn btn-primary" onClick={() => setShowModal(false)}>Close</button>
                 </Modal.Footer>
