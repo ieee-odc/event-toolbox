@@ -6,7 +6,6 @@ export const fetchFormData = createAsyncThunk(
   "registration/fetchFormData",
   async (formId) => {
     const response = await axiosRequest.get(`/form/${formId}`);
-    console.log("API response data:", response.data.form.eventId);
     return {form: response.data.form, eventId: response.data.form.eventId };
   }
 );
@@ -36,7 +35,6 @@ const registrationSlice = createSlice({
       })
       .addCase(fetchFormData.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload)
         state.formFields = action.payload.form.data;
         state.formData = {
           name: action.payload.form.name,

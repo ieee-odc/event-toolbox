@@ -141,11 +141,9 @@ const RegistrationForm = () => {
 
   useEffect(() => {
     const newSocket = socketIOClient(import.meta.env.VITE_BACKEND);
-    console.log("connected to socket frontend")
     setSocket(newSocket);
     if (eventId) {
       newSocket.emit("joinRoom",eventId );
-      console.log(`Joined room for event: ${eventId}`);
     }
     return () => newSocket.disconnect();
   }, [eventId]);

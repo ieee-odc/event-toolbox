@@ -56,22 +56,16 @@ const ParticipantsCard = () => {
     const newSocket = io(import.meta.env.VITE_BACKEND);
   
     newSocket.on('connect', () => {
-      console.log('Socket connected');
-      console.log('Socket connected status:', newSocket.connected); // Should be true now
-      // Emit joinRoom after confirming connection
       if (eventId) {
         newSocket.emit('joinRoom',eventId );
-        console.log(`Joining room with eventId: ${eventId}`);
       }
     });
   
     newSocket.on('EventParticipantAdded', (data) => {
-      console.log("EventParticipantAdded event received", data);
       dispatch(addParticipant(data));
     });
   
     return () => {
-      console.log('Cleaning up socket connection');
       newSocket.off('EventParticipantAdded');
       newSocket.disconnect();
     };
