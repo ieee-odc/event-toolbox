@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const bodyParser = require("body-parser");
+const socket = require("socket.io");
 
 app.use(bodyParser.json());
 const path = require("path");
@@ -89,3 +90,26 @@ app.get("/*", function (req, res) {
 const server = app.listen(process.env.PORT, () => {
   console.log(`server started on port ${process.env.PORT}`);
 });
+
+
+const io = socket(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:5173"
+  }
+})
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('addEventParticipant', async (data) => {
+    console.log(data)
+    io.in(data.eventId).emit('EventParticipantAdded', data);
+  });
+
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
+  });
+});
+

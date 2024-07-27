@@ -29,6 +29,7 @@
     "react-router-dom": "^6.24.1",
     "react-time-picker": "^7.0.0",
     "redux": "^5.0.1",
+    "socket.io-client": "^4.7.5",
     "styled": "^1.0.0",
     "styled-components": "^6.1.12"
   },
