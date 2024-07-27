@@ -6,6 +6,7 @@ import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
 import "./RegistrationForm.css";
 import { Modal } from 'react-bootstrap'; // Ensure you have react-bootstrap installed
+import socketIOClient from "socket.io-client";
 
 const base64UrlDecode = (str) => {
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -31,6 +32,7 @@ const RegistrationForm = () => {
 
   try {
     tokenData = JSON.parse(decodedToken);
+
   } catch (error) {
     console.error("Invalid token format", error);
   }
@@ -43,7 +45,7 @@ const RegistrationForm = () => {
       }
     };
     fetchData();
-  }, [dispatch, tokenData.formId]);
+  }, [tokenData.formId]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -113,8 +115,10 @@ const RegistrationForm = () => {
 
     try {
       const response = await axiosRequest.post("/participant/submit", submissionData);
-      console.log("Form data submitted: ", response.data);
-      // Clear all form data except for name, description, and deadline
+      if (socket) {
+        socket.emit('addEventParticipant', response.data.participant );
+      }
+      
       const { name, description, deadline } = formData;
       dispatch(resetFormData());
       dispatch(updateFormData({ field: 'name', value: name }));
@@ -132,9 +136,19 @@ const RegistrationForm = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = socketIOClient(import.meta.env.VITE_BACKEND);
+    console.log("connected to socket frontend")
+    setSocket(newSocket);
+    if (eventId) {
+      newSocket.emit("joinRoom",eventId );
+      console.log(`Joined room for event: ${eventId}`);
+    }
+    return () => newSocket.disconnect();
+  }, [eventId]);
   return (
     <div className="container-fluid vh-100">
       <div className="row no-gutters h-100">

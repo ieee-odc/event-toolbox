@@ -100,11 +100,14 @@ const io = socket(server, {
 })
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+
+  socket.on('joinRoom', (eventId) => {
+    socket.join(eventId.toString());
+  });
 
   socket.on('addEventParticipant', async (data) => {
-    console.log(data)
-    io.in(data.eventId).emit('EventParticipantAdded', data);
+    const eventId=data.eventId
+    io.to(eventId.toString()).emit('EventParticipantAdded', data);
   });
 
   // Handle disconnection
@@ -112,4 +115,3 @@ io.on('connection', (socket) => {
     console.log('A user disconnected');
   });
 });
-
