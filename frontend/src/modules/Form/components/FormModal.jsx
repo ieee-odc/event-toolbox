@@ -488,7 +488,6 @@ function FormModal() {
                 onClick={() => {
                   dispatch(resetFormModal());
                   if (isEdit) {
-                    console.log("is edit");
                     dispatch(changeFormState(false));
                   }
                   dispatch(toggleFormModal());

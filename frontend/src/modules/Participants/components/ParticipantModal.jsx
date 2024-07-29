@@ -32,7 +32,6 @@ function ParticipantModal() {
         toast.success("Participant Successfully Created!");
       })
       .catch((err) => {
-        console.log(err);
         toast.error("Failed to add participant");
       });
   };
