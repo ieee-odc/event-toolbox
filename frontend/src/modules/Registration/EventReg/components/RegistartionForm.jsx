@@ -4,6 +4,7 @@ import {
   updateFormData,
   resetFormData,
   fetchFormData,
+  initializeWorkshops,
 } from "../../../../core/Features/Registration";
 import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
@@ -24,14 +25,19 @@ const base64UrlDecode = (str) => {
 const RegistrationForm = () => {
   const dispatch = useDispatch();
   const { token } = useParams();
-  const { formFields, formData, loading, error } = useSelector(
-    (state) => state.registrationStore
-  );
+  const {
+    formFields,
+    formData,
+    loading,
+    error,
+    workshopsIds,
+    formWorkshops,
+    eventId,
+  } = useSelector((state) => state.registrationStore);
   const decodedToken = base64UrlDecode(token);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [eventId, setEventId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
   const [checkboxValidation, setCheckboxValidation] = useState({});
@@ -45,10 +51,7 @@ const RegistrationForm = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const action = await dispatch(fetchFormData(tokenData.formId));
-      if (fetchFormData.fulfilled.match(action)) {
-        setEventId(action.payload.eventId);
-      }
+      const action = dispatch(fetchFormData(tokenData.formId));
     };
     fetchData();
   }, [tokenData.formId]);
@@ -66,7 +69,6 @@ const RegistrationForm = () => {
       : currentValues.filter((val) => val !== value);
     dispatch(updateFormData({ field: field.question, value: newValues }));
 
-    // Update checkbox validation state
     setCheckboxValidation((prevState) => ({
       ...prevState,
       [field.question]: newValues.length > 0,
@@ -111,22 +113,44 @@ const RegistrationForm = () => {
       answer: formData[field.question] || "",
     }));
 
-    const submissionData = {
+    const baseSubmissionData = {
       fullName,
       email,
       phoneNumber,
       status: "Pending",
-      eventId,
       responses,
+      eventId,
     };
 
     try {
-      const response = await axiosRequest.post(
-        "/participant/submit",
-        submissionData
-      );
-      if (socket) {
-        socket.emit("addEventParticipant", response.data.participant);
+      // Check if formWorkshops exist and have items
+      if (formWorkshops && formWorkshops.length > 0) {
+        for (const workshop of formWorkshops) {
+          const submissionData = {
+            ...baseSubmissionData,
+            workshopId: workshop.id,
+          };
+          console.log(submissionData);
+
+          const response = await axiosRequest.post(
+            "/participant/submit",
+            submissionData
+          );
+
+          if (socket) {
+            socket.emit("addEventParticipant", response.data.participant);
+          }
+        }
+      } else {
+        // Submit without workshopId if formWorkshops is empty or not provided
+        const response = await axiosRequest.post(
+          "/participant/submit",
+          baseSubmissionData
+        );
+
+        if (socket) {
+          socket.emit("addEventParticipant", response.data.participant);
+        }
       }
 
       const { name, description, deadline } = formData;
@@ -156,6 +180,24 @@ const RegistrationForm = () => {
     }
     return () => newSocket.disconnect();
   }, [eventId]);
+
+  useEffect(() => {
+    console.log(workshopsIds);
+    if (workshopsIds.length !== 0) {
+      axiosRequest
+        .post("/workshop/get-many", {
+          workshopsIds,
+        })
+        .then((res) => {
+          dispatch(initializeWorkshops(res.data.workshops));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("no workshops");
+    }
+  }, [workshopsIds]);
   return (
     <div className="container-fluid vh-100">
       <HeadComponent
@@ -381,6 +423,51 @@ const RegistrationForm = () => {
                           className="form-control"
                           required
                         />
+                      )}
+                      {field.type === "workshop-selection" && (
+                        <div>
+                          {field.options.map((option, idx) => {
+                            const workshop = formWorkshops.find(
+                              (element) =>
+                                element.id.toString() === option.toString()
+                            );
+                            return (
+                              <div key={idx} className="form-check">
+                                <input
+                                  type="checkbox"
+                                  className="form-check-input"
+                                  id={`${field.question}-${idx}`}
+                                  value={option}
+                                  checked={
+                                    formData[field.question]?.includes(
+                                      option
+                                    ) || false
+                                  }
+                                  onChange={(e) =>
+                                    handleCheckboxChange(e, field)
+                                  }
+                                />
+                                <label
+                                  className="form-check-label"
+                                  htmlFor={`${field.question}-${idx}`}
+                                >
+                                  {workshop?.name}
+                                </label>
+                              </div>
+                            );
+                          })}
+                          <div
+                            className="invalid-feedback"
+                            style={{
+                              display:
+                                validated && !checkboxValidation[field.question]
+                                  ? "block"
+                                  : "none",
+                            }}
+                          >
+                            {field.question} is required.
+                          </div>
+                        </div>
                       )}
                     </div>
                   ))
