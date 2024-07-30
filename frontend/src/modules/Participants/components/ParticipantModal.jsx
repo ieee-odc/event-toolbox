@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,10 +12,12 @@ import { useParams } from "react-router-dom";
 
 function ParticipantModal() {
   const dispatch = useDispatch();
-  const { eventId,workshopId} = useParams();
+  const { eventId, workshopId } = useParams();
   const { isParticipantModalOpen, selectedParticipant, isEdit } = useSelector(
     (store) => store.participantsStore
   );
+  const modalRef = useRef(null);
+
   const handleAddParticipant = () => {
     const reqBody = {
       email: selectedParticipant.email,
@@ -42,7 +44,25 @@ function ParticipantModal() {
       updateSelectedParticipantField({ id: payload.id, value: payload.value })
     );
   };
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleParticipantModal());
+      if (isEdit) {
+        dispatch(resetParticipantModal());
+      }
+    }
+  };
+  useEffect(() => {
+    if (isParticipantModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isParticipantModalOpen]);
   // TODO: add fetching events based on organizerID
   return (
     <>
@@ -59,7 +79,11 @@ function ParticipantModal() {
           aria-modal="true"
           role="dialog"
         >
-          <div className="modal-dialog modal-dialog-centered" role="document">
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            ref={modalRef}
+          >
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">

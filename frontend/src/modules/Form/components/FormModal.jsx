@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../Form.css";
 import toast from "react-hot-toast";
 import Flatpickr from "react-flatpickr";
@@ -35,6 +35,7 @@ function FormModal() {
     (store) => store.formsStore
   );
   const modalClassName = isFormModalOpen ? "modal fade show" : "modal fade";
+  const modalRef = useRef(null);
 
   const validateFields = () => {
     const { name, description, deadline, data } = selectedForm;
@@ -42,17 +43,16 @@ function FormModal() {
       toast.error("Please fill in all fields.");
       return false;
     }
-  
+
     for (let i = 0; i < data.length; i++) {
       if (!data[i].question) {
         toast.error(`Please fill in text for Question ${i + 1}.`);
         return false;
       }
     }
-    
+
     return true;
   };
-  
 
   const [selectedWorkshops, setSelectedWorkshops] = useState([]);
   const handleAddForm = async () => {
@@ -118,7 +118,6 @@ function FormModal() {
     dispatch(addField());
   };
 
-
   const handleDateChange = (selectedDates) => {
     const selectedDate = selectedDates[0]; // Assuming single date selection
     if (selectedDate) {
@@ -137,6 +136,27 @@ function FormModal() {
       updateQuestionOptions({ index: questionIndex, options: newOptions })
     );
   };
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleFormModal());
+      if (isEdit) {
+        dispatch(resetFormModal());
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isFormModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFormModalOpen]);
+
   return (
     <>
       {isFormModalOpen && <div className="modal-backdrop fade show"></div>}
@@ -148,7 +168,7 @@ function FormModal() {
         aria-modal="true"
         role="dialog"
       >
-        <div className="modal-dialog" role="document">
+        <div className="modal-dialog" role="document" ref={modalRef}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel1">
@@ -262,7 +282,7 @@ function FormModal() {
                         <option value="date">Date</option>
                         <option value="time">Time</option>
                         <option value="workshop-selection">
-                            Workshop selection
+                          Workshop selection
                         </option>
                       </select>
                       <button
@@ -270,11 +290,11 @@ function FormModal() {
                         id="deleteButton"
                         className="btn btn-danger mb-2"
                         onClick={() => {
-                          if(element.type==="workshop-selection"){
-                            setSelectedWorkshops([])
+                          if (element.type === "workshop-selection") {
+                            setSelectedWorkshops([]);
                           }
-                          dispatch(removeField(index)
-                        )}}
+                          dispatch(removeField(index));
+                        }}
                       >
                         Remove
                       </button>
@@ -399,7 +419,11 @@ function FormModal() {
                                     optionIndex,
                                   })
                                 );
-                                setSelectedWorkshops(prev=>prev.filter((item) => item.toString() !== option));
+                                setSelectedWorkshops((prev) =>
+                                  prev.filter(
+                                    (item) => item.toString() !== option
+                                  )
+                                );
                               }}
                             >
                               Remove Option
@@ -408,48 +432,47 @@ function FormModal() {
                         );
                       })}
 
-                    {element.type === "workshop-selection" &&selectedWorkshops.length !== workshops.length  && (
-                      <select
-                        id="select2_course_select"
-                        className="select2 form-select me-2  mb-2"
-                        data-placeholder="All Courses"
-                        onChange={(e) => {
-                          setSelectedWorkshops([
-                            ...selectedWorkshops,
-                            e.target.value,
-                          ]);
-                          dispatch(
-                            addOption({
-                              index,
-                              value: e.target.value,
-                            })
-                          );
-                        }}
-                        tabIndex="-1"
-                        value={element.type}
-                        aria-hidden="true"
-                      >
-                        <option value={-1}>
-                                  Select workshop
-                                </option>
-                        {workshops &&
-                          workshops.map((workshop) => {
-                            if (
-                              !selectedWorkshops.includes(
-                                workshop.id.toString()
-                              )
-                            ) {
-                              return (
-                                <option value={workshop.id}>
-                                  {workshop.name}
-                                </option>
-                              );
-                            } else {
-                              return;
-                            }
-                          })}
-                      </select>
-                    )}
+                    {element.type === "workshop-selection" &&
+                      selectedWorkshops.length !== workshops.length && (
+                        <select
+                          id="select2_course_select"
+                          className="select2 form-select me-2  mb-2"
+                          data-placeholder="All Courses"
+                          onChange={(e) => {
+                            setSelectedWorkshops([
+                              ...selectedWorkshops,
+                              e.target.value,
+                            ]);
+                            dispatch(
+                              addOption({
+                                index,
+                                value: e.target.value,
+                              })
+                            );
+                          }}
+                          tabIndex="-1"
+                          value={element.type}
+                          aria-hidden="true"
+                        >
+                          <option value={-1}>Select workshop</option>
+                          {workshops &&
+                            workshops.map((workshop) => {
+                              if (
+                                !selectedWorkshops.includes(
+                                  workshop.id.toString()
+                                )
+                              ) {
+                                return (
+                                  <option value={workshop.id}>
+                                    {workshop.name}
+                                  </option>
+                                );
+                              } else {
+                                return;
+                              }
+                            })}
+                        </select>
+                      )}
 
                     {element.type !== "input" && element.type !== "file" && (
                       <button

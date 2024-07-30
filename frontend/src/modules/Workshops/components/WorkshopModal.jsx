@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { useDispatch, useSelector } from "react-redux";
 import { UserData } from "./../../../utils/UserData";
 import {
@@ -14,25 +13,76 @@ import {
   toggleWorkshopModal,
   updateSelectedWorkshopField,
 } from "../../../core/Features/Workshops";
-import { initializeEvents } from "../../../core/Features/Events";
 import { initializeSpaces } from "../../../core/Features/Spaces";
 import { useParams } from "react-router-dom";
+
 function WorkshopModal() {
   const { eventId } = useParams();
   const { selectedWorkshop, isModalOpen, isEdit } = useSelector(
     (state) => state.workshopsStore
   );
-  const { events } = useSelector((state) => state.eventsStore);
   const { spaces } = useSelector((state) => state.spacesStore);
   const dispatch = useDispatch();
   const userData = UserData();
 
+  const [selectedSpace, setSelectedSpace] = useState(null);
+  const [attendees, setAttendees] = useState(0);
+  const [capacityMessage, setCapacityMessage] = useState("");
+  const [isFormComplete, setIsFormComplete] = useState(false);
+  const modalRef = useRef(null);
+
   useEffect(() => {
     axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
       dispatch(initializeSpaces(res.data.spaces));
-      dispatch(updateSelectedWorkshopField({ id: "spaceId", value: res.data.spaces[0].id }))
+      if (res.data.spaces.length > 0) {
+        dispatch(
+          updateSelectedWorkshopField({
+            id: "spaceId",
+            value: res.data.spaces[0].id,
+          })
+        );
+        setSelectedSpace(res.data.spaces[0]);
+      }
     });
-  }, []);
+  }, [dispatch, eventId]);
+
+  useEffect(() => {
+    if (selectedSpace && attendees) {
+      if (attendees > selectedSpace.capacity) {
+        setCapacityMessage(
+          "The selected space does not have enough capacity for the attendees."
+        );
+      } else {
+        setCapacityMessage("The selected space has enough capacity.");
+      }
+    } else {
+      setCapacityMessage("");
+    }
+  }, [selectedSpace, attendees]);
+
+  useEffect(() => {
+    const allFieldsFilled =
+      selectedWorkshop.name &&
+      selectedWorkshop.description &&
+      selectedWorkshop.spaceId &&
+      selectedWorkshop.date &&
+      selectedWorkshop.startTime &&
+      selectedWorkshop.endTime &&
+      attendees > 0 &&
+      selectedSpace &&
+      attendees <= selectedSpace.capacity;
+
+    setIsFormComplete(allFieldsFilled);
+  }, [
+    selectedWorkshop.name,
+    selectedWorkshop.description,
+    selectedWorkshop.spaceId,
+    selectedWorkshop.date,
+    selectedWorkshop.startTime,
+    selectedWorkshop.endTime,
+    attendees,
+    selectedSpace,
+  ]);
 
   const validateTime = (value, length) => {
     if (length === 1) {
@@ -109,14 +159,17 @@ function WorkshopModal() {
     );
   };
 
-  const handleAddWorkshop = (workshop) => {
-    // Combine date, startTime, and endTime into a single Date object
-    const startDate = selectedWorkshop.date;
-    const [hours, minutes] = selectedWorkshop.startTime.split(":");
-    startDate.setHours(parseInt(hours, 10));
-    startDate.setMinutes(parseInt(minutes, 10));
+  const handleAddWorkshop = () => {
+    if (attendees > selectedSpace.capacity) {
+      toast.error("Number of attendees exceeds the space capacity.");
+      return;
+    }
+    const startDate = new Date(selectedWorkshop.date);
+    const [startHours, startMinutes] = selectedWorkshop.startTime.split(":");
+    startDate.setHours(parseInt(startHours, 10));
+    startDate.setMinutes(parseInt(startMinutes, 10));
 
-    const endDate = selectedWorkshop.date;
+    const endDate = new Date(selectedWorkshop.date);
     const [endHours, endMinutes] = selectedWorkshop.endTime.split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
@@ -125,21 +178,19 @@ function WorkshopModal() {
       organizerId: userData.id,
       name: selectedWorkshop.name,
       description: selectedWorkshop.description,
-      startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
-      endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString(),
       spaceId: selectedWorkshop.spaceId,
       eventId,
+      attendees,
     };
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
         dispatch(toggleWorkshopModal());
-        dispatch(
-          addWorkshop({
-            ...res.data.workshop,
-          })
-        );
+        resetAttendees();
+        dispatch(addWorkshop(res.data.workshop));
       })
       .catch((err) => {
         console.log(err);
@@ -148,38 +199,38 @@ function WorkshopModal() {
   };
 
   const handleEditWorkshop = () => {
-    const startDate = selectedWorkshop.date;
-    const [hours, minutes] = selectedWorkshop.startTime.split(":");
-    startDate.setHours(parseInt(hours, 10));
-    startDate.setMinutes(parseInt(minutes, 10));
+    if (attendees > selectedSpace.capacity) {
+      toast.error("Number of attendees exceeds the space capacity.");
+      return;
+    }
+    const startDate = new Date(selectedWorkshop.date);
+    const [startHours, startMinutes] = selectedWorkshop.startTime.split(":");
+    startDate.setHours(parseInt(startHours, 10));
+    startDate.setMinutes(parseInt(startMinutes, 10));
 
-    const endDate = selectedWorkshop.date;
+    const endDate = new Date(selectedWorkshop.date);
     const [endHours, endMinutes] = selectedWorkshop.endTime.split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
 
-    // Create the request body
     const reqBody = {
       organizerId: userData.id,
       name: selectedWorkshop.name,
       description: selectedWorkshop.description,
-      startTime: startDate.toISOString(), // Send as ISO string or in a format expected by your backend
-      endTime: endDate.toISOString(), // Send as ISO string or in a format expected by your backend
-      eventId: eventId,
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString(),
       spaceId: selectedWorkshop.spaceId,
+      eventId,
+      attendees,
     };
 
-    // Make the API request
     axiosRequest
       .post(`/workshop/edit/${selectedWorkshop.id}`, reqBody)
       .then((res) => {
         toast.success("Successfully Edited!");
         dispatch(toggleWorkshopModal());
-        dispatch(
-          editWorkshop({
-            ...res.data.workshop,
-          })
-        );
+        resetAttendees();
+        dispatch(editWorkshop(res.data.workshop));
       })
       .catch((err) => {
         toast.error("Failed to edit workshop");
@@ -187,15 +238,55 @@ function WorkshopModal() {
   };
 
   const handleInputChange = (e) => {
-    const payload = e.target;
-    dispatch(
-      updateSelectedWorkshopField({ id: payload.id, value: payload.value })
-    );
+    const { id, value } = e.target;
+    if (id === "attendees") {
+      setAttendees(value);
+    } else {
+      dispatch(updateSelectedWorkshopField({ id, value }));
+      if (id === "spaceId") {
+        const selected = spaces.find((space) => space.id === Number(value));
+        if (selected) {
+          setSelectedSpace(selected);
+        } else {
+          console.error("Selected space not found or spaces array is empty.", {
+            value,
+            spaces,
+          });
+        }
+      }
+    }
   };
 
   const handleDateChange = (date) => {
     dispatch(updateSelectedWorkshopField({ id: "date", value: date }));
   };
+
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleWorkshopModal());
+      resetAttendees();
+      if (isEdit) {
+        dispatch(resetWorkshopModal());
+      }
+    }
+  };
+
+  const resetAttendees = () => {
+    setAttendees(0);
+  };
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+      resetAttendees();
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModalOpen]);
 
   return (
     <>
@@ -210,7 +301,11 @@ function WorkshopModal() {
           aria-modal="true"
           role="dialog"
         >
-          <div className="modal-dialog modal-dialog-centered" role="document">
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            ref={modalRef}
+          >
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
@@ -223,6 +318,7 @@ function WorkshopModal() {
                   aria-label="Close"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
+                    resetAttendees();
                     if (isEdit) {
                       dispatch(resetWorkshopModal());
                     }
@@ -258,6 +354,9 @@ function WorkshopModal() {
                         placeholder="Enter Description"
                         id="description"
                         rows="2"
+                        style={{
+                          maxHeight: "120px",
+                        }}
                       ></textarea>
                       <span className="message-actions input-group-text">
                         <i className="bx bx-bot cursor-pointer speech-to-text"></i>
@@ -280,14 +379,50 @@ function WorkshopModal() {
                       value={selectedWorkshop.spaceId}
                       onChange={handleInputChange}
                     >
-                      {spaces.map((space, i) => {
-                        return (
-                          <option value={space.id} id={"spaceId"}>
-                            {space.name}
-                          </option>
-                        );
-                      })}
+                      {spaces.map((space) => (
+                        <option key={space.id} value={space.id}>
+                          {space.name}
+                        </option>
+                      ))}
                     </select>
+                  </div>
+                  <div className="col mb-3">
+                    <label htmlFor="spaceCapacity" className="form-label">
+                      Capacity
+                    </label>
+                    <input
+                      type="text"
+                      id="spaceCapacity"
+                      className="form-control"
+                      value={selectedSpace ? selectedSpace.capacity : ""}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col mb-3">
+                    <label htmlFor="attendees" className="form-label">
+                      Number of Attendees
+                    </label>
+                    <input
+                      type="number"
+                      id="attendees"
+                      className="form-control"
+                      value={attendees}
+                      onChange={handleInputChange}
+                      placeholder="Enter number of attendees"
+                    />
+                    {capacityMessage && (
+                      <p
+                        className={`mt-2 ${
+                          attendees > selectedSpace?.capacity
+                            ? "text-danger"
+                            : "text-success"
+                        }`}
+                      >
+                        {capacityMessage}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="row mb-3 g-2">
@@ -348,6 +483,7 @@ function WorkshopModal() {
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
+                    resetAttendees();
                   }}
                 >
                   Close
@@ -356,6 +492,7 @@ function WorkshopModal() {
                   type="button"
                   className="btn btn-primary"
                   onClick={isEdit ? handleEditWorkshop : handleAddWorkshop}
+                  disabled={!isFormComplete}
                 >
                   {isEdit ? "Save Changes" : "Create Workshop"}
                 </button>
