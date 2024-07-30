@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Card.css"; // Assuming you put the provided styles in this CSS file
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
@@ -6,6 +6,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import { setSelectedWorkshop } from "../../Features/Workshops";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast"; // Add this import
 
 const Card = ({
   title,
@@ -21,6 +22,9 @@ const Card = ({
   workshop,
 }) => {
   const { eventId } = useParams();
+  const dropdownRef = useRef(null);
+
+  const [dropdownStates, setDropdownStates] = useState({});
 
   const toggleDropdown = (workshopId) => {
     setDropdownStates({
@@ -28,15 +32,7 @@ const Card = ({
       [workshopId]: !dropdownStates[workshopId],
     });
   };
-  const [dropdownStates, setDropdownStates] = useState({});
 
-  const initializeDropdownStates = (workshops) => {
-    const initialStates = workshops.reduce((acc, workshop) => {
-      acc[workshop.id] = false;
-      return acc;
-    }, {});
-    setDropdownStates(initialStates);
-  };
   const handleDeleteWorkshop = (workshopId) => {
     axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
       dispatch(deleteWorkshop(workshopId));
@@ -44,8 +40,22 @@ const Card = ({
     });
   };
 
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownStates({});
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   return (
     <div className="custom-card">
       <div className="card-header">
@@ -65,7 +75,7 @@ const Card = ({
             </div>
           </div>
           <div className="ms-auto">
-            <div className="dropdown">
+            <div className="dropdown" ref={dropdownRef}>
               <a
                 href="javascript:;"
                 className="btn dropdown-toggle hide-arrow text-body p-0"
