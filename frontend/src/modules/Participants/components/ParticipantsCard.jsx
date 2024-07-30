@@ -2,11 +2,20 @@ import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
+import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-import { addParticipant, deleteParticipant } from "../../../core/Features/Participants";
+import { deleteParticipant, editParticipant } from "../../../core/Features/Participants";
+
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  toggleParticipantModal,
+  toggleParticipantDetails,
+  setSelectedParticipant,
+} from "../../../core/Features/Participants";
+import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown"; // Import the custom dropdown component
+
 import { io } from 'socket.io-client';
 import { useParams } from "react-router-dom";
 
@@ -23,6 +32,8 @@ const ParticipantsCard = () => {
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentParticipant, setCurrentParticipant] = useState(null);
 
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
@@ -52,25 +63,59 @@ const ParticipantsCard = () => {
   };
   const [socket, setSocket] = useState(null);
 
+
+  const handleOpenDetails = (participant) => {
+    dispatch(setSelectedParticipant(participant));
+    dispatch(toggleParticipantDetails());
+  };
+
+  const handleChangeStatus = (participant, newStatus) => {
+    const updatedParticipant = { ...participant, status: newStatus };
+    axiosRequest.post(`/participant/edit/${participant.id}`, updatedParticipant)
+      .then(() => {
+        dispatch(editParticipant(updatedParticipant));
+        toast.success("Participant status updated successfully");
+      })
+      .catch(() => {
+        toast.error("Failed to update participant status");
+      });
+  };
+
+  const handleEditParticipant = (participant) => {
+    setCurrentParticipant(participant);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSubmit = (updatedParticipant) => {
+    axiosRequest.post(`/participant/edit/${updatedParticipant.id}`, updatedParticipant)
+      .then(() => {
+        dispatch(editParticipant(updatedParticipant));
+        toast.success("Participant updated successfully");
+        setIsEditModalOpen(false);
+      })
+      .catch(() => {
+        toast.error("Failed to update participant");
+      });
+  };
   useEffect(() => {
     const newSocket = io(import.meta.env.VITE_BACKEND);
-  
+
     newSocket.on('connect', () => {
       if (eventId) {
-        newSocket.emit('joinRoom',eventId );
+        newSocket.emit('joinRoom', eventId);
       }
     });
-  
+
     newSocket.on('EventParticipantAdded', (data) => {
       dispatch(addParticipant(data));
     });
-  
+
     return () => {
       newSocket.off('EventParticipantAdded');
       newSocket.disconnect();
     };
   }, [eventId]);
-  
+
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -89,78 +134,18 @@ const ParticipantsCard = () => {
             >
               <thead>
                 <tr>
-                  <th
-                    className="sorting sorting_desc"
-                    tabIndex={0}
-                    aria-controls="DataTables_Table_0"
-                    rowSpan={1}
-                    colSpan={1}
-                    style={{ width: 92 }}
-                    aria-label="#ID: activate to sort column ascending"
-                    aria-sort="descending"
-                  >
-                    #ID
-                  </th>
-                  <th
-                    className="sorting"
-                    tabIndex={0}
-                    aria-controls="DataTables_Table_0"
-                    rowSpan={1}
-                    colSpan={1}
-                    style={{ width: 100 }}
-                    aria-label="Client: activate to sort column ascending"
-                  >
-                    Client
-                  </th>
-                  <th
-                    className="sorting"
-                    tabIndex={0}
-                    aria-controls="DataTables_Table_0"
-                    rowSpan={1}
-                    colSpan={1}
-                    style={{ width: 96 }}
-                    aria-label="Total: activate to sort column ascending"
-                  >
-                    Email
-                  </th>
-                  <th
-                    className="text-truncate sorting"
-                    tabIndex={0}
-                    aria-controls="DataTables_Table_0"
-                    rowSpan={1}
-                    colSpan={1}
-                    style={{ width: 168 }}
-                    aria-label="Issued Date: activate to sort column ascending"
-                  >
-                    Issued Date
-                  </th>
-                  <th
-                    className="cell-fit sorting_disabled"
-                    rowSpan={1}
-                    colSpan={1}
-                    style={{ width: 76 }}
-                    aria-label="Actions"
-                  >
-                    Status
-                  </th>
-                  <th
-                    className="cell-fit sorting_disabled"
-                    rowSpan={1}
-                    colSpan={1}
-                    style={{ width: 76 }}
-                    aria-label="Actions"
-                  >
-                    Actions
-                  </th>
+                  <th>#ID</th>
+                  <th>Client</th>
+                  <th>Email</th>
+                  <th>Issued Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentParticipants.map((participant, index) => (
-                  <tr
-                    className={`${index % 2 === 0 ? "even" : "odd"}`}
-                    key={participant.id}
-                  >
-                    <td className="sorting_1">
+                  <tr key={participant.id} className={`${index % 2 === 0 ? "even" : "odd"}`}>
+                    <td>
                       <span
                         className="fw-medium"
                         style={{
@@ -169,6 +154,7 @@ const ParticipantsCard = () => {
                           textDecoration: "inherit",
                           cursor: "pointer",
                         }}
+                        onClick={() => handleOpenDetails(participant)}
                       >
                         #{participant.id}
                       </span>
@@ -183,13 +169,15 @@ const ParticipantsCard = () => {
                           </div>
                         </div>
                         <div className="d-flex flex-column">
-                          <a
-                            className="text-body text-truncate"
+
+                          <span
+                            className="text-body text-truncate fw-medium"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleOpenDetails(participant)}
+
                           >
-                            <span className="fw-medium">
-                              {participant.fullName}
-                            </span>
-                          </a>
+                            {participant.fullName}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -206,66 +194,59 @@ const ParticipantsCard = () => {
                         </div>
                       </div>
                     </td>
-
-                    <td className="">
-                      <span className="d-none"></span>
-                      {formatDateWithShort(participant.createdAt)}
-                    </td>
+                    <td>{formatDateWithShort(participant.createdAt)}</td>
                     <td>{getStatusIcon(participant.status)}</td>
                     <td>
                       <div className="d-flex align-items-center">
                         <a
                           href={`mailto:${participant.email}`}
-                          data-bs-toggle="tooltip"
                           className="text-body"
-                          data-bs-placement="top"
-                          aria-label="Send Mail"
-                          data-bs-original-title="Send Mail"
                         >
                           <i className="bx bx-send mx-1" />
                         </a>
                         <a
-                          data-bs-toggle="tooltip"
                           className="text-body"
-                          data-bs-placement="top"
-                          aria-label="Preview Invoice"
-                          data-bs-original-title="Preview Invoice"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleOpenDetails(participant)}
                         >
                           <i className="bx bx-show mx-1" />
                         </a>
-                        <div className="dropdown">
+                        <CustomDropdown
+                          toggleContent={<i className="bx bx-dots-vertical-rounded" />}
+                        >
                           <a
-                            className="btn dropdown-toggle hide-arrow text-body p-0"
-                            id="three-dots"
-                            data-bs-toggle="dropdown"
+                            className="dropdown-item"
+                            onClick={() => handleEditParticipant(participant)}
                           >
-                            <i className="bx bx-dots-vertical-rounded" />
+                            Edit
                           </a>
-                          <div className="dropdown-menu dropdown-menu-end">
-                            <a href="javascript:;" className="dropdown-item">
-                              Download
-                            </a>
-                            <a
-                              href="app-invoice-edit.html"
-                              className="dropdown-item"
-                            >
-                              Edit
-                            </a>
-                            <a href="javascript:;" className="dropdown-item">
-                              Duplicate
-                            </a>
-                            <div className="dropdown-divider" />
-                            <a
-                              onClick={() => {
-                                handleDeleteParticipant(participant.id);
-                              }}
-                              style={{ cursor: "pointer" }}
-                              className="dropdown-item delete-record text-danger"
-                            >
-                              Delete
-                            </a>
-                          </div>
-                        </div>
+                          <a
+                            className="dropdown-item"
+                            onClick={() => handleChangeStatus(participant, ParticipationStatus.PAID)}
+                          >
+                            Mark as Paid
+                          </a>
+                          <a
+                            className="dropdown-item"
+                            onClick={() => handleChangeStatus(participant, ParticipationStatus.PENDING)}
+                          >
+                            Mark as Pending
+                          </a>
+                          <a
+                            className="dropdown-item"
+                            onClick={() => handleChangeStatus(participant, ParticipationStatus.CANCELED)}
+                          >
+                            Mark as Canceled
+                          </a>
+                          <hr className="dropdown-divider" />
+                          <a
+                            onClick={() => handleDeleteParticipant(participant.id)}
+                            style={{ cursor: "pointer" }}
+                            className="dropdown-item text-danger"
+                          >
+                            Delete
+                          </a>
+                        </CustomDropdown>
                       </div>
                     </td>
                   </tr>
@@ -294,10 +275,62 @@ const ParticipantsCard = () => {
               setCurrentPage={setCurrentPage}
             />
           </div>
-
           <ParticipantModal />
+          <ParticipantDetails />
         </div>
       </div>
+      {isEditModalOpen && (
+        <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Participant</h5>
+                <button type="button" className="btn-close" onClick={() => setIsEditModalOpen(false)}></button>
+              </div>
+              <div className="modal-body">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleEditSubmit(currentParticipant);
+                  }}
+                >
+                  <div className="mb-3">
+                    <label htmlFor="fullName" className="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="fullName"
+                      value={currentParticipant?.fullName || ""}
+                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, fullName: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="email" className="form-label">Email</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      id="email"
+                      value={currentParticipant?.email || ""}
+                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="phoneNumber"
+                      value={currentParticipant?.phoneNumber || ""}
+                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, phoneNumber: e.target.value })}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary">Save changes</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

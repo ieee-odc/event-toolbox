@@ -56,7 +56,7 @@ const FormSchema = new Schema({
   },
   eventId: {
     type: Number,
-    required: false,
+    required: true,
   },
   workshopId: {
     type: Number,

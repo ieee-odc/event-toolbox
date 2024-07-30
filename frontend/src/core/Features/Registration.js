@@ -6,7 +6,12 @@ export const fetchFormData = createAsyncThunk(
   "registration/fetchFormData",
   async (formId) => {
     const response = await axiosRequest.get(`/form/${formId}`);
-    return { form: response.data.form, eventId: response.data.form.eventId };
+    console.log("API response data:", response.data.form.workshopId);
+    return {
+      form: response.data.form,
+      eventId: response.data.form.eventId,
+      workshopId: response.data.form.workshopId,
+    };
   }
 );
 
@@ -20,6 +25,7 @@ const registrationSlice = createSlice({
     workshopsIds: [],
     formWorkshops: [],
     eventId: null,
+    workshopId: null,
   },
   reducers: {
     updateFormData: (state, action) => {
@@ -55,6 +61,7 @@ const registrationSlice = createSlice({
 
         state.workshopsIds = Array.from(workshopIdsSet);
         state.eventId = action.payload.form.eventId;
+        state.workshopId = acton.payload.form.workshopId;
         console.log(state.eventId);
         state.formData = {
           name: action.payload.form.name,
