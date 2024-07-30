@@ -9,7 +9,6 @@ import { storage } from "../../../../utils/firebaseConfig"; // Adjust the path a
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./RegistrationForm.css";
 
-import { Modal } from 'react-bootstrap'; // Ensure you have react-bootstrap installed
 import socketIOClient from "socket.io-client";
 
 const base64UrlDecode = (str) => {
@@ -140,9 +139,9 @@ const RegistrationForm = () => {
       console.log("Form data submitted: ", response.data);
 
       if (socket) {
-        socket.emit('addEventParticipant', response.data.participant );
+        socket.emit('addEventParticipant', response.data.participant);
       }
-      
+
       const { name, description, deadline } = formData;
       dispatch(resetFormData());
       dispatch(updateFormData({ field: 'name', value: name }));
@@ -167,7 +166,7 @@ const RegistrationForm = () => {
     const newSocket = socketIOClient(import.meta.env.VITE_BACKEND);
     setSocket(newSocket);
     if (eventId) {
-      newSocket.emit("joinRoom",eventId );
+      newSocket.emit("joinRoom", eventId);
     }
     return () => newSocket.disconnect();
   }, [eventId]);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
 import ParticipantModal from "./ParticipantModal";
@@ -99,23 +99,23 @@ const ParticipantsCard = () => {
   };
   useEffect(() => {
     const newSocket = io(import.meta.env.VITE_BACKEND);
-  
+
     newSocket.on('connect', () => {
       if (eventId) {
-        newSocket.emit('joinRoom',eventId );
+        newSocket.emit('joinRoom', eventId);
       }
     });
-  
+
     newSocket.on('EventParticipantAdded', (data) => {
       dispatch(addParticipant(data));
     });
-  
+
     return () => {
       newSocket.off('EventParticipantAdded');
       newSocket.disconnect();
     };
   }, [eventId]);
- 
+
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
