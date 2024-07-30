@@ -12,24 +12,17 @@ import { useParams } from "react-router-dom";
 
 function ParticipantModal() {
   const dispatch = useDispatch();
-  const { eventId,workshopId} = useParams();
+  const { eventId, workshopId } = useParams();
   const { isParticipantModalOpen, selectedParticipant, isEdit } = useSelector(
     (store) => store.participantsStore
   );
+
+
   const handleAddParticipant = () => {
     const reqBody = {
       email: selectedParticipant.email,
       fullName: selectedParticipant.fullName,
       phoneNumber: selectedParticipant.phoneNumber,
-      eventId,
-      workshopId,
-    };
-
-
-  const handleAddParticipant = () => {
-    const reqBody = {
-      email: selectedParticipant.email,
-      fullName: selectedParticipant.fullName,
       eventId,
       workshopId,
     };
@@ -160,6 +153,6 @@ function ParticipantModal() {
       )}
     </>
   );
-  }}
+}
 
 export default ParticipantModal;

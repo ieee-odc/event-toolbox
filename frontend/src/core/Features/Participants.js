@@ -45,6 +45,7 @@ const ParticipantsSlice = createSlice({
     },
     toggleParticipantModal: (state) => {
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
+      console.log(state.isParticipantModalOpen)
     },
     toggleParticipantsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
