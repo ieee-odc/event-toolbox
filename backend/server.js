@@ -18,33 +18,22 @@ const allowedOrigins = [
   "https://59e0-41-230-216-254.ngrok-free.app",
   "http://localhost:5173",
   "https://f2ac-41-230-216-254.ngrok-free.app",
+  "https://secure-totally-doberman.ngrok-free.app",
 ];
 
 // Create a function to check if the origin is allowed
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Content-Type, Authorization",
-};
 
-app.use(cors(corsOptions));
-app.use(helmet());
+app.use(cors());
+// app.use(helmet());
 
 const _dirname = path.dirname("");
 const buildPath = path.join(_dirname, "../frontend/dist");
 
-app.use((req, res, next) => {
-  res.header("Cross-Origin-Opener-Policy", "same-origin; allow-popups");
-  res.header("Cross-Origin-Embedder-Policy", "require-corp");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Cross-Origin-Opener-Policy", "same-origin; allow-popups");
+//   res.header("Cross-Origin-Embedder-Policy", "require-corp");
+//   next();
+// });
 
 app.use(express.static(buildPath));
 
@@ -59,22 +48,24 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
+const router = express.Router();
 const ParticipantRouter = require("./routes/ParticipantRoutes");
-app.use("/participant", ParticipantRouter);
+router.use("/participant", ParticipantRouter);
 const EventRouter = require("./routes/EventsRoutes");
-app.use("/events", EventRouter);
+router.use("/events", EventRouter);
 const authRouter = require("./routes/authRoutes");
-app.use("/auth", authRouter);
+router.use("/auth", authRouter);
 
 const WorkshopRouter = require("./routes/WorkshopRoutes");
-app.use("/workshop", WorkshopRouter);
+router.use("/workshop", WorkshopRouter);
 
 const SpaceRouter = require("./routes/SpaceRoutes");
-app.use("/space", SpaceRouter);
+router.use("/space", SpaceRouter);
 
 const FormRouter = require("./routes/FormRoutes");
-app.use("/form", FormRouter);
+router.use("/form", FormRouter);
 
+app.use("/api", router);
 app.get("/*", function (req, res) {
   res.sendFile(
     path.join(__dirname, "../frontend/dist/index.html"),
@@ -86,32 +77,29 @@ app.get("/*", function (req, res) {
     }
   );
 });
-
 const server = app.listen(process.env.PORT, () => {
   console.log(`server started on port ${process.env.PORT}`);
 });
 
-
 const io = socket(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:5173"
-  }
-})
+    origin: "http://localhost:5173",
+  },
+});
 
-io.on('connection', (socket) => {
-
-  socket.on('joinRoom', (eventId) => {
+io.on("connection", (socket) => {
+  socket.on("joinRoom", (eventId) => {
     socket.join(eventId.toString());
   });
 
-  socket.on('addEventParticipant', async (data) => {
-    const eventId=data.eventId
-    io.to(eventId.toString()).emit('EventParticipantAdded', data);
+  socket.on("addEventParticipant", async (data) => {
+    const eventId = data.eventId;
+    io.to(eventId.toString()).emit("EventParticipantAdded", data);
   });
 
   // Handle disconnection
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
   });
 });

@@ -60,6 +60,9 @@ const EventsSlice = createSlice({
     toggleEventsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
     },
+    turnIsLoadingOff: (state) => {
+      state.isLoading = false;
+    },
     selectEvent: (state, action) => {
       state.isEdit = true;
       const { startDate, endDate, ...otherFields } = action.payload;
@@ -127,5 +130,6 @@ export const {
   resetEventModal,
   changeFormState,
   setEventsPerPage,
+  turnIsLoadingOff,
 } = EventsSlice.actions;
 export default EventsSlice.reducer;
