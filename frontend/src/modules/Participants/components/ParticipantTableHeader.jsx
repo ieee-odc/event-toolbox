@@ -58,7 +58,6 @@ function ParticipantTableHeader() {
               hoverBackgroundColor="#0F205D"
               hoverTextColor="white"
               onClick={() => {
-                console.log("clicked")
                 dispatch(toggleParticipantModal());
               }}
             />
