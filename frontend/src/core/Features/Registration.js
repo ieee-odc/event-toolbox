@@ -6,7 +6,7 @@ export const fetchFormData = createAsyncThunk(
   "registration/fetchFormData",
   async (formId) => {
     const response = await axiosRequest.get(`/form/${formId}`);
-    return {form: response.data.form, eventId: response.data.form.eventId };
+    return { form: response.data.form, eventId: response.data.form.eventId };
   }
 );
 
@@ -17,6 +17,9 @@ const registrationSlice = createSlice({
     formData: {},
     loading: false,
     error: null,
+    title: "",
+    description: "",
+    image: "",
   },
   reducers: {
     updateFormData: (state, action) => {
@@ -25,6 +28,11 @@ const registrationSlice = createSlice({
     },
     resetFormData: (state) => {
       state.formData = {};
+    },
+    setHeadData(state, action) {
+      state.title = action.payload.title;
+      state.description = action.payload.description;
+      state.image = action.payload.image;
     },
   },
   extraReducers: (builder) => {
@@ -39,8 +47,8 @@ const registrationSlice = createSlice({
         state.formData = {
           name: action.payload.form.name,
           description: action.payload.form.description,
-          deadline: action.payload.form.deadline
-        }
+          deadline: action.payload.form.deadline,
+        };
       })
       .addCase(fetchFormData.rejected, (state, action) => {
         state.loading = false;
@@ -49,6 +57,7 @@ const registrationSlice = createSlice({
   },
 });
 
-export const { updateFormData, resetFormData } = registrationSlice.actions;
+export const { updateFormData, resetFormData, setHeadData } =
+  registrationSlice.actions;
 
 export default registrationSlice.reducer;

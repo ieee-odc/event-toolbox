@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateFormData, resetFormData, fetchFormData } from "../../../../core/Features/Registration";
+import {
+  updateFormData,
+  resetFormData,
+  fetchFormData,
+} from "../../../../core/Features/Registration";
 import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
 import "./RegistrationForm.css";
-import { Modal } from 'react-bootstrap'; // Ensure you have react-bootstrap installed
+import { Modal } from "react-bootstrap"; // Ensure you have react-bootstrap installed
 import socketIOClient from "socket.io-client";
+import HeadComponent from "../../../../core/components/Head/CustomHead";
 
 const base64UrlDecode = (str) => {
-  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
   while (base64.length % 4) {
-    base64 += '=';
+    base64 += "=";
   }
   return atob(base64);
 };
@@ -19,11 +24,13 @@ const base64UrlDecode = (str) => {
 const RegistrationForm = () => {
   const dispatch = useDispatch();
   const { token } = useParams();
-  const { formFields, formData, loading, error } = useSelector((state) => state.registrationStore);
+  const { formFields, formData, loading, error } = useSelector(
+    (state) => state.registrationStore
+  );
   const decodedToken = base64UrlDecode(token);
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [eventId, setEventId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -32,7 +39,6 @@ const RegistrationForm = () => {
 
   try {
     tokenData = JSON.parse(decodedToken);
-
   } catch (error) {
     console.error("Invalid token format", error);
   }
@@ -80,13 +86,14 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    
+
     // Validate checkbox groups
     let valid = true;
     const newCheckboxValidation = {};
-    formFields.forEach(field => {
-      if (field.type === 'checkbox') {
-        const isValid = formData[field.question] && formData[field.question].length > 0;
+    formFields.forEach((field) => {
+      if (field.type === "checkbox") {
+        const isValid =
+          formData[field.question] && formData[field.question].length > 0;
         newCheckboxValidation[field.question] = isValid;
         if (!isValid) valid = false;
       }
@@ -99,9 +106,9 @@ const RegistrationForm = () => {
       return;
     }
 
-    const responses = formFields.map(field => ({
+    const responses = formFields.map((field) => ({
       question: field.question,
-      answer: formData[field.question] || ""
+      answer: formData[field.question] || "",
     }));
 
     const submissionData = {
@@ -110,24 +117,27 @@ const RegistrationForm = () => {
       phoneNumber,
       status: "Pending",
       eventId,
-      responses
+      responses,
     };
 
     try {
-      const response = await axiosRequest.post("/participant/submit", submissionData);
+      const response = await axiosRequest.post(
+        "/participant/submit",
+        submissionData
+      );
       if (socket) {
-        socket.emit('addEventParticipant', response.data.participant );
+        socket.emit("addEventParticipant", response.data.participant);
       }
-      
+
       const { name, description, deadline } = formData;
       dispatch(resetFormData());
-      dispatch(updateFormData({ field: 'name', value: name }));
-      dispatch(updateFormData({ field: 'description', value: description }));
-      dispatch(updateFormData({ field: 'deadline', value: deadline }));
+      dispatch(updateFormData({ field: "name", value: name }));
+      dispatch(updateFormData({ field: "description", value: description }));
+      dispatch(updateFormData({ field: "deadline", value: deadline }));
 
-      setFullName('');
-      setEmail('');
-      setPhoneNumber('');
+      setFullName("");
+      setEmail("");
+      setPhoneNumber("");
       setCheckboxValidation({});
       setValidated(false);
       setShowModal(true);
@@ -136,19 +146,24 @@ const RegistrationForm = () => {
     }
   };
 
-
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const newSocket = socketIOClient(import.meta.env.VITE_BACKEND);
     setSocket(newSocket);
     if (eventId) {
-      newSocket.emit("joinRoom",eventId );
+      newSocket.emit("joinRoom", eventId);
     }
     return () => newSocket.disconnect();
   }, [eventId]);
   return (
     <div className="container-fluid vh-100">
+      <HeadComponent
+        title={formData.name}
+        description={formData.description}
+        image="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"
+      />
+
       <div className="row no-gutters h-100">
         <div className="col-md-6">
           <div className="card h-100 border-0">
@@ -169,12 +184,22 @@ const RegistrationForm = () => {
               {formData.deadline && (
                 <div className="form-section">
                   <div className="form-section-header">Deadline</div>
-                  <p className="form-section-content">{new Date(formData.deadline).toLocaleString()}</p>
+                  <p className="form-section-content">
+                    {new Date(formData.deadline).toLocaleString()}
+                  </p>
                 </div>
               )}
-              <form onSubmit={handleSubmit} className={`needs-validation ${validated ? 'was-validated' : ''}`} noValidate>
+              <form
+                onSubmit={handleSubmit}
+                className={`needs-validation ${
+                  validated ? "was-validated" : ""
+                }`}
+                noValidate
+              >
                 <div className="mb-3">
-                  <label className="form-label" htmlFor="fullName">Full Name</label>
+                  <label className="form-label" htmlFor="fullName">
+                    Full Name
+                  </label>
                   <input
                     type="text"
                     className="form-control"
@@ -186,7 +211,9 @@ const RegistrationForm = () => {
                   <div className="invalid-feedback">Full Name is required.</div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label" htmlFor="email">Email</label>
+                  <label className="form-label" htmlFor="email">
+                    Email
+                  </label>
                   <input
                     type="email"
                     className="form-control"
@@ -198,7 +225,9 @@ const RegistrationForm = () => {
                   <div className="invalid-feedback">Email is required.</div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label" htmlFor="phoneNumber">Phone Number</label>
+                  <label className="form-label" htmlFor="phoneNumber">
+                    Phone Number
+                  </label>
                   <input
                     type="tel"
                     className="form-control"
@@ -207,7 +236,9 @@ const RegistrationForm = () => {
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     required
                   />
-                  <div className="invalid-feedback">Phone Number is required.</div>
+                  <div className="invalid-feedback">
+                    Phone Number is required.
+                  </div>
                 </div>
                 {formFields && formFields.length > 0 ? (
                   formFields.map((field, index) => (
@@ -234,15 +265,29 @@ const RegistrationForm = () => {
                                 className="form-check-input"
                                 id={`${field.question}-${idx}`}
                                 value={option}
-                                checked={formData[field.question]?.includes(option) || false}
+                                checked={
+                                  formData[field.question]?.includes(option) ||
+                                  false
+                                }
                                 onChange={(e) => handleCheckboxChange(e, field)}
                               />
-                              <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
+                              <label
+                                className="form-check-label"
+                                htmlFor={`${field.question}-${idx}`}
+                              >
                                 {option}
                               </label>
                             </div>
                           ))}
-                          <div className="invalid-feedback" style={{ display: validated && !checkboxValidation[field.question] ? 'block' : 'none' }}>
+                          <div
+                            className="invalid-feedback"
+                            style={{
+                              display:
+                                validated && !checkboxValidation[field.question]
+                                  ? "block"
+                                  : "none",
+                            }}
+                          >
                             {field.question} is required.
                           </div>
                         </div>
@@ -261,12 +306,17 @@ const RegistrationForm = () => {
                                 onChange={(e) => handleRadioChange(e, field)}
                                 required
                               />
-                              <label className="form-check-label" htmlFor={`${field.question}-${idx}`}>
+                              <label
+                                className="form-check-label"
+                                htmlFor={`${field.question}-${idx}`}
+                              >
                                 {option}
                               </label>
                             </div>
                           ))}
-                          <div className="invalid-feedback">{field.question} is required.</div>
+                          <div className="invalid-feedback">
+                            {field.question} is required.
+                          </div>
                         </div>
                       )}
                       {field.type === "file" && (
@@ -298,8 +348,15 @@ const RegistrationForm = () => {
                         <Flatpickr
                           id={field.question}
                           value={formData[field.question] || ""}
-                          onChange={(date) => dispatch(updateFormData({ field: field.question, value: date[0] }))}
-                          options={{ dateFormat: 'Y-m-d' }}
+                          onChange={(date) =>
+                            dispatch(
+                              updateFormData({
+                                field: field.question,
+                                value: date[0],
+                              })
+                            )
+                          }
+                          options={{ dateFormat: "Y-m-d" }}
                           className="form-control"
                           required
                         />
@@ -308,8 +365,19 @@ const RegistrationForm = () => {
                         <Flatpickr
                           id={field.question}
                           value={formData[field.question] || ""}
-                          onChange={(time) => dispatch(updateFormData({ field: field.question, value: time[0] }))}
-                          options={{ enableTime: true, noCalendar: true, dateFormat: 'H:i' }}
+                          onChange={(time) =>
+                            dispatch(
+                              updateFormData({
+                                field: field.question,
+                                value: time[0],
+                              })
+                            )
+                          }
+                          options={{
+                            enableTime: true,
+                            noCalendar: true,
+                            dateFormat: "H:i",
+                          }}
                           className="form-control"
                           required
                         />
@@ -327,16 +395,26 @@ const RegistrationForm = () => {
                 <Modal.Header closeButton>
                   <Modal.Title>Registration Successful</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>Thank you! Your registration is successful.</Modal.Body>
+                <Modal.Body>
+                  Thank you! Your registration is successful.
+                </Modal.Body>
                 <Modal.Footer>
-                  <button className="btn btn-primary" onClick={() => setShowModal(false)}>Close</button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
                 </Modal.Footer>
               </Modal>
             </div>
           </div>
         </div>
         <div className="col-md-6 d-none d-md-block">
-          <div className="bg-cover h-100" style={{ backgroundImage: "url('/assets/tsyp.jpg')" }}></div>
+          <div
+            className="bg-cover h-100"
+            style={{ backgroundImage: "url('/assets/tsyp.jpg')" }}
+          ></div>
         </div>
       </div>
     </div>
