@@ -22,6 +22,16 @@ function ParticipantModal() {
     const reqBody = {
       email: selectedParticipant.email,
       fullName: selectedParticipant.fullName,
+      phoneNumber: selectedParticipant.phoneNumber,
+      eventId,
+      workshopId,
+    };
+
+
+  const handleAddParticipant = () => {
+    const reqBody = {
+      email: selectedParticipant.email,
+      fullName: selectedParticipant.fullName,
       eventId,
       workshopId,
     };
@@ -37,6 +47,10 @@ function ParticipantModal() {
         toast.error("Failed to add participant");
       });
   };
+
+
+  if (!isParticipantModalOpen) return null;
+  console.log(selectedParticipant)
 
   const handleInputChange = (e) => {
     const payload = e.target;
@@ -130,6 +144,20 @@ function ParticipantModal() {
                     />
                   </div>
                 </div>
+                <div className="row g-3">
+                  <div className="col mb-0">
+                    <label htmlFor="phoneNumberWithTitle" className="form-label">
+                      Phone number
+                    </label>
+                    <input
+                      value={selectedParticipant.phoneNumber}
+                      onChange={handleInputChange}
+                      type="number"
+                      id="phoneNumber"
+                      className="form-control"
+                    />
+                  </div>
+                </div>
               </div>
               <div className="modal-footer">
                 <button
@@ -156,6 +184,6 @@ function ParticipantModal() {
       )}
     </>
   );
-}
+  }}
 
 export default ParticipantModal;

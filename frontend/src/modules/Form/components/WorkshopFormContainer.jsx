@@ -64,14 +64,11 @@ function WorkshopFormContainer() {
   };
 
   const handleRadioChange = (form) => {
-    Promise.all([
-        axiosRequest.post(`/form/edit/${form.id}`, {
+
+        axiosRequest.post(`/workshop/select-form`, {
           workshopId,
-        }),
-        axiosRequest.post(`/workshop/edit/${workshopId}`, {
           formId: form.id,
-        }),
-      ])
+        })
         .then(() => {
             dispatch(updateSelectedWorkshopField({ id: "formId", value: form.id }));
             toast.success(`Selected ${form.name} form`);

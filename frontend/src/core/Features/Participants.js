@@ -7,6 +7,7 @@ const ParticipantsSlice = createSlice({
     isLoading: false,
     isEdit: false,
     isParticipantModalOpen: false,
+    isParticipantDetailsOpen: false,
     filterStatus: "",
     filteredParticipants: [],
     selectedParticipant: {},
@@ -23,6 +24,9 @@ const ParticipantsSlice = createSlice({
         ...state.filteredParticipants,
         action.payload,
       ];
+    },
+    toggleParticipantDetails: (state) => {
+      state.isParticipantDetailsOpen = !state.isParticipantDetailsOpen;
     },
     deleteParticipant: (state, action) => {
       state.participants = state.participants.filter(
@@ -100,6 +104,7 @@ export const {
   deleteParticipant,
   editParticipant,
   toggleParticipantModal,
+  toggleParticipantDetails,
   toggleParticipantsIsLoading,
   selectParticipant,
   setSelectedParticipant,
