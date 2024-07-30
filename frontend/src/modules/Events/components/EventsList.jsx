@@ -13,6 +13,7 @@ import {
   selectEvent,
   addEvent,
   setEventsPerPage,
+  turnIsLoadingOff,
 } from "../../../core/Features/Events";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -43,11 +44,10 @@ function EventsList() {
     }
   };
 
-  const handleEditClick=(event)=>{
-    dispatch(selectEvent(event))
-    dispatch(toggleEventModal())
-  }
-
+  const handleEditClick = (event) => {
+    dispatch(selectEvent(event));
+    dispatch(toggleEventModal());
+  };
 
   const calculateDurationInDays = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -104,16 +104,18 @@ function EventsList() {
         const response = await axiosRequest.get(
           `/events/get-organizer/${userData.id}`
         );
+        console.log(response);
         dispatch(initializeEvents(response.data.events));
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
-        dispatch(toggleEventsIsLoading());
+        console.log("finnally");
+        dispatch(turnIsLoadingOff());
       }
     };
 
     fetchEvents();
-  }, [dispatch, userData.id]);
+  }, [userData.id]);
 
   const handleEventsPerPageChange = (e) => {
     dispatch(setEventsPerPage(Number(e.target.value)));
