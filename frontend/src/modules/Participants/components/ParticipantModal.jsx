@@ -26,15 +26,6 @@ function ParticipantModal() {
       eventId,
       workshopId,
     };
-
-
-  const handleAddParticipant = () => {
-    const reqBody = {
-      email: selectedParticipant.email,
-      fullName: selectedParticipant.fullName,
-      eventId,
-      workshopId,
-    };
     axiosRequest
       .post("/participant/add", reqBody)
       .then((res) => {
@@ -47,10 +38,6 @@ function ParticipantModal() {
         toast.error("Failed to add participant");
       });
   };
-
-
-  if (!isParticipantModalOpen) return null;
-  console.log(selectedParticipant)
 
   const handleInputChange = (e) => {
     const payload = e.target;
@@ -77,7 +64,7 @@ function ParticipantModal() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isParticipantModalOpen]);
-  // TODO: add fetching events based on organizerID
+
   return (
     <>
       {isParticipantModalOpen && (
@@ -146,7 +133,10 @@ function ParticipantModal() {
                 </div>
                 <div className="row g-3">
                   <div className="col mb-0">
-                    <label htmlFor="phoneNumberWithTitle" className="form-label">
+                    <label
+                      htmlFor="phoneNumberWithTitle"
+                      className="form-label"
+                    >
                       Phone number
                     </label>
                     <input
@@ -184,6 +174,6 @@ function ParticipantModal() {
       )}
     </>
   );
-  }}
+}
 
 export default ParticipantModal;
