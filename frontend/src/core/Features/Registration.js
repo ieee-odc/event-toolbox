@@ -17,9 +17,9 @@ const registrationSlice = createSlice({
     formData: {},
     loading: false,
     error: null,
-    title: "",
-    description: "",
-    image: "",
+    workshopsIds: [],
+    formWorkshops: [],
+    eventId: null,
   },
   reducers: {
     updateFormData: (state, action) => {
@@ -29,10 +29,8 @@ const registrationSlice = createSlice({
     resetFormData: (state) => {
       state.formData = {};
     },
-    setHeadData(state, action) {
-      state.title = action.payload.title;
-      state.description = action.payload.description;
-      state.image = action.payload.image;
+    initializeWorkshops: (state, action) => {
+      state.formWorkshops = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -44,12 +42,27 @@ const registrationSlice = createSlice({
       .addCase(fetchFormData.fulfilled, (state, action) => {
         state.loading = false;
         state.formFields = action.payload.form.data;
+
+        const workshopIdsSet = new Set(state.workshopsIds); // Create a Set to store unique workshop IDs
+
+        for (let i = 0; i < action.payload.form.data.length; i++) {
+          if (action.payload.form.data[i].type === "workshop-selection") {
+            action.payload.form.data[i].options.forEach((option) => {
+              workshopIdsSet.add(option);
+            });
+          }
+        }
+
+        state.workshopsIds = Array.from(workshopIdsSet);
+        state.eventId = action.payload.form.eventId;
+        console.log(state.eventId);
         state.formData = {
           name: action.payload.form.name,
           description: action.payload.form.description,
           deadline: action.payload.form.deadline,
         };
       })
+
       .addCase(fetchFormData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
@@ -57,7 +70,11 @@ const registrationSlice = createSlice({
   },
 });
 
-export const { updateFormData, resetFormData, setHeadData } =
-  registrationSlice.actions;
+export const {
+  updateFormData,
+  initializeWorkshops,
+  resetFormData,
+  setHeadData,
+} = registrationSlice.actions;
 
 export default registrationSlice.reducer;

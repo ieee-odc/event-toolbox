@@ -16,7 +16,7 @@ const FormsSlice = createSlice({
       description: "",
       data: [],
     },
-    selectedWorkshops:[]
+    selectedWorkshops: [],
   },
   reducers: {
     initializeForms: (state, action) => {
@@ -49,7 +49,16 @@ const FormsSlice = createSlice({
     setSelectedForm: (state, action) => {
       state.isEdit = true;
       state.selectedForm = action.payload;
+
+      state.selectedWorkshops = [];
+
+      action.payload.data.forEach((field) => {
+        if (field.type === "workshop-selection") {
+          state.selectedWorkshops.push(...field.options);
+        }
+      });
     },
+
     updateSelectedFormField: (state, action) => {
       const { id, value } = action.payload;
       state.selectedForm[id] = value;
@@ -113,7 +122,7 @@ const FormsSlice = createSlice({
       }
     },
     addOption: (state, action) => {
-      const {index,value} = action.payload;
+      const { index, value } = action.payload;
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].options.push(value);
       }
@@ -124,11 +133,13 @@ const FormsSlice = createSlice({
     resetSelectedWorkshops: (state) => {
       state.selectedWorkshops = [];
     },
-    removeOneSelectedWorkshop:(state,action)=>{
-      state.selectedWorkshops = state.selectedWorkshops.filter((item) => item.toString() !== action.payload);
+    removeOneSelectedWorkshop: (state, action) => {
+      state.selectedWorkshops = state.selectedWorkshops.filter(
+        (item) => item.toString() !== action.payload
+      );
     },
 
-    selectAWorkshop:(state,action)=>{
+    selectAWorkshop: (state, action) => {
       state.selectedWorkshops = [...state.selectedWorkshops, action.payload];
     },
     changeFormState: (state, action) => {
@@ -157,6 +168,6 @@ export const {
   addOption,
   resetSelectedWorkshops,
   removeOneSelectedWorkshop,
-  selectAWorkshop
+  selectAWorkshop,
 } = FormsSlice.actions;
 export default FormsSlice.reducer;
