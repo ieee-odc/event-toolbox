@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - Ops-TestCICD
+      - ChaymaWerdi1-patch-1
   pull_request:
     types: [opened, synchronize, reopened]
 
