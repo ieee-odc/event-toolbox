@@ -8,6 +8,7 @@ const {
   getSpaceWorkshops,
   getEventWorkshops,
   getOrganizerWorkshops,
+  getMultipleWorkshops,
 } = require("../controllers/WorkshopController");
 
 router.get("/get-space/:spaceId", getSpaceWorkshops);
@@ -16,6 +17,7 @@ router.get("/get-organizer/:organizerId", getOrganizerWorkshops);
 
 router.get("/:workshopId", getOneWorkshop);
 router.post("/add", addWorkshop);
+router.post("/get-many",getMultipleWorkshops)
 router.post("/edit/:workshopId", editWorkshop);
 router.post("/delete/:workshopId", deleteWorkshop);
 

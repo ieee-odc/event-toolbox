@@ -4,15 +4,14 @@ const Space = require("../models/SpaceModel");
 
 const addWorkshop = async (req, res) => {
   try {
-    let { startTime, endTime,spaceId, ...rest } = req.body;
+    let { startTime, endTime, spaceId, ...rest } = req.body;
 
     if (!(startTime instanceof Date)) {
       startTime = new Date(startTime);
     }
     if (!(endTime instanceof Date)) {
-      endTime = new Date(endTime); 
+      endTime = new Date(endTime);
     }
-    
 
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalWorkshop" },
@@ -20,7 +19,7 @@ const addWorkshop = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const space=await Space.findOne({id:spaceId});
+    const space = await Space.findOne({ id: spaceId });
 
     const workshop = new Workshop({
       id: counter.seq,
@@ -58,8 +57,7 @@ const editWorkshop = async (req, res) => {
       { new: true }
     );
 
-    const space=await Space.findOne({id:req.body.spaceId});
-
+    const space = await Space.findOne({ id: req.body.spaceId });
 
     if (!updatedWorkshop) {
       return res.status(404).json({ message: "Workshop not found" });
@@ -70,7 +68,7 @@ const editWorkshop = async (req, res) => {
       message: "Workshop updated",
       workshop: {
         ...updatedWorkshop,
-        space
+        space,
       },
     });
   } catch (error) {
@@ -136,26 +134,27 @@ const getEventWorkshops = async (req, res) => {
   try {
     const eventId = req.params.eventId;
     const workshops = await Workshop.find({ eventId });
-    
-    const workshopsWithCapacity = await Promise.all(workshops.map(async (workshop) => {
-      const workshopObj = workshop.toObject();
-      const workshopSpace = await Space.findOne({ id: workshop.spaceId });
-      return {
-        ...workshopObj,
-        space: workshopSpace
-      };
-    }));
+
+    const workshopsWithCapacity = await Promise.all(
+      workshops.map(async (workshop) => {
+        const workshopObj = workshop.toObject();
+        const workshopSpace = await Space.findOne({ id: workshop.spaceId });
+        return {
+          ...workshopObj,
+          space: workshopSpace,
+        };
+      })
+    );
 
     res.status(200).json({
-      status:"success",
-      message:"Retrieved workshops",
-      workshops:workshopsWithCapacity
+      status: "success",
+      message: "Retrieved workshops",
+      workshops: workshopsWithCapacity,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching workshops', error });
+    res.status(500).json({ message: "Error fetching workshops", error });
   }
 };
-
 
 const getOrganizerWorkshops = async (req, res) => {
   try {
@@ -163,21 +162,22 @@ const getOrganizerWorkshops = async (req, res) => {
     const workshops = await Workshop.find({
       organizerId,
     });
-    const workshopsWithCapacity = await Promise.all(workshops.map(async (workshop) => {
-      const workshopObj = workshop.toObject();
-      const workshopSpace = await Space.findOne({ id: workshop.spaceId });
-      return {
-        ...workshopObj,
-        space: workshopSpace
-      };
-    }));
+    const workshopsWithCapacity = await Promise.all(
+      workshops.map(async (workshop) => {
+        const workshopObj = workshop.toObject();
+        const workshopSpace = await Space.findOne({ id: workshop.spaceId });
+        return {
+          ...workshopObj,
+          space: workshopSpace,
+        };
+      })
+    );
 
     res.status(200).json({
-      status:"success",
-      message:"Retrieved workshops",
-      workshops:workshopsWithCapacity
+      status: "success",
+      message: "Retrieved workshops",
+      workshops: workshopsWithCapacity,
     });
-
   } catch (e) {
     console.error(e);
     res.status(500).json({
@@ -208,6 +208,33 @@ const getOneWorkshop = async (req, res) => {
   }
 };
 
+const getMultipleWorkshops = async (req, res) => {
+  try {
+    const { workshopsIds } = req.body;
+
+    // Validate if workshopsIds is an array and not empty
+    if (!Array.isArray(workshopsIds) || workshopsIds.length === 0) {
+      return res.status(400).json({
+        message: "Invalid request, workshopsIds must be a non-empty array",
+      });
+    }
+    // Fetch workshops from the database using the array of IDs
+    const workshops = await Workshop.find({
+      id: { $in: workshopsIds },
+    });
+
+    res.status(200).json({
+      message: "retrieved workshops succesfully",
+      status: "success",
+      workshops,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
 module.exports = {
   addWorkshop,
   deleteWorkshop,
@@ -216,4 +243,5 @@ module.exports = {
   getEventWorkshops,
   getOrganizerWorkshops,
   getOneWorkshop,
+  getMultipleWorkshops,
 };
