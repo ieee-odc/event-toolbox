@@ -8,6 +8,26 @@ const ParticipantModal = () => {
     (store) => store.participantsStore
   );
 
+  const handleAddParticipant = () => {
+    const reqBody = {
+      email: selectedParticipant.email,
+      fullName: selectedParticipant.fullName,
+      eventId,
+      workshopId,
+    };
+    axiosRequest
+      .post("/participant/add", reqBody)
+      .then((res) => {
+        dispatch(addParticipant(res.data.participant));
+        dispatch(resetParticipantModal());
+        dispatch(toggleParticipantModal());
+        toast.success("Participant Successfully Created!");
+      })
+      .catch((err) => {
+        toast.error("Failed to add participant");
+      });
+  };
+
   if (!isParticipantModalOpen) return null;
   console.log(selectedParticipant)
 

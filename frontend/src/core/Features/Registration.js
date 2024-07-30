@@ -36,7 +36,6 @@ const registrationSlice = createSlice({
       })
       .addCase(fetchFormData.fulfilled, (state, action) => {
         state.loading = false;
-        console.log(action.payload)
         state.formFields = action.payload.form.data;
         state.formData = {
           name: action.payload.form.name,
