@@ -1,5 +1,38 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+
+const groupParticipantsByEmail = (participants) => {
+  const emailToParticipant = {};
+  participants.forEach((participant) => {
+    if (!emailToParticipant[participant.email]) {
+      emailToParticipant[participant.email] = { ...participant };
+    } else {
+      // Aggregate statuses
+      if (!emailToParticipant[participant.email].statuses) {
+        emailToParticipant[participant.email].statuses = [emailToParticipant[participant.email].status];
+      }
+      emailToParticipant[participant.email].statuses.push(participant.status);
+
+      // Aggregate phone numbers
+      if (!emailToParticipant[participant.email].phoneNumbers) {
+        emailToParticipant[participant.email].phoneNumbers = [emailToParticipant[participant.email].phoneNumber];
+      }
+      if (participant.phoneNumber && !emailToParticipant[participant.email].phoneNumbers.includes(participant.phoneNumber)) {
+        emailToParticipant[participant.email].phoneNumbers.push(participant.phoneNumber);
+      }
+
+      // Aggregate responses
+      if (!emailToParticipant[participant.email].responses) {
+        emailToParticipant[participant.email].responses = [];
+      }
+      if (participant.responses) {
+        emailToParticipant[participant.email].responses = emailToParticipant[participant.email].responses.concat(participant.responses);
+      }
+    }
+  });
+  return Object.values(emailToParticipant);
+};
+
 const ParticipantsSlice = createSlice({
   name: "Participants",
   initialState: {
@@ -15,8 +48,9 @@ const ParticipantsSlice = createSlice({
   },
   reducers: {
     initializeParticipants: (state, action) => {
-      state.participants = action.payload;
-      state.filteredParticipants = action.payload;
+      const groupedParticipants = groupParticipantsByEmail(action.payload);
+      state.participants = groupedParticipants;
+      state.filteredParticipants = groupedParticipants;
     },
     addParticipant: (state, action) => {
       state.participants = [...state.participants, action.payload];
@@ -97,6 +131,7 @@ const ParticipantsSlice = createSlice({
     },
   },
 });
+
 
 export const {
   initializeParticipants,

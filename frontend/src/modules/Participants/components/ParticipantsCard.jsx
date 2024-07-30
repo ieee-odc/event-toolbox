@@ -27,7 +27,7 @@ const ParticipationStatus = Object.freeze({
 
 const ParticipantsCard = () => {
   const { eventId } = useParams();
-  const { participants, filteredParticipants, participantsPerPage } =
+  const { participants, filteredParticipants, participantsPerPage, groupedParticipants } =
     useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
 
