@@ -16,6 +16,7 @@ const FormsSlice = createSlice({
       description: "",
       data: [],
     },
+    selectedWorkshops:[]
   },
   reducers: {
     initializeForms: (state, action) => {
@@ -44,13 +45,6 @@ const FormsSlice = createSlice({
     },
     toggleFormsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
-    },
-    selectForm: (state, action) => {
-      state.isEdit = true;
-      const { Data } = action.payload;
-      state.selectedForm = {
-        ...Data,
-      };
     },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
@@ -127,6 +121,16 @@ const FormsSlice = createSlice({
     removeField: (state, action) => {
       state.selectedForm.data.splice(action.payload, 1); // Just splice, don't reassign
     },
+    resetSelectedWorkshops: (state) => {
+      state.selectedWorkshops = [];
+    },
+    removeOneSelectedWorkshop:(state,action)=>{
+      state.selectedWorkshops = state.selectedWorkshops.filter((item) => item.toString() !== action.payload);
+    },
+
+    selectAWorkshop:(state,action)=>{
+      state.selectedWorkshops = [...state.selectedWorkshops, action.payload];
+    },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
     },
@@ -140,7 +144,6 @@ export const {
   editForm,
   toggleFormModal,
   toggleFormsIsLoading,
-  selectForm,
   setSelectedForm,
   updateSelectedFormField,
   addField,
@@ -152,5 +155,8 @@ export const {
   updateQuestionOptions,
   removeOption,
   addOption,
+  resetSelectedWorkshops,
+  removeOneSelectedWorkshop,
+  selectAWorkshop
 } = FormsSlice.actions;
 export default FormsSlice.reducer;
