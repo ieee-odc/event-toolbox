@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../Form.css";
 import toast from "react-hot-toast";
 import Flatpickr from "react-flatpickr";
@@ -36,6 +36,7 @@ function FormModal() {
   const { isFormModalOpen, selectedForm, isEdit, selectedWorkshops } =
     useSelector((store) => store.formsStore);
   const modalClassName = isFormModalOpen ? "modal fade show" : "modal fade";
+  const modalRef = useRef(null);
 
   const validateFields = () => {
     const { name, description, deadline, data } = selectedForm;
@@ -149,6 +150,26 @@ function FormModal() {
       updateQuestionOptions({ index: questionIndex, options: newOptions })
     );
   };
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleFormModal());
+      if (isEdit) {
+        dispatch(resetFormModal());
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isFormModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFormModalOpen]);
 
   return (
     <>
@@ -161,7 +182,7 @@ function FormModal() {
         aria-modal="true"
         role="dialog"
       >
-        <div className="modal-dialog" role="document">
+        <div className="modal-dialog" role="document" ref={modalRef}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel1">

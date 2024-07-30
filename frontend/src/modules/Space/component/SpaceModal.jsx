@@ -1,39 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import axiosRequest from '../../../utils/AxiosConfig';
-import { useDispatch, useSelector } from 'react-redux';
-import { addSpace, deleteSpace, editSpace, resetSpaceModal, toggleSpaceModal, updateSelectedSpaceField } from '../../../core/Features/Spaces';
-import toast from 'react-hot-toast';
-import { UserData } from '../../../utils/UserData';
-import { useParams } from 'react-router-dom';
-import { initializeWorkshops } from '../../../core/Features/Workshops';
-
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import axiosRequest from "../../../utils/AxiosConfig";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addSpace,
+  deleteSpace,
+  editSpace,
+  resetSpaceModal,
+  toggleSpaceModal,
+  updateSelectedSpaceField,
+} from "../../../core/Features/Spaces";
+import toast from "react-hot-toast";
+import { UserData } from "../../../utils/UserData";
+import { useParams } from "react-router-dom";
+import { initializeWorkshops } from "../../../core/Features/Workshops";
 
 function SpaceModal() {
   const dispatch = useDispatch();
   const { eventId } = useParams();
 
-  const { isModalOpen, selectedSpace, isEdit } = useSelector((store) => store.spacesStore)
-  const { workshops } = useSelector((store) => store.workshopsStore)
-
+  const { isModalOpen, selectedSpace, isEdit } = useSelector(
+    (store) => store.spacesStore
+  );
+  const { workshops } = useSelector((store) => store.workshopsStore);
 
   const modalClassName = isModalOpen ? "modal fade show" : "modal fade";
   const userData = UserData();
+  const modalRef = useRef(null);
 
   const handleDelete = async () => {
     try {
       axiosRequest.delete(`/space/delete/${selectedSpace.id}`).then((res) => {
-        const updatedWorkshops = workshops.map(workshop => {
-
+        const updatedWorkshops = workshops.map((workshop) => {
           if (workshop.spaceId === selectedSpace.id) {
-            return { ...workshop, spaceId: null,space:null }; // Update the spaceId to null
+            return { ...workshop, spaceId: null, space: null }; // Update the spaceId to null
           }
           return workshop;
         });
 
-        dispatch(initializeWorkshops(updatedWorkshops))
-        dispatch(deleteSpace(selectedSpace.id))
-        dispatch(toggleSpaceModal())
+        dispatch(initializeWorkshops(updatedWorkshops));
+        dispatch(deleteSpace(selectedSpace.id));
+        dispatch(toggleSpaceModal());
         toast.success("Space deleted successfully");
       });
     } catch (error) {}
@@ -47,32 +54,53 @@ function SpaceModal() {
   };
 
   const handleCreateSpace = () => {
-    axiosRequest.post("/space/add", {
-      ...selectedSpace,
-      eventId,
-      organizerId: userData.id
-    }).then((res) => {
-      dispatch(toggleSpaceModal())
-      dispatch(resetSpaceModal())
-      dispatch(addSpace(res.data.space))
-      toast.success("Space added successfully");
-
-    })
-  }
+    axiosRequest
+      .post("/space/add", {
+        ...selectedSpace,
+        eventId,
+        organizerId: userData.id,
+      })
+      .then((res) => {
+        dispatch(toggleSpaceModal());
+        dispatch(resetSpaceModal());
+        dispatch(addSpace(res.data.space));
+        toast.success("Space added successfully");
+      });
+  };
 
   const handleEditSpace = () => {
-    axiosRequest.post(`/space/edit/${selectedSpace.id}`, {
-      ...selectedSpace,
-      organizerId: userData.id
-    }).then((res) => {
-      dispatch(editSpace(res.data.space))
-      dispatch(toggleSpaceModal())
-      dispatch(resetSpaceModal())
-      toast.success("Space edited successfully");
+    axiosRequest
+      .post(`/space/edit/${selectedSpace.id}`, {
+        ...selectedSpace,
+        organizerId: userData.id,
+      })
+      .then((res) => {
+        dispatch(editSpace(res.data.space));
+        dispatch(toggleSpaceModal());
+        dispatch(resetSpaceModal());
+        toast.success("Space edited successfully");
+      });
+  };
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleSpaceModal());
+      if (isEdit) {
+        dispatch(resetSpaceModal());
+      }
+    }
+  };
 
-    })
-  }
+  useEffect(() => {
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModalOpen]);
 
   return (
     <>
@@ -85,7 +113,7 @@ function SpaceModal() {
         aria-modal="true"
         role="dialog"
       >
-        <div className="modal-dialog" role="document">
+        <div className="modal-dialog" role="document" ref={modalRef}>
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">

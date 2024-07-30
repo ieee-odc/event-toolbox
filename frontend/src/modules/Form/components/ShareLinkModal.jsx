@@ -1,5 +1,4 @@
-import React from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
 
@@ -17,6 +16,7 @@ const base64UrlDecode = (str) => {
 
 const ShareLinkModal = ({ formId, onClose }) => {
   const userData = UserData();
+  const modalRef = useRef(null);
 
   const token = base64UrlEncode(
     JSON.stringify({ userId: userData.id, formId })
@@ -42,6 +42,19 @@ const ShareLinkModal = ({ formId, onClose }) => {
     window.open(linkedInShareUrl, "_blank");
   };
 
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div
       className="modal fade show"
@@ -52,7 +65,7 @@ const ShareLinkModal = ({ formId, onClose }) => {
       role="dialog"
     >
       <div className="modal-dialog modal-dialog-centered" role="document">
-        <div className="modal-content">
+        <div className="modal-content" ref={modalRef}>
           <div className="modal-header">
             <h5 className="modal-title">Share Form</h5>
             <button

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,7 +16,7 @@ function ParticipantModal() {
   const { isParticipantModalOpen, selectedParticipant, isEdit } = useSelector(
     (store) => store.participantsStore
   );
-
+  const modalRef = useRef(null);
 
   const handleAddParticipant = () => {
     const reqBody = {
@@ -39,18 +39,32 @@ function ParticipantModal() {
       });
   };
 
-
-  if (!isParticipantModalOpen) return null;
-  console.log(selectedParticipant)
-
   const handleInputChange = (e) => {
     const payload = e.target;
     dispatch(
       updateSelectedParticipantField({ id: payload.id, value: payload.value })
     );
   };
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleParticipantModal());
+      if (isEdit) {
+        dispatch(resetParticipantModal());
+      }
+    }
+  };
+  useEffect(() => {
+    if (isParticipantModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
-  // TODO: add fetching events based on organizerID
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isParticipantModalOpen]);
+
   return (
     <>
       {isParticipantModalOpen && (
@@ -66,7 +80,11 @@ function ParticipantModal() {
           aria-modal="true"
           role="dialog"
         >
-          <div className="modal-dialog modal-dialog-centered" role="document">
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            ref={modalRef}
+          >
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
@@ -115,7 +133,10 @@ function ParticipantModal() {
                 </div>
                 <div className="row g-3">
                   <div className="col mb-0">
-                    <label htmlFor="phoneNumberWithTitle" className="form-label">
+                    <label
+                      htmlFor="phoneNumberWithTitle"
+                      className="form-label"
+                    >
                       Phone number
                     </label>
                     <input
