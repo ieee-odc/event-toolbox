@@ -1,6 +1,7 @@
 const Counter = require("../models/CounterModel");
 const Workshop = require("../models/WorkshopModel");
 const Space = require("../models/SpaceModel");
+const Form = require("../models/FormModel");
 
 const addWorkshop = async (req, res) => {
   try {
@@ -208,6 +209,41 @@ const getOneWorkshop = async (req, res) => {
   }
 };
 
+const selectForm = async (req, res) => {
+  const { workshopId, formId } = req.body;
+
+  try {
+    // Unset workshopId in all forms that have the specified workshopId
+    await Form.updateMany(
+      { workshopId: workshopId },
+      { $unset: { workshopId: "" } }
+    );
+
+    // Unset formId in all workshops that have the specified formId
+    await Workshop.updateMany(
+      { formId: formId },
+      { $unset: { formId: "" } }
+    );
+
+    // Add the new formId to the specified workshop
+    await Workshop.updateOne(
+      { id: workshopId },
+      { $set: { formId: formId } }
+    );
+
+    // Add the new workshopId to the specified form
+    await Form.updateOne(
+      { id: formId },
+      { $set: { workshopId: workshopId } }
+    );
+
+    res.status(200).send({ message: 'Form and workshop updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'An error occurred while updating the form and workshop' });
+  }
+};
+
 module.exports = {
   addWorkshop,
   deleteWorkshop,
@@ -216,4 +252,5 @@ module.exports = {
   getEventWorkshops,
   getOrganizerWorkshops,
   getOneWorkshop,
+  selectForm
 };

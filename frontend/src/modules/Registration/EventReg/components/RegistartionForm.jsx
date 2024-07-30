@@ -4,8 +4,10 @@ import { updateFormData, resetFormData, fetchFormData } from "../../../../core/F
 import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
+import { Modal } from 'react-bootstrap';
+import { storage } from "../../../../utils/firebaseConfig"; // Adjust the path as needed
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./RegistrationForm.css";
-import { Modal } from 'react-bootstrap'; // Ensure you have react-bootstrap installed
 
 const base64UrlDecode = (str) => {
   let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -24,6 +26,7 @@ const RegistrationForm = () => {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [eventId, setEventId] = useState(null);
+  const [workshopId, setWorkshopId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
   const [checkboxValidation, setCheckboxValidation] = useState({});
@@ -40,6 +43,9 @@ const RegistrationForm = () => {
       const action = await dispatch(fetchFormData(tokenData.formId));
       if (fetchFormData.fulfilled.match(action)) {
         setEventId(action.payload.eventId);
+        setWorkshopId(action.payload.workshopId);
+        console.log(action.payload.workshopId);
+        console.log(action.payload);
       }
     };
     fetchData();
@@ -58,7 +64,6 @@ const RegistrationForm = () => {
       : currentValues.filter((val) => val !== value);
     dispatch(updateFormData({ field: field.question, value: newValues }));
 
-    // Update checkbox validation state
     setCheckboxValidation((prevState) => ({
       ...prevState,
       [field.question]: newValues.length > 0,
@@ -70,16 +75,27 @@ const RegistrationForm = () => {
     dispatch(updateFormData({ field: field.question, value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const { id, files } = e.target;
-    dispatch(updateFormData({ field: id, value: files[0] }));
+    const file = files[0];
+
+    if (file) {
+      const storageRef = ref(storage, `files/${file.name}`);
+      try {
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        console.log(downloadURL)
+        dispatch(updateFormData({ field: id, value: downloadURL }));
+      } catch (error) {
+        console.error("Error uploading file: ", error);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    
-    // Validate checkbox groups
+
     let valid = true;
     const newCheckboxValidation = {};
     formFields.forEach(field => {
@@ -108,13 +124,15 @@ const RegistrationForm = () => {
       phoneNumber,
       status: "Pending",
       eventId,
+      workshopId,
       responses
     };
+
+    console.log(submissionData);
 
     try {
       const response = await axiosRequest.post("/participant/submit", submissionData);
       console.log("Form data submitted: ", response.data);
-      // Clear all form data except for name, description, and deadline
       const { name, description, deadline } = formData;
       dispatch(resetFormData());
       dispatch(updateFormData({ field: 'name', value: name }));

@@ -6,8 +6,8 @@ export const fetchFormData = createAsyncThunk(
   "registration/fetchFormData",
   async (formId) => {
     const response = await axiosRequest.get(`/form/${formId}`);
-    console.log("API response data:", response.data.form.eventId);
-    return {form: response.data.form, eventId: response.data.form.eventId };
+    console.log("API response data:", response.data.form.workshopId);
+    return {form: response.data.form, eventId: response.data.form.eventId, workshopId:response.data.form.workshopId };
   }
 );
 

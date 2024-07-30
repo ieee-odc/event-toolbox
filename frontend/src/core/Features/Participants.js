@@ -42,6 +42,9 @@ const ParticipantsSlice = createSlice({
     toggleParticipantModal: (state) => {
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
     },
+    setSelectedParticipant: (state, action) => {
+      state.selectedParticipant = action.payload;
+    },
     toggleParticipantsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
     },
@@ -63,7 +66,6 @@ const ParticipantsSlice = createSlice({
     updateData: (state, action) => {
       state.selectedParticipant.data = action.payload;
     },
-
     removeField: (state, action) => {
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedParticipant.data;
@@ -111,4 +113,5 @@ export const {
   changeParticipantState,
   setParticipantsPerPage,
 } = ParticipantsSlice.actions;
+
 export default ParticipantsSlice.reducer;

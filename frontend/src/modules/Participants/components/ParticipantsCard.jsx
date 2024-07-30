@@ -7,6 +7,10 @@ import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
 import { deleteParticipant } from "../../../core/Features/Participants";
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  toggleParticipantModal,
+  setSelectedParticipant,
+} from "../../../core/Features/Participants";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -46,6 +50,11 @@ const ParticipantsCard = () => {
       dispatch(deleteParticipant(participantId));
       toast.success("Participant deleted successfully");
     });
+  };
+
+  const handleOpenModal = (participant) => {
+    dispatch(setSelectedParticipant(participant));
+    dispatch(toggleParticipantModal());
   };
 
   return (
@@ -146,6 +155,7 @@ const ParticipantsCard = () => {
                           textDecoration: "inherit",
                           cursor: "pointer",
                         }}
+                        onClick={() => handleOpenModal(participant)}
                       >
                         #{participant.id}
                       </span>
@@ -160,14 +170,13 @@ const ParticipantsCard = () => {
                           </div>
                         </div>
                         <div className="d-flex flex-column">
-                          <a
-                            href="pages-profile-user.html"
-                            className="text-body text-truncate"
+                          <span
+                            className="text-body text-truncate fw-medium"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleOpenModal(participant)}
                           >
-                            <span className="fw-medium">
-                              {participant.fullName}
-                            </span>
-                          </a>
+                            {participant.fullName}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -185,7 +194,6 @@ const ParticipantsCard = () => {
                         </div>
                       </div>
                     </td>
-
                     <td className="">
                       <span className="d-none"></span>
                       {formatDateWithShort(participant.createdAt)}
@@ -209,6 +217,7 @@ const ParticipantsCard = () => {
                           data-bs-placement="top"
                           aria-label="Preview Invoice"
                           data-bs-original-title="Preview Invoice"
+                          onClick={() => handleOpenModal(participant)}
                         >
                           <i className="bx bx-show mx-1" />
                         </a>
@@ -273,7 +282,6 @@ const ParticipantsCard = () => {
               setCurrentPage={setCurrentPage}
             />
           </div>
-
           <ParticipantModal />
         </div>
       </div>
