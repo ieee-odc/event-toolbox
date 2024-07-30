@@ -25,6 +25,14 @@ function ParticipantModal() {
       workshopId,
     };
 
+
+  const handleAddParticipant = () => {
+    const reqBody = {
+      email: selectedParticipant.email,
+      fullName: selectedParticipant.fullName,
+      eventId,
+      workshopId,
+    };
     axiosRequest
       .post("/participant/add", reqBody)
       .then((res) => {
@@ -37,6 +45,10 @@ function ParticipantModal() {
         toast.error("Failed to add participant");
       });
   };
+
+
+  if (!isParticipantModalOpen) return null;
+  console.log(selectedParticipant)
 
   const handleInputChange = (e) => {
     const payload = e.target;
@@ -148,6 +160,6 @@ function ParticipantModal() {
       )}
     </>
   );
-}
+  }}
 
 export default ParticipantModal;

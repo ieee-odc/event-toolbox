@@ -6,6 +6,7 @@ import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
 import { deleteParticipant, editParticipant } from "../../../core/Features/Participants";
+
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,6 +16,9 @@ import {
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown"; // Import the custom dropdown component
 
+import { io } from 'socket.io-client';
+import { useParams } from "react-router-dom";
+
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
   PENDING: "Pending",
@@ -22,6 +26,7 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
+  const { eventId } = useParams();
   const { participants, filteredParticipants, participantsPerPage } =
     useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
@@ -56,6 +61,8 @@ const ParticipantsCard = () => {
       toast.success("Participant deleted successfully");
     });
   };
+  const [socket, setSocket] = useState(null);
+
 
   const handleOpenDetails = (participant) => {
     dispatch(setSelectedParticipant(participant));
@@ -90,7 +97,25 @@ const ParticipantsCard = () => {
         toast.error("Failed to update participant");
       });
   };
-
+  useEffect(() => {
+    const newSocket = io(import.meta.env.VITE_BACKEND);
+  
+    newSocket.on('connect', () => {
+      if (eventId) {
+        newSocket.emit('joinRoom',eventId );
+      }
+    });
+  
+    newSocket.on('EventParticipantAdded', (data) => {
+      dispatch(addParticipant(data));
+    });
+  
+    return () => {
+      newSocket.off('EventParticipantAdded');
+      newSocket.disconnect();
+    };
+  }, [eventId]);
+ 
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -144,10 +169,12 @@ const ParticipantsCard = () => {
                           </div>
                         </div>
                         <div className="d-flex flex-column">
+
                           <span
                             className="text-body text-truncate fw-medium"
                             style={{ cursor: "pointer" }}
                             onClick={() => handleOpenDetails(participant)}
+
                           >
                             {participant.fullName}
                           </span>
@@ -158,7 +185,6 @@ const ParticipantsCard = () => {
                       <div className="d-flex justify-content-start align-items-center">
                         <div className="d-flex flex-column">
                           <a
-                            href="pages-profile-user.html"
                             className="text-body text-truncate"
                           >
                             <span className="fw-medium">

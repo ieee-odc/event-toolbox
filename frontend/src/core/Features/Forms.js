@@ -119,9 +119,9 @@ const FormsSlice = createSlice({
       }
     },
     addOption: (state, action) => {
-      const index = action.payload;
+      const {index,value} = action.payload;
       if (index >= 0 && index < state.selectedForm.data.length) {
-        state.selectedForm.data[index].options.push("");
+        state.selectedForm.data[index].options.push(value);
       }
     },
     removeField: (state, action) => {

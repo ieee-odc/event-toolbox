@@ -29,7 +29,7 @@ function FormModal() {
   const dispatch = useDispatch();
   const userData = UserData();
   const { eventId, workshopId } = useParams();
-
+  const { workshops } = useSelector((store) => store.workshopsStore);
   const { events } = useSelector((store) => store.eventsStore);
   const { isFormModalOpen, selectedForm, isEdit } = useSelector(
     (store) => store.formsStore
@@ -37,14 +37,24 @@ function FormModal() {
   const modalClassName = isFormModalOpen ? "modal fade show" : "modal fade";
 
   const validateFields = () => {
-    const { name, description, deadline } = selectedForm;
+    const { name, description, deadline, data } = selectedForm;
     if (!name || !description || !deadline) {
       toast.error("Please fill in all fields.");
       return false;
     }
+  
+    for (let i = 0; i < data.length; i++) {
+      if (!data[i].question) {
+        toast.error(`Please fill in text for Question ${i + 1}.`);
+        return false;
+      }
+    }
+    
     return true;
   };
+  
 
+  const [selectedWorkshops, setSelectedWorkshops] = useState([]);
   const handleAddForm = async () => {
     try {
       if (!validateFields()) {
@@ -108,9 +118,6 @@ function FormModal() {
     dispatch(addField());
   };
 
-  const handleRemoveField = (index) => {
-    dispatch(removeField(index));
-  };
 
   const handleDateChange = (selectedDates) => {
     const selectedDate = selectedDates[0]; // Assuming single date selection
@@ -228,6 +235,14 @@ function FormModal() {
                         className="select2 form-select me-2  mb-2"
                         data-placeholder="All Courses"
                         onChange={(e) => {
+                          if (
+                            e.target.value === "workshop-selection" &&
+                            workshops.length < 2
+                          ) {
+                            toast.error("You should have at least 2 workshops");
+                            return;
+                          }
+
                           dispatch(
                             switchQuestionType({
                               index,
@@ -246,18 +261,27 @@ function FormModal() {
                         <option value="dropdown">Dropdown</option>
                         <option value="date">Date</option>
                         <option value="time">Time</option>
+                        <option value="workshop-selection">
+                            Workshop selection
+                        </option>
                       </select>
                       <button
                         type="button"
                         id="deleteButton"
                         className="btn btn-danger mb-2"
-                        onClick={() => dispatch(removeField(index))}
+                        onClick={() => {
+                          if(element.type==="workshop-selection"){
+                            setSelectedWorkshops([])
+                          }
+                          dispatch(removeField(index)
+                        )}}
                       >
                         Remove
                       </button>
                     </div>
 
-                    {element.options &&
+                    {element.type !== "workshop-selection" &&
+                      element.options &&
                       element.options.map((option, optionIndex) => (
                         <div
                           key={optionIndex}
@@ -302,26 +326,144 @@ function FormModal() {
                             type="button"
                             id="deleteButton"
                             className="btn btn-danger"
-                            onClick={() =>
+                            onClick={() => {
                               dispatch(
                                 removeOption({
                                   questionIndex: index,
                                   optionIndex,
                                 })
-                              )
-                            }
+                              );
+                            }}
                           >
                             Remove Option
                           </button>
                         </div>
                       ))}
 
+                    {element.type === "workshop-selection" &&
+                      element.options &&
+                      element.options.map((option, optionIndex) => {
+                        const currentWorkshop = workshops.find((workshop) => {
+                          return workshop.id.toString() === option;
+                        });
+                        return (
+                          <div
+                            key={optionIndex}
+                            className="form-check mt-3"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 10,
+                            }}
+                          >
+                            <input
+                              name="default-radio-1"
+                              className="form-check-input"
+                              type="radio"
+                              value=""
+                              id="defaultRadio1"
+                              readOnly
+                            />
+                            <input
+                              type="text"
+                              id={`data.${index}.options.${optionIndex}`}
+                              className="form-control"
+                              placeholder={`Enter Option ${optionIndex + 1}`}
+                              value={currentWorkshop.name || ""}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  handleOptionChange(
+                                    index,
+                                    optionIndex,
+                                    e.target.value
+                                  );
+                                }
+                              }}
+                              readOnly
+                              onBlur={(e) =>
+                                handleOptionChange(
+                                  index,
+                                  optionIndex,
+                                  e.target.value
+                                )
+                              }
+                            />
+                            <button
+                              type="button"
+                              id="deleteButton"
+                              className="btn btn-danger"
+                              onClick={() => {
+                                dispatch(
+                                  removeOption({
+                                    questionIndex: index,
+                                    optionIndex,
+                                  })
+                                );
+                                setSelectedWorkshops(prev=>prev.filter((item) => item.toString() !== option));
+                              }}
+                            >
+                              Remove Option
+                            </button>
+                          </div>
+                        );
+                      })}
+
+                    {element.type === "workshop-selection" &&selectedWorkshops.length !== workshops.length  && (
+                      <select
+                        id="select2_course_select"
+                        className="select2 form-select me-2  mb-2"
+                        data-placeholder="All Courses"
+                        onChange={(e) => {
+                          setSelectedWorkshops([
+                            ...selectedWorkshops,
+                            e.target.value,
+                          ]);
+                          dispatch(
+                            addOption({
+                              index,
+                              value: e.target.value,
+                            })
+                          );
+                        }}
+                        tabIndex="-1"
+                        value={element.type}
+                        aria-hidden="true"
+                      >
+                        <option value={-1}>
+                                  Select workshop
+                                </option>
+                        {workshops &&
+                          workshops.map((workshop) => {
+                            if (
+                              !selectedWorkshops.includes(
+                                workshop.id.toString()
+                              )
+                            ) {
+                              return (
+                                <option value={workshop.id}>
+                                  {workshop.name}
+                                </option>
+                              );
+                            } else {
+                              return;
+                            }
+                          })}
+                      </select>
+                    )}
+
                     {element.type !== "input" && element.type !== "file" && (
                       <button
                         type="button"
                         id="addOption"
                         className="btn btn-primary mt-3"
-                        onClick={() => dispatch(addOption(index))}
+                        onClick={() =>
+                          dispatch(
+                            addOption({
+                              index,
+                              value: "",
+                            })
+                          )
+                        }
                       >
                         Add Option
                       </button>
@@ -346,7 +488,6 @@ function FormModal() {
                 onClick={() => {
                   dispatch(resetFormModal());
                   if (isEdit) {
-                    console.log("is edit");
                     dispatch(changeFormState(false));
                   }
                   dispatch(toggleFormModal());
