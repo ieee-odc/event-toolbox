@@ -9,8 +9,11 @@ import {
 import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
+import { Modal } from "react-bootstrap";
+import { storage } from "../../../../utils/firebaseConfig"; // Adjust the path as needed
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./RegistrationForm.css";
-import { Modal } from "react-bootstrap"; // Ensure you have react-bootstrap installed
+
 import socketIOClient from "socket.io-client";
 import HeadComponent from "../../../../core/components/Head/CustomHead";
 
@@ -31,6 +34,7 @@ const RegistrationForm = () => {
     loading,
     error,
     workshopsIds,
+    workshopId,
     formWorkshops,
     eventId,
   } = useSelector((state) => state.registrationStore);
@@ -80,16 +84,27 @@ const RegistrationForm = () => {
     dispatch(updateFormData({ field: field.question, value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const { id, files } = e.target;
-    dispatch(updateFormData({ field: id, value: files[0] }));
+    const file = files[0];
+
+    if (file) {
+      const storageRef = ref(storage, `files/${file.name}`);
+      try {
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        console.log(downloadURL);
+        dispatch(updateFormData({ field: id, value: downloadURL }));
+      } catch (error) {
+        console.error("Error uploading file: ", error);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
 
-    // Validate checkbox groups
     let valid = true;
     const newCheckboxValidation = {};
     formFields.forEach((field) => {
@@ -118,8 +133,9 @@ const RegistrationForm = () => {
       email,
       phoneNumber,
       status: "Pending",
-      responses,
       eventId,
+      workshopId,
+      responses,
     };
 
     try {
@@ -130,7 +146,6 @@ const RegistrationForm = () => {
             ...baseSubmissionData,
             workshopId: workshop.id,
           };
-          console.log(submissionData);
 
           const response = await axiosRequest.post(
             "/participant/submit",
