@@ -94,8 +94,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addEventParticipant", async (data) => {
-    const eventId = data.eventId;
-    io.to(eventId.toString()).emit("EventParticipantAdded", data);
+    const roomId = data.roomId;
+    io.to(roomId).emit("EventParticipantAdded", data.participant);
   });
 
   // Handle disconnection
