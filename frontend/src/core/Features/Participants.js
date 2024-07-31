@@ -141,13 +141,15 @@ const ParticipantsSlice = createSlice({
         : state.participants;
     },
     setSearchQuery: (state, action) => {
-      state.searchQuery = action.payload;
+      const query = action.payload.toLowerCase();
+      state.searchQuery = query;
+      
       state.filteredParticipants = state.participants.filter((participant) =>
-        participant.fullName
-          .toLowerCase()
-          .includes(state.searchQuery.toLowerCase())
+        participant.fullName.toLowerCase().includes(query) ||
+        participant.email.toLowerCase().includes(query)
       );
-    },
+    }
+    
   },
 });
 
