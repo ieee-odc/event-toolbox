@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import {
   toggleParticipantModal,
   setParticipantsPerPage,
+  resetParticipantModal,
 } from "../../../core/Features/Participants";
 import CustomButton from "../../../core/components/Button/Button";
 import "../Participants.css";
@@ -49,6 +50,7 @@ function ParticipantTableHeader({ onSearchChange }) {
               hoverBackgroundColor="#0F205D"
               hoverTextColor="white"
               onClick={() => {
+                dispatch(resetParticipantModal() );
                 dispatch(toggleParticipantModal());
               }}
             />

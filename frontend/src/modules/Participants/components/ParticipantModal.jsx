@@ -40,6 +40,7 @@ function ParticipantModal() {
       });
   };
   const handleEditParticipant = () => {
+    console.log(isEdit)
     const reqBody = {
       email: selectedParticipant.email,
       fullName: selectedParticipant.fullName,
@@ -56,7 +57,7 @@ function ParticipantModal() {
         dispatch(editParticipant(res.data.participant));
       })
       .catch((err) => {
-        toast.error("Failed to edit workshop");
+        toast.error("Failed to edit participant");
       });
   };
 
@@ -109,7 +110,7 @@ function ParticipantModal() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
-                  {isEdit ? "Edit" : "Add"} Event
+                  {isEdit ? "Edit" : "Add"} Participant
                 </h5>
                 <button
                   type="button"
