@@ -214,7 +214,6 @@ const RegistrationForm = () => {
 
   useEffect(() => {
     if (workshopsIds && workshopsIds.length !== 0) {
-      console.log(workshopsIds);
       axiosRequest
         .post("/workshop/get-many", {
           workshopsIds,

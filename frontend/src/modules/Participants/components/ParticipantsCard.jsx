@@ -30,9 +30,13 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
-  const { eventId, workshopId } = useParams();
-  const { participants, filteredParticipants, participantsPerPage } =
-    useSelector((store) => store.participantsStore);
+  const { eventId } = useParams();
+  const {
+    participants,
+    filteredParticipants,
+    participantsPerPage,
+    groupedParticipants,
+  } = useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -305,85 +309,6 @@ const ParticipantsCard = () => {
           <ParticipantDetails />
         </div>
       </div>
-      {isEditModalOpen && (
-        <div className="modal show" tabIndex="-1" style={{ display: "block" }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Edit Participant</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setIsEditModalOpen(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleEditSubmit(currentParticipant);
-                  }}
-                >
-                  <div className="mb-3">
-                    <label htmlFor="fullName" className="form-label">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="fullName"
-                      value={currentParticipant?.fullName || ""}
-                      onChange={(e) =>
-                        setCurrentParticipant({
-                          ...currentParticipant,
-                          fullName: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      id="email"
-                      value={currentParticipant?.email || ""}
-                      onChange={(e) =>
-                        setCurrentParticipant({
-                          ...currentParticipant,
-                          email: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="phoneNumber" className="form-label">
-                      Phone Number
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="phoneNumber"
-                      value={currentParticipant?.phoneNumber || ""}
-                      onChange={(e) =>
-                        setCurrentParticipant({
-                          ...currentParticipant,
-                          phoneNumber: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary">
-                    Save changes
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
