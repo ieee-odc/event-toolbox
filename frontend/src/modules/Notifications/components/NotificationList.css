@@ -1,0 +1,9 @@
+/* CSS for unread notifications */
+.notification-unread {
+    background-color: #f5f5f5; /* Light background color for unread notifications */
+    border-left: 3px solid #007bff; /* Blue border to indicate unread status */
+}
+
+.notification-unread .font-weight-bold {
+    font-weight: bold; /* Make text bold for unread notifications */
+}

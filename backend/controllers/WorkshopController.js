@@ -63,12 +63,14 @@ const editWorkshop = async (req, res) => {
     if (!updatedWorkshop) {
       return res.status(404).json({ message: "Workshop not found" });
     }
-    const workshopWithSpace = { ...updatedWorkshop._doc, space };
 
     res.status(200).json({
       status: "success",
       message: "Workshop updated",
-      workshop: workshopWithSpace,
+      workshop: {
+        ...updatedWorkshop,
+        space,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -256,48 +258,11 @@ const selectForm = async (req, res) => {
     res.status(200).send({ message: "Form and workshop updated successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).send({
-      error: "An error occurred while updating the form and workshop",
-    });
-  }
-};
-
-const selectSpace = async (req, res) => {
-  const { workshopId, spaceId } = req.body;
-
-  try {
-    // Unset workshopId in all forms that have the specified workshopId
-    await Space.updateMany(
-      { workshopId: workshopId },
-      { $unset: { workshopId: "" } }
-    );
-
-    // Unset spaceId in all workshops that have the specified spaceId
-    await Workshop.updateMany(
-      { spaceId: spaceId },
-      { $unset: { spaceId: "" } }
-    );
-
-    // Add the new spaceId to the specified workshop
-    await Workshop.updateOne(
-      { id: workshopId },
-      { $set: { spaceId: spaceId } }
-    );
-
-    // Add the new workshopId to the specified form
-    await Space.updateOne(
-      { id: spaceId },
-      { $set: { workshopId: workshopId } }
-    );
-
     res
-      .status(200)
-      .send({ message: "Space and workshop updated successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({
-      error: "An error occurred while updating the form and workshop",
-    });
+      .status(500)
+      .send({
+        error: "An error occurred while updating the form and workshop",
+      });
   }
 };
 
@@ -311,5 +276,4 @@ module.exports = {
   getOneWorkshop,
   getMultipleWorkshops,
   selectForm,
-  selectSpace,
 };

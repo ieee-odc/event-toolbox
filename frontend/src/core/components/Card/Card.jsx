@@ -3,11 +3,7 @@ import "./Card.css"; // Assuming you put the provided styles in this CSS file
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import axiosRequest from "../../../utils/AxiosConfig";
-import {
-  deleteWorkshop,
-  setSelectedWorkshop,
-  toggleWorkshopModal,
-} from "../../Features/Workshops";
+import { setSelectedWorkshop } from "../../Features/Workshops";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast"; // Add this import
@@ -36,23 +32,9 @@ const Card = ({
       [workshopId]: !dropdownStates[workshopId],
     });
   };
-  const handleEditWorkshop = (workshop) => {
-    dispatch(
-      setSelectedWorkshop({
-        ...workshop,
-        startTime: formatTime(workshop.startTime),
-        endTime: formatTime(workshop.endTime),
-        date: new Date(workshop.startTime),
-      })
-    );
-    dispatch(toggleWorkshopModal());
-    setDropdownStates({
-      ...dropdownStates,
-      [workshop.id]: false,
-    });
-  };
+
   const handleDeleteWorkshop = (workshopId) => {
-    axiosRequest.post(`/workshop/delete/${workshopId}`).then((res) => {
+    axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
       dispatch(deleteWorkshop(workshopId));
       toast.success("Workshop deleted successfully");
     });

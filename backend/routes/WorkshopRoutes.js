@@ -10,7 +10,6 @@ const {
   getOrganizerWorkshops,
   getMultipleWorkshops,
   selectForm,
-  selectSpace,
 } = require("../controllers/WorkshopController");
 
 router.get("/get-space/:spaceId", getSpaceWorkshops);
@@ -23,6 +22,5 @@ router.post("/get-many", getMultipleWorkshops);
 router.post("/edit/:workshopId", editWorkshop);
 router.post("/delete/:workshopId", deleteWorkshop);
 router.post("/select-form", selectForm);
-router.post("/select-space", selectSpace);
 
 module.exports = router;

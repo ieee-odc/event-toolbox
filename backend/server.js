@@ -64,6 +64,8 @@ router.use("/space", SpaceRouter);
 
 const FormRouter = require("./routes/FormRoutes");
 router.use("/form", FormRouter);
+const NotificationRouter = require("./routes/notificationRoutes");
+app.use("/notification", NotificationRouter);
 
 app.use("/api", router);
 app.get("/*", function (req, res) {
@@ -94,8 +96,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addEventParticipant", async (data) => {
-    const roomId = data.roomId;
-    io.to(roomId).emit("EventParticipantAdded", data.participant);
+    const eventId = data.eventId;
+    io.to(eventId.toString()).emit("EventParticipantAdded", data);
   });
 
   // Handle disconnection

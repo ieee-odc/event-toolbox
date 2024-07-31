@@ -36,6 +36,14 @@ const WorkshopsCard = () => {
     indexOfLastWorkshop
   );
 
+  const handleDeleteWorkshop = (workshopId) => {
+    axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
+      dispatch(deleteWorkshop(workshopId));
+      toast.success("Workshop deleted successfully");
+    });
+  };
+
+
   const renderTag = (startTime) => {
     const workshopDate = new Date(startTime);
     const currentDate = new Date();
@@ -56,6 +64,39 @@ const WorkshopsCard = () => {
     }
   };
 
+  const initializeDropdownStates = (workshops) => {
+    const initialStates = workshops.reduce((acc, workshop) => {
+      acc[workshop.id] = false;
+      return acc;
+    }, {});
+    setDropdownStates(initialStates);
+  };
+
+  const toggleDropdown = (workshopId) => {
+    setDropdownStates({
+      ...dropdownStates,
+      [workshopId]: !dropdownStates[workshopId],
+    });
+  };
+  const progressPercentage = (currentParticipants, capacity) => {
+    return (currentParticipants / capacity) * 100;
+  };
+  const handleEditWorkshop = (workshop) => {
+    dispatch(
+      setSelectedWorkshop({
+        ...workshop,
+        startTime: formatTime(workshop.startTime),
+        endTime: formatTime(workshop.endTime),
+        date: new Date(workshop.startTime),
+      })
+    );
+    dispatch(toggleWorkshopModal());
+    setDropdownStates({
+      ...dropdownStates,
+      [workshop.id]: false,
+    });
+  };
+
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -72,10 +113,8 @@ const WorkshopsCard = () => {
             ) : (
               currentWorkshops &&
               currentWorkshops.map((workshop) => {
-                const progressPercentage = (
-                  (workshop.currentParticipants / workshop?.numberOfAttendees) *
-                  100
-                ).toFixed(2);
+                const progressPercentage =
+                (workshop.currentParticipants / workshop?.space?.capacity) * 100;
 
                 return (
                   <div className=" col-md-4" key={workshop.id}>
@@ -88,12 +127,12 @@ const WorkshopsCard = () => {
                       startTime={formatTime(workshop.startTime)}
                       description={workshop.description}
                       badgeText={renderTag(workshop.startTime)}
-                      personCount={workshop.currentParticipants}
-                      personCapacity={workshop?.numberOfAttendees}
+                      personCount={0}
+                      personCapacity={workshop?.space?.capacity}
                       progress={progressPercentage}
                     />
                   </div>
-                );
+                )
               })
             )}
           </div>
