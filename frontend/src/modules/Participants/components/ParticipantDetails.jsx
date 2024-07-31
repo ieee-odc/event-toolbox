@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleParticipantDetails } from "../../../core/Features/Participants";
+import { resetParticipantModal, toggleParticipantDetails } from "../../../core/Features/Participants";
 
 const ParticipantDetails = () => {
   const dispatch = useDispatch();
@@ -8,7 +8,6 @@ const ParticipantDetails = () => {
     (store) => store.participantsStore
   );
 
-  if (!isParticipantDetailsOpen) return null;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -24,7 +23,8 @@ const ParticipantDetails = () => {
   };
 
   return (
-    <div className="modal show" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+
+    isParticipantDetailsOpen && <div className="modal show" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
       <div className="modal-dialog">
         <div className="modal-content" style={{ backgroundColor: "#f5f5f9", borderRadius: "8px" }}>
           <div className="modal-header" style={{ borderBottom: "1px solid #A1ACB8" }}>
@@ -32,7 +32,10 @@ const ParticipantDetails = () => {
             <button
               type="button"
               className="btn-close"
-              onClick={() => dispatch(toggleParticipantDetails())}
+              onClick={() => {
+                dispatch(resetParticipantModal())
+                dispatch(toggleParticipantDetails())
+              }}
             ></button>
           </div>
           <div className="modal-body" style={{ color: "#566A7F" }}>
@@ -40,7 +43,7 @@ const ParticipantDetails = () => {
             <p><strong>Email:</strong> {selectedParticipant.email}</p>
             <p><strong>Phone Number:</strong> {selectedParticipant.phoneNumber}</p>
             <p>
-              <strong>Status:</strong> 
+              <strong>Status:</strong>
               <span style={{ color: getStatusColor(selectedParticipant.status) }}>
                 {selectedParticipant.status}
               </span>
@@ -66,14 +69,17 @@ const ParticipantDetails = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => dispatch(toggleParticipantDetails())}
-            >
+              onClick={() => {
+                dispatch(resetParticipantModal())
+                dispatch(toggleParticipantDetails())
+              }}            >
               Close
             </button>
           </div>
         </div>
       </div>
     </div>
+
   );
 };
 

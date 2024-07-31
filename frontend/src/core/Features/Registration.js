@@ -61,8 +61,7 @@ const registrationSlice = createSlice({
 
         state.workshopsIds = Array.from(workshopIdsSet);
         state.eventId = action.payload.form.eventId;
-        state.workshopId = acton.payload.form.workshopId;
-        console.log(state.eventId);
+        state.workshopId = action.payload.form.workshopId;
         state.formData = {
           name: action.payload.form.name,
           description: action.payload.form.description,

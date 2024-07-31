@@ -197,7 +197,6 @@ const RegistrationForm = () => {
   }, [eventId]);
 
   useEffect(() => {
-    console.log(workshopsIds);
     if (workshopsIds.length !== 0) {
       axiosRequest
         .post("/workshop/get-many", {
@@ -209,8 +208,6 @@ const RegistrationForm = () => {
         .catch((err) => {
           console.log(err);
         });
-    } else {
-      console.log("no workshops");
     }
   }, [workshopsIds]);
   return (
@@ -248,9 +245,8 @@ const RegistrationForm = () => {
               )}
               <form
                 onSubmit={handleSubmit}
-                className={`needs-validation ${
-                  validated ? "was-validated" : ""
-                }`}
+                className={`needs-validation ${validated ? "was-validated" : ""
+                  }`}
                 noValidate
               >
                 <div className="mb-3">
