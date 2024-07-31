@@ -18,6 +18,7 @@ import "./RegistrationForm.css";
 
 import socketIOClient from "socket.io-client";
 import HeadComponent from "../../../../core/components/Head/CustomHead";
+import toast from "react-hot-toast";
 
 const base64UrlDecode = (str) => {
   let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
@@ -33,8 +34,6 @@ const RegistrationForm = () => {
   const {
     formFields,
     formData,
-    loading,
-    error,
     workshopsIds,
     formWorkshops,
     eventId,
@@ -119,6 +118,17 @@ const RegistrationForm = () => {
         if (!isValid) valid = false;
       }
     });
+    if (!isEventForm) {
+      const emailIsAllowed = formData.event.allowedList.some(
+        (email) => email === e.target.value
+      );
+      if (!emailIsAllowed) {
+        setValidated(false); // Ensure form is marked as invalid
+        valid = false;
+        toast.error("Email is not allowed.");
+      }
+    }
+
     setCheckboxValidation(newCheckboxValidation);
 
     if (form.checkValidity() === false || !valid) {
@@ -161,16 +171,21 @@ const RegistrationForm = () => {
         }
       }
       if (isEventForm) {
-        const response = await axiosRequest.post(
-          "/participant/add",
-          baseSubmissionData
-        );
+        try {
+          const response = await axiosRequest.post(
+            "/participant/add",
+            baseSubmissionData
+          );
 
-        if (socket) {
-          socket.emit("addEventParticipant", {
-            participant: response.data.participant,
-            roomId: `${eventId}`,
-          });
+          if (socket) {
+            socket.emit("addEventParticipant", {
+              participant: response.data.participant,
+              roomId: `${eventId}`,
+            });
+          }
+        } catch (err) {
+          toast.error("Participant already registered for this event");
+          return;
         }
       }
 
@@ -243,9 +258,9 @@ const RegistrationForm = () => {
     }
   }, [workshopsIds]);
 
-  useEffect(() => {
-    console.log(allFull);
-  }, [allFull]);
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
   return (
     <div className="container-fluid vh-100">
       <HeadComponent
@@ -326,7 +341,7 @@ const RegistrationForm = () => {
                       className="form-control"
                       id="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={handleEmailChange}
                       required
                     />
                     <div className="invalid-feedback">Email is required.</div>

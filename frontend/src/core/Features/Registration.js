@@ -83,11 +83,7 @@ const registrationSlice = createSlice({
         state.hasMultiSelectForm = action.payload.form.data.some(
           (question) => question.type === "workshop-selection"
         );
-        state.formData = {
-          name: action.payload.form.name,
-          description: action.payload.form.description,
-          deadline: action.payload.form.deadline,
-        };
+        state.formData = action.payload.form;
       })
 
       .addCase(fetchFormData.rejected, (state, action) => {

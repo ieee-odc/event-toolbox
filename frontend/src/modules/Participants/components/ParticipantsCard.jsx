@@ -5,11 +5,6 @@ import ParticipantModal from "./ParticipantModal";
 import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-import {
-  addParticipant,
-  deleteParticipant,
-  editParticipant,
-} from "../../../core/Features/Participants";
 
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +16,7 @@ import {
   editParticipant,
   filterParticipants,
   setSearchQuery,
+  addParticipant,
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
@@ -33,7 +29,7 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
-  const { eventId } = useParams();
+  const { eventId, workshopId } = useParams();
   const {
     participants,
     filteredParticipants,
@@ -46,8 +42,6 @@ const ParticipantsCard = () => {
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [currentParticipant, setCurrentParticipant] = useState(null);
 
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
