@@ -43,7 +43,11 @@ const ParticipantsSlice = createSlice({
     isParticipantDetailsOpen: false,
     filterStatus: "",
     filteredParticipants: [],
-    selectedParticipant: {},
+    selectedParticipant: {
+      email: '',
+      fullName: '',
+      phoneNumber: '',
+    },
     participantsPerPage: 10,
   },
   reducers: {
@@ -80,6 +84,9 @@ const ParticipantsSlice = createSlice({
     toggleParticipantModal: (state) => {
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
     },
+    resetParticipantModal: (state) => {
+      state.selectedParticipant = { email: '', fullName: '', phoneNumber: '' };
+    },
     toggleParticipantsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
     },
@@ -106,10 +113,6 @@ const ParticipantsSlice = createSlice({
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedParticipant.data;
       state.selectedParticipant.data = newData;
-    },
-    resetParticipantModal: (state) => {
-      state.isEdit = false;
-      state.selectedParticipant = {};
     },
     changeParticipantState: (state, action) => {
       state.isEdit = action.payload;
