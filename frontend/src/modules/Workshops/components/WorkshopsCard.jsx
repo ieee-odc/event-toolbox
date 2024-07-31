@@ -72,9 +72,10 @@ const WorkshopsCard = () => {
             ) : (
               currentWorkshops &&
               currentWorkshops.map((workshop) => {
-                const progressPercentage =
+                const progressPercentage = (
                   (workshop.currentParticipants / workshop?.numberOfAttendees) *
-                  100;
+                  100
+                ).toFixed(2);
 
                 return (
                   <div className=" col-md-4" key={workshop.id}>
