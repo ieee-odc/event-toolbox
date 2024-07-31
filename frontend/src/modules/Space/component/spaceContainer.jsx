@@ -108,7 +108,7 @@ function SpaceContainer() {
                   }}
                 >
                    <span>
-              <i className="bx bx-plus me-md-1" />
+              <i className="bx bx-plus me-md-1 mrt-1" />
               <span className="d-md-inline-block d-none">
                 Create Space
               </span>
@@ -116,7 +116,7 @@ function SpaceContainer() {
                 </button> */}
                 <CustomButton
                   text="Add Venue"
-                  iconClass="bx bx-plus me-md-1"
+                  iconClass="bx bx-plus me-md-1 mrt-1"
                   backgroundColor="var(--primary-color)"
                   textColor="white"
                   hoverBackgroundColor="#0F205D"

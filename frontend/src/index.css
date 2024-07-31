@@ -10,7 +10,17 @@
 html {
   font-size: 90% !important;
 }
-
+.mrt-1{
+  margin-top: 0.15rem !important;
+}
+.extend-select {
+  width: auto;
+  display: inline-block;
+}
+.extend-select option {
+  width: auto;
+  padding-right: 10px;
+}
 select {
   height: 40px !important;
 }
