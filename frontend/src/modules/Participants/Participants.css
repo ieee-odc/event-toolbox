@@ -1,1 +1,8 @@
-
+.extend-select {
+  width: auto;
+  display: inline-block;
+}
+.extend-select option {
+  width: auto;
+  padding-right: 10px;
+}

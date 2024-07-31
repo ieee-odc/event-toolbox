@@ -21,6 +21,10 @@ const CustomDropdown = ({ children, toggleContent }) => {
     };
   }, []);
 
+  const handleItemClick = (e) => {
+    setIsOpen(false);
+  };
+
   return (
     <div ref={dropdownRef} className="dropdown">
       <button
@@ -29,7 +33,11 @@ const CustomDropdown = ({ children, toggleContent }) => {
       >
         {toggleContent}
       </button>
-      {isOpen && <div className="dropdown-menu show">{children}</div>}
+      {isOpen && (
+        <div className="dropdown-menu show" onClick={handleItemClick}>
+          {children}
+        </div>
+      )}
     </div>
   );
 };

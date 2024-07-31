@@ -12,6 +12,7 @@ const ParticipantsSlice = createSlice({
     filteredParticipants: [],
     selectedParticipant: {},
     participantsPerPage: 10,
+    searchQuery: "",
   },
   reducers: {
     initializeParticipants: (state, action) => {
@@ -42,6 +43,7 @@ const ParticipantsSlice = createSlice({
       );
       state.participants = updatedParticipants;
       state.filteredParticipants = updatedParticipants;
+      state.isEdit = false;
     },
     toggleParticipantModal: (state) => {
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
@@ -95,6 +97,22 @@ const ParticipantsSlice = createSlice({
     setParticipantsPerPage: (state, action) => {
       state.participantsPerPage = action.payload;
     },
+    filterParticipants: (state, action) => {
+      state.filterStatus = action.payload;
+      state.filteredParticipants = action.payload
+        ? state.participants.filter(
+            (participant) => participant.status === action.payload
+          )
+        : state.participants;
+    },
+    setSearchQuery: (state, action) => {
+      state.searchQuery = action.payload;
+      state.filteredParticipants = state.participants.filter((participant) =>
+        participant.fullName
+          .toLowerCase()
+          .includes(state.searchQuery.toLowerCase())
+      );
+    },
   },
 });
 
@@ -115,5 +133,7 @@ export const {
   resetParticipantModal,
   changeParticipantState,
   setParticipantsPerPage,
+  filterParticipants,
+  setSearchQuery,
 } = ParticipantsSlice.actions;
 export default ParticipantsSlice.reducer;

@@ -5,7 +5,6 @@ import ParticipantModal from "./ParticipantModal";
 import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-import { deleteParticipant, editParticipant } from "../../../core/Features/Participants";
 
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,10 +12,13 @@ import {
   toggleParticipantModal,
   toggleParticipantDetails,
   setSelectedParticipant,
+  deleteParticipant,
+  editParticipant,
+  filterParticipants,
+  setSearchQuery,
 } from "../../../core/Features/Participants";
-import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown"; // Import the custom dropdown component
-
-import { io } from 'socket.io-client';
+import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
+import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 
 const ParticipationStatus = Object.freeze({
@@ -27,8 +29,12 @@ const ParticipationStatus = Object.freeze({
 
 const ParticipantsCard = () => {
   const { eventId } = useParams();
-  const { participants, filteredParticipants, participantsPerPage } =
-    useSelector((store) => store.participantsStore);
+  const {
+    participants,
+    filteredParticipants,
+    participantsPerPage,
+    searchQuery,
+  } = useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,8 +67,8 @@ const ParticipantsCard = () => {
       toast.success("Participant deleted successfully");
     });
   };
-  const [socket, setSocket] = useState(null);
 
+  const [socket, setSocket] = useState(null);
 
   const handleOpenDetails = (participant) => {
     dispatch(setSelectedParticipant(participant));
@@ -71,7 +77,8 @@ const ParticipantsCard = () => {
 
   const handleChangeStatus = (participant, newStatus) => {
     const updatedParticipant = { ...participant, status: newStatus };
-    axiosRequest.post(`/participant/edit/${participant.id}`, updatedParticipant)
+    axiosRequest
+      .post(`/participant/edit/${participant.id}`, updatedParticipant)
       .then(() => {
         dispatch(editParticipant(updatedParticipant));
         toast.success("Participant status updated successfully");
@@ -81,41 +88,40 @@ const ParticipantsCard = () => {
       });
   };
 
-  const handleEditParticipant = (participant) => {
-    setCurrentParticipant(participant);
-    setIsEditModalOpen(true);
-  };
 
-  const handleEditSubmit = (updatedParticipant) => {
-    axiosRequest.post(`/participant/edit/${updatedParticipant.id}`, updatedParticipant)
-      .then(() => {
-        dispatch(editParticipant(updatedParticipant));
-        toast.success("Participant updated successfully");
-        setIsEditModalOpen(false);
-      })
-      .catch(() => {
-        toast.error("Failed to update participant");
-      });
-  };
+
   useEffect(() => {
     const newSocket = io(import.meta.env.VITE_BACKEND);
 
-    newSocket.on('connect', () => {
+    newSocket.on("connect", () => {
       if (eventId) {
-        newSocket.emit('joinRoom', eventId);
+        newSocket.emit("joinRoom", eventId);
       }
     });
 
-    newSocket.on('EventParticipantAdded', (data) => {
+    newSocket.on("EventParticipantAdded", (data) => {
       dispatch(addParticipant(data));
     });
 
     return () => {
-      newSocket.off('EventParticipantAdded');
+      newSocket.off("EventParticipantAdded");
       newSocket.disconnect();
     };
   }, [eventId]);
 
+  const handleStatusChange = (e) => {
+    dispatch(filterParticipants(e.target.value));
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    dispatch(setSearchQuery(query));
+    setCurrentPage(1);
+  };
+  const handleEditClick = (participant) => {
+    dispatch(setSelectedParticipant(participant));
+    dispatch(toggleParticipantModal());
+  };
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -124,7 +130,21 @@ const ParticipantsCard = () => {
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <ParticipantTableHeader />
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <ParticipantTableHeader onSearchChange={handleSearchChange} />
+            <div className="d-flex align-items-center gap-2">
+              <select
+                id="participantStatusFilter"
+                className="form-select"
+                onChange={handleStatusChange}
+              >
+                <option value="">All Participants</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Canceled">Canceled</option>
+              </select>
+            </div>
+          </div>
           <div className="table-responsive">
             <table
               className="invoice-list-table table border-top dataTable no-footer dtr-column"
@@ -144,7 +164,10 @@ const ParticipantsCard = () => {
               </thead>
               <tbody>
                 {currentParticipants.map((participant, index) => (
-                  <tr key={participant.id} className={`${index % 2 === 0 ? "even" : "odd"}`}>
+                  <tr
+                    key={participant.id}
+                    className={`${index % 2 === 0 ? "even" : "odd"}`}
+                  >
                     <td>
                       <span
                         className="fw-medium"
@@ -169,12 +192,10 @@ const ParticipantsCard = () => {
                           </div>
                         </div>
                         <div className="d-flex flex-column">
-
                           <span
                             className="text-body text-truncate fw-medium"
                             style={{ cursor: "pointer" }}
                             onClick={() => handleOpenDetails(participant)}
-
                           >
                             {participant.fullName}
                           </span>
@@ -184,9 +205,7 @@ const ParticipantsCard = () => {
                     <td>
                       <div className="d-flex justify-content-start align-items-center">
                         <div className="d-flex flex-column">
-                          <a
-                            className="text-body text-truncate"
-                          >
+                          <a className="text-body text-truncate">
                             <span className="fw-medium">
                               {participant.email}
                             </span>
@@ -212,35 +231,54 @@ const ParticipantsCard = () => {
                           <i className="bx bx-show mx-1" />
                         </a>
                         <CustomDropdown
-                          toggleContent={<i className="bx bx-dots-vertical-rounded" />}
+                          toggleContent={
+                            <i className="bx bx-dots-vertical-rounded" />
+                          }
                         >
                           <a
                             className="dropdown-item"
-                            onClick={() => handleEditParticipant(participant)}
+                            onClick={() => handleEditClick(participant)}
                           >
                             Edit
                           </a>
                           <a
                             className="dropdown-item"
-                            onClick={() => handleChangeStatus(participant, ParticipationStatus.PAID)}
+                            onClick={() =>
+                              handleChangeStatus(
+                                participant,
+                                ParticipationStatus.PAID
+                              )
+                            }
                           >
                             Mark as Paid
                           </a>
                           <a
                             className="dropdown-item"
-                            onClick={() => handleChangeStatus(participant, ParticipationStatus.PENDING)}
+                            onClick={() =>
+                              handleChangeStatus(
+                                participant,
+                                ParticipationStatus.PENDING
+                              )
+                            }
                           >
                             Mark as Pending
                           </a>
                           <a
                             className="dropdown-item"
-                            onClick={() => handleChangeStatus(participant, ParticipationStatus.CANCELED)}
+                            onClick={() =>
+                              handleChangeStatus(
+                                participant,
+                                ParticipationStatus.CANCELED
+                              )
+                            }
                           >
                             Mark as Canceled
                           </a>
                           <hr className="dropdown-divider" />
                           <a
-                            onClick={() => handleDeleteParticipant(participant.id)}
+                            onClick={() =>
+                              handleDeleteParticipant(participant.id)
+                            }
                             style={{ cursor: "pointer" }}
                             className="dropdown-item text-danger"
                           >
@@ -285,7 +323,11 @@ const ParticipantsCard = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Edit Participant</h5>
-                <button type="button" className="btn-close" onClick={() => setIsEditModalOpen(false)}></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setIsEditModalOpen(false)}
+                ></button>
               </div>
               <div className="modal-body">
                 <form
@@ -295,36 +337,59 @@ const ParticipantsCard = () => {
                   }}
                 >
                   <div className="mb-3">
-                    <label htmlFor="fullName" className="form-label">Full Name</label>
+                    <label htmlFor="fullName" className="form-label">
+                      Full Name
+                    </label>
                     <input
                       type="text"
                       className="form-control"
                       id="fullName"
                       value={currentParticipant?.fullName || ""}
-                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, fullName: e.target.value })}
+                      onChange={(e) =>
+                        setCurrentParticipant({
+                          ...currentParticipant,
+                          fullName: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
+                    <label htmlFor="email" className="form-label">
+                      Email
+                    </label>
                     <input
                       type="email"
                       className="form-control"
                       id="email"
                       value={currentParticipant?.email || ""}
-                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, email: e.target.value })}
+                      onChange={(e) =>
+                        setCurrentParticipant({
+                          ...currentParticipant,
+                          email: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                    <label htmlFor="phoneNumber" className="form-label">
+                      Phone Number
+                    </label>
                     <input
                       type="text"
                       className="form-control"
                       id="phoneNumber"
                       value={currentParticipant?.phoneNumber || ""}
-                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, phoneNumber: e.target.value })}
+                      onChange={(e) =>
+                        setCurrentParticipant({
+                          ...currentParticipant,
+                          phoneNumber: e.target.value,
+                        })
+                      }
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary">Save changes</button>
+                  <button type="submit" className="btn btn-primary">
+                    Save changes
+                  </button>
                 </form>
               </div>
             </div>
