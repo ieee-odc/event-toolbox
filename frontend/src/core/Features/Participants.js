@@ -49,6 +49,7 @@ const ParticipantsSlice = createSlice({
       phoneNumber: '',
     },
     participantsPerPage: 10,
+    searchQuery: "",
   },
   reducers: {
     initializeParticipants: (state, action) => {
@@ -80,12 +81,14 @@ const ParticipantsSlice = createSlice({
       );
       state.participants = updatedParticipants;
       state.filteredParticipants = updatedParticipants;
+      state.isEdit = false;
     },
     toggleParticipantModal: (state) => {
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
     },
     resetParticipantModal: (state) => {
       state.selectedParticipant = { email: '', fullName: '', phoneNumber: '' };
+      state.isEdit = false;
     },
     toggleParticipantsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
@@ -126,12 +129,27 @@ const ParticipantsSlice = createSlice({
     removeField: (state, action) => {
       state.selectedParticipant.data.splice(action.payload, 1); // Just splice, don't reassign
     },
-    changeParticipantState: (state, action) => {
-      state.isEdit = action.payload;
-    },
     setParticipantsPerPage: (state, action) => {
       state.participantsPerPage = action.payload;
     },
+    filterParticipants: (state, action) => {
+      state.filterStatus = action.payload;
+      state.filteredParticipants = action.payload
+        ? state.participants.filter(
+            (participant) => participant.status === action.payload
+          )
+        : state.participants;
+    },
+    setSearchQuery: (state, action) => {
+      const query = action.payload.toLowerCase();
+      state.searchQuery = query;
+      
+      state.filteredParticipants = state.participants.filter((participant) =>
+        participant.fullName.toLowerCase().includes(query) ||
+        participant.email.toLowerCase().includes(query)
+      );
+    }
+    
   },
 });
 
@@ -153,5 +171,7 @@ export const {
   resetParticipantModal,
   changeParticipantState,
   setParticipantsPerPage,
+  filterParticipants,
+  setSearchQuery,
 } = ParticipantsSlice.actions;
 export default ParticipantsSlice.reducer;
