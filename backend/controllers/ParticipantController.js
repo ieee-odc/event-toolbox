@@ -1,21 +1,42 @@
 const Counter = require("../models/CounterModel");
 const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
+const Event = require("../models/EventModel");
 
 const addParticipant = async (req, res) => {
   try {
+    const { eventId, email, ...participantData } = req.body;
+
+    const existingParticipant = await Participant.findOne({ email, eventId });
+    if (existingParticipant) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email is already registered for this event.",
+      });
+    }
+
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
 
+    const event = await Event.findOne({ id: eventId });
+    if (event.allowedList) {
+      event.allowedList.push(email);
+    } else {
+      event.allowedList = [email];
+    }
+    await event.save();
+
+    // Create and save the new participant
     const participant = new Participant({
       id: counter.seq,
       status: "Pending",
-      ...req.body,
+      eventId,
+      email,
+      ...participantData,
     });
-
     await participant.save();
 
     res.status(201).json({

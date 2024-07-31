@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const EventSchema = mongoose.Schema(
   {
-    id:{
-      type:Number,
-      required:true,
+    id: {
+      type: Number,
+      required: true,
     },
     name: {
       type: String,
@@ -26,13 +26,17 @@ const EventSchema = mongoose.Schema(
       type: Date,
       required: true,
     },
-    organizerId:{
+    organizerId: {
       type: Number,
       required: true,
     },
-    formId:{
-      type:Number,
-    }
+    formId: {
+      type: Number,
+    },
+    allowedList: {
+      type: Array(String),
+      default: [],
+    },
   },
   { timestamps: true }
 );
