@@ -51,7 +51,6 @@ const updateForm = async (req, res) => {
 const deleteForm = async (req, res) => {
   const { formId } = req.params;
   try {
-
     const deletedForm = await Form.findOneAndDelete({ id: formId });
     if (!deletedForm) {
       return res.status(404).json({ error: "Form not found" });
@@ -139,7 +138,7 @@ const getWorkshopForms = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Forms retrieved successfully",
-      forms
+      forms,
     });
   } catch (e) {
     console.error(e);
@@ -154,18 +153,22 @@ const getFormById = async (req, res) => {
 
   try {
     const form = await Form.findOne({
-      id:formId
+      id: formId,
     });
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
     }
+
+    const event = await Event.findOne({ id: form.eventId });
+    const formWithEvent = { ...form._doc, event };
+
     res.status(200).json({
-      status:"success",
-      message:"Retrived form",
-      form
+      status: "success",
+      message: "Retrived form",
+      form: formWithEvent,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

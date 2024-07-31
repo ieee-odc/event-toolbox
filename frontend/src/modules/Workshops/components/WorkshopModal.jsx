@@ -26,7 +26,6 @@ function WorkshopModal() {
   const userData = UserData();
 
   const [selectedSpace, setSelectedSpace] = useState(null);
-  const [attendees, setAttendees] = useState(0);
   const [capacityMessage, setCapacityMessage] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const modalRef = useRef(null);
@@ -47,10 +46,10 @@ function WorkshopModal() {
   }, [dispatch, eventId]);
 
   useEffect(() => {
-    if (selectedSpace && attendees) {
-      if (attendees > selectedSpace.capacity) {
+    if (selectedSpace && selectedWorkshop.numberOfAttendees) {
+      if (selectedWorkshop.numberOfAttendees > selectedSpace.capacity) {
         setCapacityMessage(
-          "The selected space does not have enough capacity for the attendees."
+          "The selected space does not have enough capacity for the numberOfAttendees."
         );
       } else {
         setCapacityMessage("The selected space has enough capacity.");
@@ -58,7 +57,7 @@ function WorkshopModal() {
     } else {
       setCapacityMessage("");
     }
-  }, [selectedSpace, attendees]);
+  }, [selectedSpace, selectedWorkshop.numberOfAttendees]);
 
   useEffect(() => {
     const allFieldsFilled =
@@ -68,9 +67,9 @@ function WorkshopModal() {
       selectedWorkshop.date &&
       selectedWorkshop.startTime &&
       selectedWorkshop.endTime &&
-      attendees > 0 &&
+      selectedWorkshop.numberOfAttendees > 0 &&
       selectedSpace &&
-      attendees <= selectedSpace.capacity;
+      selectedWorkshop.numberOfAttendees <= selectedSpace.capacity;
 
     setIsFormComplete(allFieldsFilled);
   }, [
@@ -80,7 +79,7 @@ function WorkshopModal() {
     selectedWorkshop.date,
     selectedWorkshop.startTime,
     selectedWorkshop.endTime,
-    attendees,
+    selectedWorkshop.numberOfAttendees,
     selectedSpace,
   ]);
 
@@ -160,8 +159,8 @@ function WorkshopModal() {
   };
 
   const handleAddWorkshop = () => {
-    if (attendees > selectedSpace.capacity) {
-      toast.error("Number of attendees exceeds the space capacity.");
+    if (selectedWorkshop.numberOfAttendees > selectedSpace.capacity) {
+      toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
     const startDate = new Date(selectedWorkshop.date);
@@ -182,14 +181,13 @@ function WorkshopModal() {
       endTime: endDate.toISOString(),
       spaceId: selectedWorkshop.spaceId,
       eventId,
-      attendees,
+      numberOfAttendees: selectedWorkshop.numberOfAttendees,
     };
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
         dispatch(toggleWorkshopModal());
-        resetAttendees();
         dispatch(addWorkshop(res.data.workshop));
       })
       .catch((err) => {
@@ -199,8 +197,8 @@ function WorkshopModal() {
   };
 
   const handleEditWorkshop = () => {
-    if (attendees > selectedSpace.capacity) {
-      toast.error("Number of attendees exceeds the space capacity.");
+    if (selectedWorkshop.numberOfAttendees > selectedSpace.capacity) {
+      toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
     const startDate = new Date(selectedWorkshop.date);
@@ -221,7 +219,7 @@ function WorkshopModal() {
       endTime: endDate.toISOString(),
       spaceId: selectedWorkshop.spaceId,
       eventId,
-      attendees,
+      numberOfAttendees: selectedWorkshop.numberOfAttendees,
     };
 
     axiosRequest
@@ -229,7 +227,7 @@ function WorkshopModal() {
       .then((res) => {
         toast.success("Successfully Edited!");
         dispatch(toggleWorkshopModal());
-        resetAttendees();
+        console.log(res.data.workshop);
         dispatch(editWorkshop(res.data.workshop));
       })
       .catch((err) => {
@@ -239,20 +237,16 @@ function WorkshopModal() {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    if (id === "attendees") {
-      setAttendees(value);
-    } else {
-      dispatch(updateSelectedWorkshopField({ id, value }));
-      if (id === "spaceId") {
-        const selected = spaces.find((space) => space.id === Number(value));
-        if (selected) {
-          setSelectedSpace(selected);
-        } else {
-          console.error("Selected space not found or spaces array is empty.", {
-            value,
-            spaces,
-          });
-        }
+    dispatch(updateSelectedWorkshopField({ id, value }));
+    if (id === "spaceId") {
+      const selected = spaces.find((space) => space.id === Number(value));
+      if (selected) {
+        setSelectedSpace(selected);
+      } else {
+        console.error("Selected space not found or spaces array is empty.", {
+          value,
+          spaces,
+        });
       }
     }
   };
@@ -264,15 +258,10 @@ function WorkshopModal() {
   const handleClickOutside = (event) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
       dispatch(toggleWorkshopModal());
-      resetAttendees();
       if (isEdit) {
         dispatch(resetWorkshopModal());
       }
     }
-  };
-
-  const resetAttendees = () => {
-    setAttendees(0);
   };
 
   useEffect(() => {
@@ -280,7 +269,6 @@ function WorkshopModal() {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
-      resetAttendees();
     }
 
     return () => {
@@ -318,7 +306,6 @@ function WorkshopModal() {
                   aria-label="Close"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
-                    resetAttendees();
                     if (isEdit) {
                       dispatch(resetWorkshopModal());
                     }
@@ -401,21 +388,22 @@ function WorkshopModal() {
                 </div>
                 <div className="row">
                   <div className="col mb-3">
-                    <label htmlFor="attendees" className="form-label">
+                    <label htmlFor="numberOfAttendees" className="form-label">
                       Number of Attendees
                     </label>
                     <input
                       type="number"
-                      id="attendees"
+                      id="numberOfAttendees"
                       className="form-control"
-                      value={attendees}
+                      value={selectedWorkshop.numberOfAttendees}
                       onChange={handleInputChange}
                       placeholder="Enter number of attendees"
                     />
                     {capacityMessage && (
                       <p
                         className={`mt-2 ${
-                          attendees > selectedSpace?.capacity
+                          selectedWorkshop.numberOfAttendees >
+                          selectedSpace?.capacity
                             ? "text-danger"
                             : "text-success"
                         }`}
@@ -483,7 +471,6 @@ function WorkshopModal() {
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
-                    resetAttendees();
                   }}
                 >
                   Close

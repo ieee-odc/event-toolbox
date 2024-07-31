@@ -54,6 +54,10 @@ function SpaceModal() {
   };
 
   const handleCreateSpace = () => {
+    if (selectedSpace.capacity < 1) {
+      toast.error("Capacity should be greater than 0");
+      return;
+    }
     axiosRequest
       .post("/space/add", {
         ...selectedSpace,
@@ -69,6 +73,10 @@ function SpaceModal() {
   };
 
   const handleEditSpace = () => {
+    if (selectedSpace.capacity < 1) {
+      toast.error("Capacity should be greater than 0");
+      return;
+    }
     axiosRequest
       .post(`/space/edit/${selectedSpace.id}`, {
         ...selectedSpace,
