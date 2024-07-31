@@ -1,12 +1,29 @@
-name: "EventToolBox"
+name: "EventToolBoxBuild"
 
 on:
   push:
     branches: [ Ops-TestCICD ]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
+
+  sonar-checks:
+    name: analyze
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis    
+      - uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
   build-front:
     runs-on: ubuntu-latest
+    needs: sonar-checks
 
     steps:
       - name: Checkout code
@@ -30,6 +47,7 @@ jobs:
 
   build-back:
     runs-on: ubuntu-latest
+    needs: sonar-checks
 
     steps:
       - name: Checkout code
