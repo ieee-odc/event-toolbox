@@ -153,26 +153,30 @@ function FormModal() {
       updateQuestionOptions({ index: questionIndex, options: newOptions })
     );
   };
-  // const handleClickOutside = (event) => {
-  //   if (modalRef.current && !modalRef.current.contains(event.target)) {
-  //     dispatch(toggleFormModal());
-  //     if (isEdit) {
-  //       dispatch(resetFormModal());
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (isFormModalOpen) {
-  //     document.addEventListener("mousedown", handleClickOutside);
-  //   } else {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   }
-
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [isFormModalOpen]);
+  const handleClickOutside = (event) => {
+    const flatpickrNode = flatpickrRef.current?.flatpickr?.calendarContainer;
+    if (
+      modalRef.current &&
+      !modalRef.current.contains(event.target) &&
+      flatpickrNode &&
+      !flatpickrNode.contains(event.target)
+    ) {
+      dispatch(toggleFormModal());
+      if (isEdit) {
+        dispatch(resetFormModal());
+      }
+    }
+  };
+  useEffect(() => {
+    if (isFormModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFormModalOpen]);
 
   return (
     <>
