@@ -17,9 +17,12 @@ import {
   toggleParticipantModal,
   toggleParticipantDetails,
   setSelectedParticipant,
+  deleteParticipant,
+  editParticipant,
+  filterParticipants,
+  setSearchQuery,
 } from "../../../core/Features/Participants";
-import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown"; // Import the custom dropdown component
-
+import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 
@@ -36,7 +39,10 @@ const ParticipantsCard = () => {
     filteredParticipants,
     participantsPerPage,
     groupedParticipants,
+    searchQuery,
+    isEdit,
   } = useSelector((store) => store.participantsStore);
+
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,7 +75,6 @@ const ParticipantsCard = () => {
       toast.success("Participant deleted successfully");
     });
   };
-  const [socket, setSocket] = useState(null);
 
   const handleOpenDetails = (participant) => {
     dispatch(setSelectedParticipant(participant));
@@ -89,23 +94,6 @@ const ParticipantsCard = () => {
       });
   };
 
-  const handleEditParticipant = (participant) => {
-    setCurrentParticipant(participant);
-    setIsEditModalOpen(true);
-  };
-
-  const handleEditSubmit = (updatedParticipant) => {
-    axiosRequest
-      .post(`/participant/edit/${updatedParticipant.id}`, updatedParticipant)
-      .then(() => {
-        dispatch(editParticipant(updatedParticipant));
-        toast.success("Participant updated successfully");
-        setIsEditModalOpen(false);
-      })
-      .catch(() => {
-        toast.error("Failed to update participant");
-      });
-  };
   useEffect(() => {
     const newSocket = io(import.meta.env.VITE_BACKEND.split("/api")[0]);
 
@@ -118,7 +106,6 @@ const ParticipantsCard = () => {
     });
 
     newSocket.on("EventParticipantAdded", (data) => {
-      console.log("added particpant");
       dispatch(addParticipant(data));
     });
 
@@ -128,6 +115,19 @@ const ParticipantsCard = () => {
     };
   }, [eventId, workshopId]);
 
+  const handleStatusChange = (e) => {
+    dispatch(filterParticipants(e.target.value));
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    dispatch(setSearchQuery(query));
+    setCurrentPage(1);
+  };
+  const handleEditClick = (participant) => {
+    dispatch(setSelectedParticipant(participant));
+    dispatch(toggleParticipantModal());
+  };
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -136,7 +136,21 @@ const ParticipantsCard = () => {
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <ParticipantTableHeader />
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <ParticipantTableHeader onSearchChange={handleSearchChange} />
+            <div className="d-flex align-items-center gap-2">
+              <select
+                id="participantStatusFilter"
+                className="form-select"
+                onChange={handleStatusChange}
+              >
+                <option value="">All Participants</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Canceled">Canceled</option>
+              </select>
+            </div>
+          </div>
           <div className="table-responsive">
             <table
               className="invoice-list-table table border-top dataTable no-footer dtr-column"
@@ -229,7 +243,7 @@ const ParticipantsCard = () => {
                         >
                           <a
                             className="dropdown-item"
-                            onClick={() => handleEditParticipant(participant)}
+                            onClick={() => handleEditClick(participant)}
                           >
                             Edit
                           </a>
