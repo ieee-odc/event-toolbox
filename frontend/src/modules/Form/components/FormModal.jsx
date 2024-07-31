@@ -54,15 +54,18 @@ function FormModal() {
       }
 
       if (
-        ["checkbox", "radio", "dropdown", "workshop-selection"].includes(
-          type
-        ) &&
-        (!options || options.length < 2)
+        ["checkbox", "radio", "dropdown", "workshop-selection"].includes(type)
       ) {
-        toast.error(
-          `Please provide at least two options for Question ${i + 1}.`
-        );
-        return false;
+        if (
+          !options ||
+          options.length < 2 ||
+          options.some((option) => option === "")
+        ) {
+          toast.error(
+            `Please provide at least two valid options for Question ${i + 1}.`
+          );
+          return false;
+        }
       }
     }
 
@@ -117,7 +120,7 @@ function FormModal() {
 
   const handleSubmit = () => {
     if (isEdit) {
-      handleEditForm(selectedForm.id);
+      handleEditForm(selectedForm?.id);
     } else {
       handleAddForm();
     }
@@ -144,32 +147,32 @@ function FormModal() {
     }
   };
   const handleOptionChange = (questionIndex, optionIndex, newValue) => {
-    const newOptions = [...selectedForm.data[questionIndex].options];
+    const newOptions = [...selectedForm?.data[questionIndex].options];
     newOptions[optionIndex] = newValue;
     dispatch(
       updateQuestionOptions({ index: questionIndex, options: newOptions })
     );
   };
-  const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      dispatch(toggleFormModal());
-      if (isEdit) {
-        dispatch(resetFormModal());
-      }
-    }
-  };
+  // const handleClickOutside = (event) => {
+  //   if (modalRef.current && !modalRef.current.contains(event.target)) {
+  //     dispatch(toggleFormModal());
+  //     if (isEdit) {
+  //       dispatch(resetFormModal());
+  //     }
+  //   }
+  // };
 
-  useEffect(() => {
-    if (isFormModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
+  // useEffect(() => {
+  //   if (isFormModalOpen) {
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //   } else {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   }
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isFormModalOpen]);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [isFormModalOpen]);
 
   return (
     <>
@@ -211,7 +214,7 @@ function FormModal() {
                   id="name"
                   className="form-control"
                   placeholder="Enter Form Name"
-                  value={selectedForm.name}
+                  value={selectedForm?.name}
                   onChange={handleInputChange}
                 />
               </div>
@@ -223,7 +226,7 @@ function FormModal() {
                   id="description"
                   className="form-control"
                   placeholder="Enter Form Description"
-                  value={selectedForm.description}
+                  value={selectedForm?.description}
                   onChange={handleInputChange}
                 ></textarea>
               </div>
@@ -232,7 +235,7 @@ function FormModal() {
                 <label className="form-label">Deadline</label>
                 <Flatpickr
                   id="deadline"
-                  value={selectedForm.deadline}
+                  value={selectedForm?.deadline}
                   options={{
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
@@ -243,7 +246,7 @@ function FormModal() {
               </div>
 
               <>
-                {selectedForm.data.map((element, index) => (
+                {selectedForm?.data.map((element, index) => (
                   <div className="mb-3" key={index}>
                     <label htmlFor={index} className="form-label">
                       Question {index + 1}:
@@ -256,7 +259,7 @@ function FormModal() {
                         placeholder={`Enter Question ${index + 1}`}
                         value={element.question || ""}
                         onChange={(e) => {
-                          const newDataArray = [...selectedForm.data];
+                          const newDataArray = [...selectedForm?.data];
                           newDataArray[index] = {
                             ...newDataArray[index],
                             question: e.target.value,
@@ -403,7 +406,7 @@ function FormModal() {
                               id={`data.${index}.options.${optionIndex}`}
                               className="form-control"
                               placeholder={`Enter Option ${optionIndex + 1}`}
-                              value={currentWorkshop.name || ""}
+                              value={currentWorkshop?.name || ""}
                               readOnly
                             />
                             <button

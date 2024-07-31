@@ -5,7 +5,11 @@ import ParticipantModal from "./ParticipantModal";
 import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-import { deleteParticipant, editParticipant } from "../../../core/Features/Participants";
+import {
+  addParticipant,
+  deleteParticipant,
+  editParticipant,
+} from "../../../core/Features/Participants";
 
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,7 +20,7 @@ import {
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown"; // Import the custom dropdown component
 
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 
 const ParticipationStatus = Object.freeze({
@@ -26,7 +30,7 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
-  const { eventId } = useParams();
+  const { eventId, workshopId } = useParams();
   const { participants, filteredParticipants, participantsPerPage } =
     useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
@@ -63,7 +67,6 @@ const ParticipantsCard = () => {
   };
   const [socket, setSocket] = useState(null);
 
-
   const handleOpenDetails = (participant) => {
     dispatch(setSelectedParticipant(participant));
     dispatch(toggleParticipantDetails());
@@ -71,7 +74,8 @@ const ParticipantsCard = () => {
 
   const handleChangeStatus = (participant, newStatus) => {
     const updatedParticipant = { ...participant, status: newStatus };
-    axiosRequest.post(`/participant/edit/${participant.id}`, updatedParticipant)
+    axiosRequest
+      .post(`/participant/edit/${participant.id}`, updatedParticipant)
       .then(() => {
         dispatch(editParticipant(updatedParticipant));
         toast.success("Participant status updated successfully");
@@ -87,7 +91,8 @@ const ParticipantsCard = () => {
   };
 
   const handleEditSubmit = (updatedParticipant) => {
-    axiosRequest.post(`/participant/edit/${updatedParticipant.id}`, updatedParticipant)
+    axiosRequest
+      .post(`/participant/edit/${updatedParticipant.id}`, updatedParticipant)
       .then(() => {
         dispatch(editParticipant(updatedParticipant));
         toast.success("Participant updated successfully");
@@ -98,23 +103,26 @@ const ParticipantsCard = () => {
       });
   };
   useEffect(() => {
-    const newSocket = io(import.meta.env.VITE_BACKEND);
+    const newSocket = io(import.meta.env.VITE_BACKEND.split("/api")[0]);
 
-    newSocket.on('connect', () => {
+    newSocket.on("connect", () => {
+      const roomId = workshopId ? `${eventId}/${workshopId}` : `${eventId}`;
+      console.log(roomId);
       if (eventId) {
-        newSocket.emit('joinRoom', eventId);
+        newSocket.emit("joinRoom", roomId);
       }
     });
 
-    newSocket.on('EventParticipantAdded', (data) => {
+    newSocket.on("EventParticipantAdded", (data) => {
+      console.log("added particpant");
       dispatch(addParticipant(data));
     });
 
     return () => {
-      newSocket.off('EventParticipantAdded');
+      newSocket.off("EventParticipantAdded");
       newSocket.disconnect();
     };
-  }, [eventId]);
+  }, [eventId, workshopId]);
 
   return (
     <div className="card" style={{ padding: "20px" }}>
@@ -144,7 +152,10 @@ const ParticipantsCard = () => {
               </thead>
               <tbody>
                 {currentParticipants.map((participant, index) => (
-                  <tr key={participant.id} className={`${index % 2 === 0 ? "even" : "odd"}`}>
+                  <tr
+                    key={participant.id}
+                    className={`${index % 2 === 0 ? "even" : "odd"}`}
+                  >
                     <td>
                       <span
                         className="fw-medium"
@@ -169,12 +180,10 @@ const ParticipantsCard = () => {
                           </div>
                         </div>
                         <div className="d-flex flex-column">
-
                           <span
                             className="text-body text-truncate fw-medium"
                             style={{ cursor: "pointer" }}
                             onClick={() => handleOpenDetails(participant)}
-
                           >
                             {participant.fullName}
                           </span>
@@ -184,9 +193,7 @@ const ParticipantsCard = () => {
                     <td>
                       <div className="d-flex justify-content-start align-items-center">
                         <div className="d-flex flex-column">
-                          <a
-                            className="text-body text-truncate"
-                          >
+                          <a className="text-body text-truncate">
                             <span className="fw-medium">
                               {participant.email}
                             </span>
@@ -212,7 +219,9 @@ const ParticipantsCard = () => {
                           <i className="bx bx-show mx-1" />
                         </a>
                         <CustomDropdown
-                          toggleContent={<i className="bx bx-dots-vertical-rounded" />}
+                          toggleContent={
+                            <i className="bx bx-dots-vertical-rounded" />
+                          }
                         >
                           <a
                             className="dropdown-item"
@@ -222,25 +231,42 @@ const ParticipantsCard = () => {
                           </a>
                           <a
                             className="dropdown-item"
-                            onClick={() => handleChangeStatus(participant, ParticipationStatus.PAID)}
+                            onClick={() =>
+                              handleChangeStatus(
+                                participant,
+                                ParticipationStatus.PAID
+                              )
+                            }
                           >
                             Mark as Paid
                           </a>
                           <a
                             className="dropdown-item"
-                            onClick={() => handleChangeStatus(participant, ParticipationStatus.PENDING)}
+                            onClick={() =>
+                              handleChangeStatus(
+                                participant,
+                                ParticipationStatus.PENDING
+                              )
+                            }
                           >
                             Mark as Pending
                           </a>
                           <a
                             className="dropdown-item"
-                            onClick={() => handleChangeStatus(participant, ParticipationStatus.CANCELED)}
+                            onClick={() =>
+                              handleChangeStatus(
+                                participant,
+                                ParticipationStatus.CANCELED
+                              )
+                            }
                           >
                             Mark as Canceled
                           </a>
                           <hr className="dropdown-divider" />
                           <a
-                            onClick={() => handleDeleteParticipant(participant.id)}
+                            onClick={() =>
+                              handleDeleteParticipant(participant.id)
+                            }
                             style={{ cursor: "pointer" }}
                             className="dropdown-item text-danger"
                           >
@@ -285,7 +311,11 @@ const ParticipantsCard = () => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Edit Participant</h5>
-                <button type="button" className="btn-close" onClick={() => setIsEditModalOpen(false)}></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setIsEditModalOpen(false)}
+                ></button>
               </div>
               <div className="modal-body">
                 <form
@@ -295,36 +325,59 @@ const ParticipantsCard = () => {
                   }}
                 >
                   <div className="mb-3">
-                    <label htmlFor="fullName" className="form-label">Full Name</label>
+                    <label htmlFor="fullName" className="form-label">
+                      Full Name
+                    </label>
                     <input
                       type="text"
                       className="form-control"
                       id="fullName"
                       value={currentParticipant?.fullName || ""}
-                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, fullName: e.target.value })}
+                      onChange={(e) =>
+                        setCurrentParticipant({
+                          ...currentParticipant,
+                          fullName: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email</label>
+                    <label htmlFor="email" className="form-label">
+                      Email
+                    </label>
                     <input
                       type="email"
                       className="form-control"
                       id="email"
                       value={currentParticipant?.email || ""}
-                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, email: e.target.value })}
+                      onChange={(e) =>
+                        setCurrentParticipant({
+                          ...currentParticipant,
+                          email: e.target.value,
+                        })
+                      }
                     />
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="phoneNumber" className="form-label">Phone Number</label>
+                    <label htmlFor="phoneNumber" className="form-label">
+                      Phone Number
+                    </label>
                     <input
                       type="text"
                       className="form-control"
                       id="phoneNumber"
                       value={currentParticipant?.phoneNumber || ""}
-                      onChange={(e) => setCurrentParticipant({ ...currentParticipant, phoneNumber: e.target.value })}
+                      onChange={(e) =>
+                        setCurrentParticipant({
+                          ...currentParticipant,
+                          phoneNumber: e.target.value,
+                        })
+                      }
                     />
                   </div>
-                  <button type="submit" className="btn btn-primary">Save changes</button>
+                  <button type="submit" className="btn btn-primary">
+                    Save changes
+                  </button>
                 </form>
               </div>
             </div>

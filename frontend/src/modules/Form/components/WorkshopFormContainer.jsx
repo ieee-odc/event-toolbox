@@ -18,7 +18,7 @@ import { updateSelectedWorkshopField } from "../../../core/Features/Workshops";
 function WorkshopFormContainer() {
   const dispatch = useDispatch();
   const userData = UserData();
-  const {workshopId}=useParams();
+  const { workshopId } = useParams();
   const { filteredForms, forms } = useSelector((store) => store.formsStore);
 
   function formatDate(originalDate) {
@@ -37,7 +37,7 @@ function WorkshopFormContainer() {
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
   const [currentFormId, setCurrentFormId] = useState(null);
-  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore)
+  const { selectedWorkshop } = useSelector((store) => store.workshopsStore);
 
   const handleMouseEnter = (iconId) => {
     setHoveredIcon(iconId);
@@ -64,18 +64,23 @@ function WorkshopFormContainer() {
   };
 
   const handleRadioChange = (form) => {
+    if (form.data.some((field) => field.type === "workshop-selection")) {
+      toast.error("This form has a workshop selection field.");
+      return;
+    }
 
-        axiosRequest.post(`/workshop/select-form`, {
-          workshopId,
-          formId: form.id,
-        })
-        .then(() => {
-            dispatch(updateSelectedWorkshopField({ id: "formId", value: form.id }));
-            toast.success(`Selected ${form.name} form`);
-        })
-        .catch((error) => {
-          console.error("Error updating space or workshop:", error);
-        });
+    axiosRequest
+      .post(`/workshop/select-form`, {
+        workshopId,
+        formId: form.id,
+      })
+      .then(() => {
+        dispatch(updateSelectedWorkshopField({ id: "formId", value: form.id }));
+        toast.success(`Selected ${form.name} form`);
+      })
+      .catch((error) => {
+        console.error("Error updating space or workshop:", error);
+      });
   };
 
   return (
@@ -173,7 +178,7 @@ function WorkshopFormContainer() {
                 {filteredForms &&
                   filteredForms.map((form) => (
                     <tr key={form.id}>
-                      <td style={{cursor:"pointer"}}>
+                      <td style={{ cursor: "pointer" }}>
                         <input
                           type="radio"
                           name="selectedForm"
@@ -182,14 +187,20 @@ function WorkshopFormContainer() {
                           onChange={() => handleRadioChange(form)}
                         />
                       </td>
-                      <td style={{cursor:"pointer"}} onClick={()=>{
-                        handleRadioChange(form)
-                      }}>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          handleRadioChange(form);
+                        }}
+                      >
                         <a href="">{form.name}</a>
                       </td>
-                      <td style={{cursor:"pointer"}} onClick={()=>{
-                        handleRadioChange(form)
-                      }}>
+                      <td
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          handleRadioChange(form);
+                        }}
+                      >
                         <a href="">{formatDate(form.deadline)}</a>
                       </td>
                       <td style={{ textAlign: "right" }}>
