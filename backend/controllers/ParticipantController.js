@@ -157,6 +157,17 @@ const register = async (req, res) => {
       return res.status(404).json({ message: "Workshop not found" });
     }
 
+    const existingParticipant = await Participant.findOne({
+      email,
+      workshopId,
+    });
+    if (existingParticipant) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email is already registered for this workshop.",
+      });
+    }
+
     // Create the participant with an auto-incremented id
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },

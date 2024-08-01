@@ -37,12 +37,13 @@ const Card = ({
     });
   };
   const handleEditWorkshop = (workshop) => {
+    const newDate = new Date(workshop.startTime).toISOString();
     dispatch(
       setSelectedWorkshop({
         ...workshop,
-        startTime: formatTime(workshop.startTime),
-        endTime: formatTime(workshop.endTime),
-        date: new Date(workshop.startTime),
+        startTime: workshop.startTime,
+        endTime: workshop.endTime,
+        date: newDate,
       })
     );
     dispatch(toggleWorkshopModal());
@@ -95,7 +96,6 @@ const Card = ({
           <div className="ms-auto">
             <div className="dropdown" ref={dropdownRef}>
               <a
-                href="javascript:;"
                 className="btn dropdown-toggle hide-arrow text-body p-0"
                 onClick={() => toggleDropdown(workshop.id)}
                 aria-expanded={dropdownStates[workshop.id]}
@@ -110,9 +110,7 @@ const Card = ({
                     flexDirection: "column",
                   }}
                 >
-                  <a href="javascript:;" className="dropdown-item">
-                    Download
-                  </a>
+                  <a className="dropdown-item">Download</a>
                   <a
                     onClick={() => {
                       handleEditWorkshop(workshop);
@@ -121,9 +119,7 @@ const Card = ({
                   >
                     Edit
                   </a>
-                  <a href="javascript:;" className="dropdown-item">
-                    Duplicate
-                  </a>
+                  <a className="dropdown-item">Duplicate</a>
                   <div className="dropdown-divider" />
                   <a
                     onClick={() => {

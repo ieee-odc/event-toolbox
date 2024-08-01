@@ -83,6 +83,18 @@ function SpaceModal() {
         organizerId: userData.id,
       })
       .then((res) => {
+        const updatedWorkshops = workshops.map((workshop) => {
+          if (workshop.spaceId === selectedSpace.id) {
+            return {
+              ...workshop,
+              spaceId: selectedSpace.id,
+              space: res.data.space,
+            };
+          }
+          return workshop;
+        });
+
+        dispatch(initializeWorkshops(updatedWorkshops));
         dispatch(editSpace(res.data.space));
         dispatch(toggleSpaceModal());
         dispatch(resetSpaceModal());

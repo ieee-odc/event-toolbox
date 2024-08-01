@@ -104,12 +104,10 @@ function EventsList() {
         const response = await axiosRequest.get(
           `/events/get-organizer/${userData.id}`
         );
-        console.log(response);
         dispatch(initializeEvents(response.data.events));
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
-        console.log("finnally");
         dispatch(turnIsLoadingOff());
       }
     };

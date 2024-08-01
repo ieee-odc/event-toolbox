@@ -68,7 +68,6 @@ function Login() {
         err.response ? err.response.data : err.message
       );
       if (err.response && err.response.status === 400) {
-        console.log("Server message:", err.response.data.msg);
         setErrors({ server: err.response.data.msg });
       } else {
         setErrors({ server: "Login failed. Please try again." });
@@ -215,8 +214,7 @@ function Login() {
                   action={(data) => {
                     return axiosRequest
                       .post("/auth/loginwithgoogle", data)
-                      .then((response) => {
-                      })
+                      .then((response) => {})
                       .catch((err) => {
                         console.log(err);
                       });
