@@ -185,10 +185,6 @@ function WorkshopModal() {
     };
   }, [isModalOpen]);
 
-  useEffect(() => {
-    console.log(selectedWorkshop);
-  }, [selectedWorkshop]);
-
   return (
     <>
       {isModalOpen && <div className="modal-backdrop fade show"></div>}
