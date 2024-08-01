@@ -3,6 +3,8 @@ const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
 const Notification = require("../models/notificationModel");
+const mongoose = require('mongoose'); // Ensure mongoose is imported
+
 
 
 
@@ -31,7 +33,7 @@ const addParticipant = async (req, res) => {
 
     // Create a notification for the organizer
     const newNotification = new Notification({
-      from: participant.id, // Participant's ID
+      from: participant._id, // Participant's ID
       to: organizerId, // Organizer's ID
       type: 'EventRegistration',
       message: `A new participant has registered for your event: ${event.name}`,

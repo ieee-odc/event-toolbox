@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { jwtDecode } from "jwt-decode";
 import './NotificationList.css';
 import { FaCalendarAlt, FaChalkboardTeacher } from 'react-icons/fa'; // Updated icons
+import { formatDistanceToNow } from 'date-fns';
+
 
 // Function to fetch notifications
 const fetchNotifications = async () => {
@@ -131,8 +133,8 @@ const NotificationPage = () => {
                                                 ? 'Registered for an event'
                                                 : 'Registered for a workshop'}
                                         </p>
-                                        <small className="text-muted">{new Date(notification.createdAt).toLocaleString()}</small>
-                                    </div>
+                                        <small className="text-muted">{formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}</small>
+                                        </div>
                                     <div className="flex-shrink-0 dropdown-notifications-actions">
                                         <a href="javascript:void(0)" className="dropdown-notifications-read">
                                             <span className="badge badge-dot"></span>
