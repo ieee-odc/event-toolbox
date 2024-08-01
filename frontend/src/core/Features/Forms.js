@@ -16,6 +16,7 @@ const FormsSlice = createSlice({
       description: "",
       data: [],
     },
+    selectedWorkshops: [],
   },
   reducers: {
     initializeForms: (state, action) => {
@@ -45,17 +46,19 @@ const FormsSlice = createSlice({
     toggleFormsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
     },
-    selectForm: (state, action) => {
-      state.isEdit = true;
-      const { Data } = action.payload;
-      state.selectedForm = {
-        ...Data,
-      };
-    },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
       state.selectedForm = action.payload;
+
+      state.selectedWorkshops = [];
+
+      action.payload.data.forEach((field) => {
+        if (field.type === "workshop-selection") {
+          state.selectedWorkshops.push(...field.options);
+        }
+      });
     },
+
     updateSelectedFormField: (state, action) => {
       const { id, value } = action.payload;
       state.selectedForm[id] = value;
@@ -119,13 +122,25 @@ const FormsSlice = createSlice({
       }
     },
     addOption: (state, action) => {
-      const {index,value} = action.payload;
+      const { index, value } = action.payload;
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].options.push(value);
       }
     },
     removeField: (state, action) => {
       state.selectedForm.data.splice(action.payload, 1); // Just splice, don't reassign
+    },
+    resetSelectedWorkshops: (state) => {
+      state.selectedWorkshops = [];
+    },
+    removeOneSelectedWorkshop: (state, action) => {
+      state.selectedWorkshops = state.selectedWorkshops.filter(
+        (item) => item.toString() !== action.payload
+      );
+    },
+
+    selectAWorkshop: (state, action) => {
+      state.selectedWorkshops = [...state.selectedWorkshops, action.payload];
     },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
@@ -140,7 +155,6 @@ export const {
   editForm,
   toggleFormModal,
   toggleFormsIsLoading,
-  selectForm,
   setSelectedForm,
   updateSelectedFormField,
   addField,
@@ -152,5 +166,8 @@ export const {
   updateQuestionOptions,
   removeOption,
   addOption,
+  resetSelectedWorkshops,
+  removeOneSelectedWorkshop,
+  selectAWorkshop,
 } = FormsSlice.actions;
 export default FormsSlice.reducer;

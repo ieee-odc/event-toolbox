@@ -39,7 +39,12 @@ const WorkshopSchema=mongoose.Schema({
     organizerId:{
         type:Number,
         required:true,
-    }
+    },
+    currentParticipants: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
     
 } ,{ timestamps: true })
 

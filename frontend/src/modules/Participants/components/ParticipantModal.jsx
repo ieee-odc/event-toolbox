@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addParticipant,
+  editParticipant,
   resetParticipantModal,
   toggleParticipantModal,
   updateSelectedParticipantField,
@@ -12,14 +13,17 @@ import { useParams } from "react-router-dom";
 
 function ParticipantModal() {
   const dispatch = useDispatch();
-  const { eventId,workshopId} = useParams();
+  const { eventId, workshopId } = useParams();
   const { isParticipantModalOpen, selectedParticipant, isEdit } = useSelector(
     (store) => store.participantsStore
   );
+  const modalRef = useRef(null);
+
   const handleAddParticipant = () => {
     const reqBody = {
       email: selectedParticipant.email,
       fullName: selectedParticipant.fullName,
+      phoneNumber: selectedParticipant.phoneNumber,
       eventId,
       workshopId,
     };
@@ -35,6 +39,27 @@ function ParticipantModal() {
         toast.error("Failed to add participant");
       });
   };
+  const handleEditParticipant = () => {
+    console.log(isEdit)
+    const reqBody = {
+      email: selectedParticipant.email,
+      fullName: selectedParticipant.fullName,
+      phoneNumber: selectedParticipant.phoneNumber,
+      eventId,
+      workshopId,
+    };
+
+    axiosRequest
+      .post(`/participant/edit/${selectedParticipant.id}`, reqBody)
+      .then((res) => {
+        toast.success("Successfully Edited!");
+        dispatch(toggleParticipantModal());
+        dispatch(editParticipant(res.data.participant));
+      })
+      .catch((err) => {
+        toast.error("Failed to edit participant");
+      });
+  };
 
   const handleInputChange = (e) => {
     const payload = e.target;
@@ -42,8 +67,26 @@ function ParticipantModal() {
       updateSelectedParticipantField({ id: payload.id, value: payload.value })
     );
   };
+  const handleClickOutside = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      dispatch(toggleParticipantModal());
+      if (isEdit) {
+        dispatch(resetParticipantModal());
+      }
+    }
+  };
+  useEffect(() => {
+    if (isParticipantModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
-  // TODO: add fetching events based on organizerID
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isParticipantModalOpen]);
+
   return (
     <>
       {isParticipantModalOpen && (
@@ -59,11 +102,15 @@ function ParticipantModal() {
           aria-modal="true"
           role="dialog"
         >
-          <div className="modal-dialog modal-dialog-centered" role="document">
+          <div
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            ref={modalRef}
+          >
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
-                  Add Participant
+                  {isEdit ? "Edit" : "Add"} Participant
                 </h5>
                 <button
                   type="button"
@@ -71,6 +118,10 @@ function ParticipantModal() {
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   onClick={() => {
+                    dispatch(resetParticipantModal());
+                    if (isEdit) {
+                      dispatch(changeFormState(false));
+                    }
                     dispatch(toggleParticipantModal());
                   }}
                 />
@@ -106,6 +157,23 @@ function ParticipantModal() {
                     />
                   </div>
                 </div>
+                <div className="row g-3">
+                  <div className="col mb-0">
+                    <label
+                      htmlFor="phoneNumberWithTitle"
+                      className="form-label"
+                    >
+                      Phone number
+                    </label>
+                    <input
+                      value={selectedParticipant.phoneNumber}
+                      onChange={handleInputChange}
+                      type="number"
+                      id="phoneNumber"
+                      className="form-control"
+                    />
+                  </div>
+                </div>
               </div>
               <div className="modal-footer">
                 <button
@@ -114,6 +182,7 @@ function ParticipantModal() {
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleParticipantModal());
+                    dispatch(resetParticipantModal())
                   }}
                 >
                   Close
@@ -121,7 +190,7 @@ function ParticipantModal() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={handleAddParticipant}
+                  onClick={isEdit ? handleEditParticipant : handleAddParticipant}
                 >
                   {isEdit ? "Save Changes" : "Create"}
                 </button>

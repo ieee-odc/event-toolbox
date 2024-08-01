@@ -7,7 +7,16 @@ const DataItemSchema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ["input", "checkbox", "radio", "file", "dropdown", "date", "time"], // Define allowed values
+      enum: [
+        "input",
+        "checkbox",
+        "radio",
+        "file",
+        "dropdown",
+        "date",
+        "time",
+        "workshop-selection",
+      ], // Define allowed values
     },
     question: {
       type: String,
@@ -47,7 +56,7 @@ const FormSchema = new Schema({
   },
   eventId: {
     type: Number,
-    required: false,
+    required: true,
   },
   workshopId: {
     type: Number,

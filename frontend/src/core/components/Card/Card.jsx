@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Card.css"; // Assuming you put the provided styles in this CSS file
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
@@ -6,6 +6,7 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import { setSelectedWorkshop } from "../../Features/Workshops";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast"; // Add this import
 
 const Card = ({
   title,
@@ -21,6 +22,9 @@ const Card = ({
   workshop,
 }) => {
   const { eventId } = useParams();
+  const dropdownRef = useRef(null);
+
+  const [dropdownStates, setDropdownStates] = useState({});
 
   const toggleDropdown = (workshopId) => {
     setDropdownStates({
@@ -28,15 +32,7 @@ const Card = ({
       [workshopId]: !dropdownStates[workshopId],
     });
   };
-  const [dropdownStates, setDropdownStates] = useState({});
 
-  const initializeDropdownStates = (workshops) => {
-    const initialStates = workshops.reduce((acc, workshop) => {
-      acc[workshop.id] = false;
-      return acc;
-    }, {});
-    setDropdownStates(initialStates);
-  };
   const handleDeleteWorkshop = (workshopId) => {
     axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
       dispatch(deleteWorkshop(workshopId));
@@ -44,8 +40,22 @@ const Card = ({
     });
   };
 
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setDropdownStates({});
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const navigate = useNavigate();
-const dispatch=useDispatch();
+  const dispatch = useDispatch();
+
   return (
     <div className="custom-card">
       <div className="card-header">
@@ -65,7 +75,7 @@ const dispatch=useDispatch();
             </div>
           </div>
           <div className="ms-auto">
-            <div className="dropdown">
+            <div className="dropdown" ref={dropdownRef}>
               <a
                 href="javascript:;"
                 className="btn dropdown-toggle hide-arrow text-body p-0"
@@ -113,19 +123,26 @@ const dispatch=useDispatch();
         </div>
       </div>
 
-      <div className="card-body" style={{ cursor: "pointer" }} onClick={() => {
-        dispatch(setSelectedWorkshop(workshop))
-        navigate(`/event/${eventId}/workshop/${workshop.id}`)
-      }}>
-        <div className="d-flex align-items-start flex-wrap mb-2" style={{
-          flexDirection:"column"
-        }}>
+      <div
+        className="card-body"
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          dispatch(setSelectedWorkshop(workshop));
+          navigate(`/event/${eventId}/workshop/${workshop.id}`);
+        }}
+      >
+        <div
+          className="d-flex align-items-start flex-wrap mb-2"
+          style={{
+            flexDirection: "column",
+          }}
+        >
           <div className="bg-lighter p-2 rounded me-auto mb-3">
             <h6 className="mb-1">
-              <span className="text-body fw-normal">{workshop.formId?`Form`:"No form"}</span>{" "}
-              {workshop.formId&&<span>
-                #{workshop.formId}
-              </span>}
+              <span className="text-body fw-normal">
+                {workshop.formId ? `Form` : "No form"}
+              </span>{" "}
+              {workshop.formId && <span>#{workshop.formId}</span>}
             </h6>
           </div>
           <div className="text-start mb-3" id="info-box">
@@ -150,26 +167,28 @@ const dispatch=useDispatch();
       </div>
       <div className="card-body border-top">
         <div className="d-flex align-items-center mb-3">{badgeText}</div>
-        { workshop.space?
+        {workshop.space ? (
           <div>
-          <div className="d-flex justify-content-between align-items-center mb-1">
-            <small>
-              Capacity: {personCount}/{personCapacity}
-            </small>
-            <small>{progress}% Full</small>
+            <div className="d-flex justify-content-between align-items-center mb-1">
+              <small>
+                Capacity: {personCount}/{personCapacity}
+              </small>
+              <small>{progress}% Full</small>
+            </div>
+            <div className="progress mb-3" style={{ height: 8 }}>
+              <div
+                className="progress-bar"
+                role="progressbar"
+                style={{ width: `${progress}%` }}
+                aria-valuenow={progress}
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
           </div>
-          <div className="progress mb-3" style={{ height: 8 }}>
-            <div
-              className="progress-bar"
-              role="progressbar"
-              style={{ width: `${progress}%` }}
-              aria-valuenow={progress}
-              aria-valuemin="0"
-              aria-valuemax="100"
-            ></div>
-          </div>
-        </div>:<div>No space assigned</div>
-        }
+        ) : (
+          <div>No space assigned</div>
+        )}
       </div>
     </div>
   );

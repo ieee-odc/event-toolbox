@@ -24,18 +24,7 @@
     />
 
     <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-5DDHKGP");
-    </script>
+
     <!-- End Google Tag Manager -->
 
     <!-- Favicon -->
@@ -54,10 +43,6 @@
     />
 
     <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/fonts/boxicons.css"
-    />
-    <link
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
     />
@@ -65,54 +50,19 @@
     <!-- Core CSS -->
     <link
       rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/css/core.css"
+      href="./public/style/core.css"
       class="template-customizer-core-css"
     />
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/css/theme-default.css"
-      class="template-customizer-theme-css"
-    />
+
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="./public/style/perfect-scrollbar.css" />
+
+    <link rel="stylesheet" href="./public/style/typeahead.css" />
+
     <link
       rel="stylesheet"
       href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/css/demo.css"
     />
-
-    <!-- Vendors CSS -->
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/typeahead-js/typeahead.css"
-    />
-
-
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/jquery-timepicker/jquery-timepicker.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/pickr/pickr-themes.css"
-    />
-    <!-- Page CSS -->
-    <script src="https://unpkg.com/react-popper/dist/index.umd.js"></script>
-
-    <!-- Helpers -->
-    <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/vendor/js/helpers.js"></script>
-    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/js/config.js"></script>
   </head>
   <body>
     <div id="root"></div>
@@ -135,8 +85,6 @@
     <!-- Main JS -->
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template-free/assets/js/main.js"></script>
 
-    <!-- Page JS -->
-
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 
@@ -148,20 +96,16 @@
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/i18n/i18n.js"></script>
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/typeahead-js/typeahead.js"></script>
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/js/menu.js"></script>
+    <!-- xxxxxxxxxxxxx -->
 
-    <!-- endbuild -->
-
-    <!-- Vendors JS -->
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/moment/moment.js"></script>
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/bootstrap-datepicker/bootstrap-datepicker.js"></script>
-    <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js"></script>
+
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/jquery-timepicker/jquery-timepicker.js"></script>
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/vendor/libs/pickr/pickr.js"></script>
 
-    <!-- Main JS -->
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/js/main.js"></script>
 
-    <!-- Page JS -->
     <script src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/js/forms-pickers.js"></script>
   </body>
 </html>
