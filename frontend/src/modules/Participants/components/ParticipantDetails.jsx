@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetParticipantModal, toggleParticipantDetails } from "../../../core/Features/Participants";
+import { Modal, Button, ListGroup, Badge } from "react-bootstrap";
+
 
 const ParticipantDetails = () => {
   const dispatch = useDispatch();
@@ -26,109 +28,102 @@ const ParticipantDetails = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isParticipantDetailsOpen, dispatch]);
-  console.log(selectedParticipant)
 
   const getStatusColor = (status) => {
     switch (status) {
       case "Paid":
-        return "#56C28B";
+        return "success";
       case "Pending":
-        return "#FFC107";
+        return "warning";
       case "Canceled":
-        return "#FF5A5F";
+        return "danger";
       default:
-        return "#566A7F";
+        return "secondary";
     }
   };
 
   return (
-    isParticipantDetailsOpen && (
-      <div className="modal show" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-        <div className="modal-dialog">
-          <div className="modal-content" style={{ backgroundColor: "#ffffff", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
-            <div className="modal-header" style={{ borderBottom: "1px solid #E5E7EB" }}>
-              <h5 className="modal-title" style={{ color: "#111827" }}>{selectedParticipant.fullName}</h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => {
-                  dispatch(resetParticipantModal());
-                  dispatch(toggleParticipantDetails());
-                }}
-              ></button>
-            </div>
-            <div className="modal-body" style={{ padding: "20px", color: "#4B5563" }}>
-              <div style={{ marginBottom: "20px" }}>
-                <p>
-                  <strong>ID:</strong> {selectedParticipant.id}
-                </p>
-                <p>
-                  <strong>Email:</strong> {selectedParticipant.email}
-                </p>
-                <p>
-                  <strong>Phone Number:</strong> {selectedParticipant.phoneNumber}
-                </p>
-                <p>
-                  <strong>Status:</strong>
-                  <span style={{ color: getStatusColor(selectedParticipant.status), marginLeft: "8px" }}>
-                    {selectedParticipant.status}
-                  </span>
-                </p>
-                <p>
-                  <strong>Event Name:</strong> {selectedParticipant.eventName}
-                </p>
-                {selectedParticipant.responses && selectedParticipant.responses.length > 0 && (
-                  <div>
-                    <h6 style={{ color: "#111827", marginTop: "10px" }}>Event Responses:</h6>
-                    <ul style={{ listStyleType: "none", padding: 0, marginLeft: "20px" }}>
-                      {selectedParticipant.responses.map((response, index) => (
-                        <li key={index} style={{ marginBottom: "10px" }}>
-                          <strong>{response.question}:</strong> {response.answer}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-              {selectedParticipant.workshops && selectedParticipant.workshops.length > 0 && (
-                <div>
-                  <h6 style={{ color: "#111827", marginBottom: "15px" }}>Workshops:</h6>
-                  {selectedParticipant.workshops.map((workshop, index) => (
-                    <div key={index} style={{ marginBottom: "20px", padding: "15px", border: "1px solid #E5E7EB", borderRadius: "8px", backgroundColor: "#F9FAFB" }}>
-                      <p style={{ marginBottom: "10px" }}>
-                        <strong>Workshop Name:</strong> {workshop.workshopId}
+    <Modal
+      show={isParticipantDetailsOpen}
+      onHide={() => dispatch(toggleParticipantDetails())}
+      centered
+      ref={modalRef}
+      backdrop="static"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>{selectedParticipant.fullName}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <ListGroup variant="flush">
+          <ListGroup.Item>
+            <strong>ID:</strong> {selectedParticipant.id}
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <strong>Email:</strong> {selectedParticipant.email}
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <strong>Phone Number:</strong> {selectedParticipant.phoneNumber}
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <strong>Status:</strong>
+            <Badge bg={getStatusColor(selectedParticipant.status)} className="ms-2">
+              {selectedParticipant.status}
+            </Badge>
+          </ListGroup.Item>
+          <ListGroup.Item>
+            <strong>Event Name:</strong> {selectedParticipant.eventName}
+          </ListGroup.Item>
+          {selectedParticipant.eventResponses && selectedParticipant.eventResponses.length > 0 && (
+            <ListGroup.Item>
+              <strong>Event Responses:</strong>
+              <ul className="mt-2">
+                {selectedParticipant.eventResponses.map((response, index) => (
+                  <li key={index}>
+                    <strong>{response.question}:</strong> {response.answer}
+                  </li>
+                ))}
+              </ul>
+            </ListGroup.Item>
+          )}
+          {selectedParticipant.workshops && selectedParticipant.workshops.length > 0 && (
+            <ListGroup.Item>
+              <strong>Workshops:</strong>
+              <ul className="mt-2">
+                {selectedParticipant.workshops.map((workshop, index) => (
+                  <li key={index}>
+                    <div className="border p-2 rounded">
+                      <p>
+                        <strong>Workshop Name:</strong> {workshop.workshopName}
                       </p>
                       {workshop.responses && workshop.responses.length > 0 && (
-                        <ul style={{ listStyleType: "none", padding: 0, marginLeft: "20px" }}>
-                          {workshop.responses.map((response, index) => (
-                            <li key={index} style={{ marginBottom: "10px" }}>
+                        <ul className="mt-2">
+                          {workshop.responses.map((response, i) => (
+                            <li key={i}>
                               <strong>{response.question}:</strong> {response.answer}
                             </li>
                           ))}
                         </ul>
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="modal-footer" style={{ borderTop: "1px solid #E5E7EB" }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => {
-                  dispatch(resetParticipantModal());
-                  dispatch(toggleParticipantDetails());
-                }}
-                style={{ backgroundColor: "#1F2937", color: "#FFFFFF" }}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+                  </li>
+                ))}
+              </ul>
+            </ListGroup.Item>
+          )}
+        </ListGroup>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            dispatch(resetParticipantModal());
+            dispatch(toggleParticipantDetails());
+          }}
+        >
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

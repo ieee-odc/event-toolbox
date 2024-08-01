@@ -1,45 +1,56 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosRequest from "../../utils/AxiosConfig";
 
+// Function to fetch event data
+export const fetchEventData = createAsyncThunk(
+  "Participant/fetchEventData",
+  async (eventId) => {
+    const response = await axiosRequest.get(`/events/${eventId}`);
+    return response.data;
+  }
+);
 
+// Function to fetch workshop data
+export const fetchWorkshopData = createAsyncThunk(
+  "Participant/fetchWorkshopData",
+  async (workshopId) => {
+    const response = await axiosRequest.get(`/workshop/${workshopId}`);
+    return response.data;
+  }
+);
 
-const groupParticipantsByEmail = (participants) => {
-  const emailToParticipant = {};
-  participants.forEach((participant) => {
-    if (!emailToParticipant[participant.email]) {
-      emailToParticipant[participant.email] = { ...participant, workshops: [] };
+// Function to initialize participants
+export const initializeParticipants = createAsyncThunk(
+  "Participants/initializeParticipants",
+  async (participants, { dispatch }) => {
+    const emailToParticipant = {};
+    console.log(participants)
+    for (const participant of participants) {
+      const eventId = participant.eventId;
+      const workshopId = participant.workshopId;
+
+      if (!emailToParticipant[participant.email]) {
+        const eventResponse = await dispatch(fetchEventData(eventId));
+        emailToParticipant[participant.email] = {
+          ...participant,
+          eventName: eventResponse.payload.event.name,
+          eventResponses: participant.responses || [],
+          workshops: [],
+        };
+      }
+
+      if (workshopId) {
+        const workshopResponse = await dispatch(fetchWorkshopData(workshopId));
+        emailToParticipant[participant.email].workshops.push({
+          workshopId,
+          workshopName: workshopResponse.payload.workshop.name,
+          responses: participant.responses || [],
+        });
+      }
     }
-
-    emailToParticipant[participant.email].workshops.push({
-      workshopId: participant.workshopId,
-      responses: participant.responses || [],
-    });
-
-    // Aggregate statuses
-    if (!emailToParticipant[participant.email].statuses) {
-      emailToParticipant[participant.email].statuses = [emailToParticipant[participant.email].status];
-    }
-    emailToParticipant[participant.email].statuses.push(participant.status);
-
-    // Aggregate phone numbers
-    if (!emailToParticipant[participant.email].phoneNumbers) {
-      emailToParticipant[participant.email].phoneNumbers = [emailToParticipant[participant.email].phoneNumber];
-    }
-    if (participant.phoneNumber && !emailToParticipant[participant.email].phoneNumbers.includes(participant.phoneNumber)) {
-      emailToParticipant[participant.email].phoneNumbers.push(participant.phoneNumber);
-    }
-
-    // Aggregate responses
-    if (!emailToParticipant[participant.email].responses) {
-      emailToParticipant[participant.email].responses = [];
-    }
-    if (participant.responses) {
-      emailToParticipant[participant.email].responses = emailToParticipant[participant.email].responses.concat(participant.responses);
-    }
-  });
-  return Object.values(emailToParticipant);
-};
-
-
+    return Object.values(emailToParticipant);
+  }
+);
 const ParticipantsSlice = createSlice({
   name: "Participants",
   initialState: {
@@ -59,10 +70,9 @@ const ParticipantsSlice = createSlice({
     searchQuery: "",
   },
   reducers: {
-    initializeParticipants: (state, action) => {
-      const groupedParticipants = groupParticipantsByEmail(action.payload);
-      state.participants = groupedParticipants;
-      state.filteredParticipants = groupedParticipants;
+    setParticipants: (state, action) => {
+      state.participants = action.payload;
+      state.filteredParticipants = action.payload;
     },
     addParticipant: (state, action) => {
       state.participants = [...state.participants, action.payload];
@@ -118,7 +128,6 @@ const ParticipantsSlice = createSlice({
     updateData: (state, action) => {
       state.selectedParticipant.data = action.payload;
     },
-
     removeField: (state, action) => {
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedParticipant.data;
@@ -134,7 +143,7 @@ const ParticipantsSlice = createSlice({
       ];
     },
     removeField: (state, action) => {
-      state.selectedParticipant.data.splice(action.payload, 1); // Just splice, don't reassign
+      state.selectedParticipant.data.splice(action.payload, 1);
     },
     setParticipantsPerPage: (state, action) => {
       state.participantsPerPage = action.payload;
@@ -156,13 +165,45 @@ const ParticipantsSlice = createSlice({
         participant.email.toLowerCase().includes(query)
       );
     }
-
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(initializeParticipants.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(initializeParticipants.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.participants = action.payload;
+        state.filteredParticipants = action.payload;
+      })
+      .addCase(initializeParticipants.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(fetchEventData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchEventData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Process event data if needed
+      })
+      .addCase(fetchEventData.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(fetchWorkshopData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchWorkshopData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Process workshop data if needed
+      })
+      .addCase(fetchWorkshopData.rejected, (state) => {
+        state.isLoading = false;
+      });
+  }
 });
 
-
 export const {
-  initializeParticipants,
+  setParticipants,
   addParticipant,
   deleteParticipant,
   editParticipant,
@@ -181,4 +222,5 @@ export const {
   filterParticipants,
   setSearchQuery,
 } = ParticipantsSlice.actions;
+
 export default ParticipantsSlice.reducer;

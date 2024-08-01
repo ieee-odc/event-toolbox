@@ -90,8 +90,7 @@ function ParticipantModal() {
   return (
     <>
       {isParticipantModalOpen && (
-        <div className="modal-backdrop fade show"></div>
-      )}
+        <div className="modal-backdrop fade show"></div>)}
 
       {isParticipantModalOpen && (
         <div

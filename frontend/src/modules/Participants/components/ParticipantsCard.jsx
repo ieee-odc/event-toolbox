@@ -17,6 +17,7 @@ import {
   filterParticipants,
   setSearchQuery,
   addParticipant,
+  initializeParticipants,
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
@@ -100,7 +101,9 @@ const ParticipantsCard = () => {
     });
 
     newSocket.on("EventParticipantAdded", (data) => {
-      dispatch(addParticipant(data));
+      // dispatch(addParticipant(data));
+      console.log("dazdza")
+      dispatch(initializeParticipants([...participants, data]))
     });
 
     return () => {
