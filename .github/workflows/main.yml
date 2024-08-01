@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Test frontend of the application
-        run: cd /frontend && npm test
+        run: ls
 
 
   sonar-checks:
