@@ -16,7 +16,6 @@ import {
   editParticipant,
   filterParticipants,
   setSearchQuery,
-  addParticipant,
   initializeParticipants,
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
@@ -35,7 +34,6 @@ const ParticipantsCard = () => {
     participants,
     filteredParticipants,
     participantsPerPage,
-    groupedParticipants,
     searchQuery,
     isEdit,
   } = useSelector((store) => store.participantsStore);
@@ -90,27 +88,26 @@ const ParticipantsCard = () => {
   };
 
   useEffect(() => {
+    dispatch(initializeParticipants(participants));
+
     const newSocket = io(import.meta.env.VITE_BACKEND.split("/api")[0]);
 
     newSocket.on("connect", () => {
       const roomId = workshopId ? `${eventId}/${workshopId}` : `${eventId}`;
-      console.log(roomId);
       if (eventId) {
         newSocket.emit("joinRoom", roomId);
       }
     });
 
     newSocket.on("EventParticipantAdded", (data) => {
-      // dispatch(addParticipant(data));
-      console.log("dazdza")
-      dispatch(initializeParticipants([...participants, data]))
+      dispatch(initializeParticipants([...participants, data]));
     });
 
     return () => {
       newSocket.off("EventParticipantAdded");
       newSocket.disconnect();
     };
-  }, [eventId, workshopId]);
+  }, [eventId, workshopId, dispatch]);
 
   const handleStatusChange = (e) => {
     dispatch(filterParticipants(e.target.value));
@@ -132,17 +129,35 @@ const ParticipantsCard = () => {
   };
 
   const generateCSV = () => {
-    const csvHeader = ["ID", "Full Name", "Email", "Created At", "Status", "Responses"];
-    const csvRows = participants.map((participant) =>
-      [
+    const csvHeader = [
+      "ID",
+      "Full Name",
+      "Email",
+      "Created At",
+      "Status",
+      "Event Name",
+      "Event Questions & Responses",
+      "Workshop Details"
+    ];
+
+    const csvRows = participants.map((participant) => {
+      const eventResponses = formatResponses(participant.eventResponses);
+      const workshopDetails = participant.workshops.map(workshop => {
+        const workshopResponses = formatResponses(workshop.responses);
+        return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
+      }).join("; ");
+
+      return [
         participant.id,
         participant.fullName,
         participant.email,
         formatDateWithShort(participant.createdAt),
         participant.status,
-        formatResponses(participant.responses)
-      ].join(",")
-    );
+        participant.eventName,
+        eventResponses,
+        workshopDetails
+      ].join(",");
+    });
 
     const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
