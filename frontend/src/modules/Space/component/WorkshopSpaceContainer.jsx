@@ -7,6 +7,7 @@ import SpaceModal from "./SpaceModal";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import CustomButton from "../../../core/components/Button/Button";
 
 function WorkshopSpaceContainer() {
   const { workshopId } = useParams();
@@ -117,21 +118,21 @@ function WorkshopSpaceContainer() {
               className="app-logistics-fleet-sidebar col h-100 show"
               id="app-logistics-fleet-sidebar"
             >
-              <div
+             <div
                 className="card-header border-0 pt-4 pb-2 d-flex justify-content-end"
                 style={{ alignItems: "center" }}
               >
-                <button
-                  className="btn btn-primary"
+                <CustomButton
+                  text="Add Venue"
+                  iconClass="bx bx-plus me-md-1 mrt-1"
+                  backgroundColor="var(--primary-color)"
+                  textColor="white"
+                  hoverBackgroundColor="#0F205D"
+                  hoverTextColor="white"
                   onClick={() => {
                     dispatch(toggleSpaceModal());
                   }}
-                >
-                  <span>
-                    <i className="bx bx-plus me-md-1 mrt-1" />
-                    <span className="d-md-inline-block d-none">Add Venue</span>
-                  </span>
-                </button>
+                />
               </div>
 
               <div className="card-body p-0 logistics-fleet-sidebar-body ps">
@@ -151,7 +152,7 @@ function WorkshopSpaceContainer() {
                     <div
                       key={space.id}
                       role="button"
-                      className={`shadow-none collapsed`}
+                      className="shadow-none collapsed"
                       style={{
                         border:
                           selectedWorkshop.spaceId === space.id
@@ -164,40 +165,34 @@ function WorkshopSpaceContainer() {
                       }}
                       data-bs-toggle="collapse"
                       aria-expanded="false"
+                      
                     >
                       <div
                         className="d-flex align-items-center"
-                        style={{ width: "100%" }}
+                        id="space-info"
                         onClick={() => handleSpaceClick(space)}
                       >
                         <div className="avatar-wrapper">
                           <div className="avatar me-3">
                             <span className="avatar-initial rounded-circle bg-label-secondary">
-                              <i className="bx bxs-truck"></i>
+                              <i className="bx bxs-buildings"></i>
                             </span>
                           </div>
                         </div>
-                        <span
-                          className="d-flex flex-column"
-                          style={{
-                            width: "100%",
-                            textOverflow: "ellipsis",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <span className="h6 mb-0" style={{}}>
-                            {space.name}
-                          </span>
+                        <span id="space-info" className="d-flex flex-column align-items-start">
+                          <span className="h6 mb-0">{space.name}</span>
                           <span className="text-muted">{space.capacity}</span>
                         </span>
                       </div>
-                      <div
-                        onClick={() => {
+                      <div className="avatar-wrapper"  onClick={() => {
                           handleOpenEditModal(space);
-                        }}
-                      >
-                        edit
-                      </div>
+                        }}>
+                          <div className="avatar d-flex">
+                            <span className="avatar-initial rounded-circle bg-label-secondary">
+                              <i className="bx bxs-edit-alt m-0"></i>
+                            </span>
+                          </div>
+                        </div>
                     </div>
                   ))}
                 </div>

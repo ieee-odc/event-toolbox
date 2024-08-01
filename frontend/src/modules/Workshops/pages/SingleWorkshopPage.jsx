@@ -50,7 +50,7 @@ function SingleWorkshopPage() {
 
   return (
     <DashboardLayout>
-      <div id="u-container" style={{ padding: 5 }}>
+      <div id="u-container" style={{ padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h4 className="py-3 mb-4">
             <span className="text-muted fw-light">
@@ -123,7 +123,7 @@ function SingleWorkshopPage() {
             id="pills-participant"
             role="tabpanel"
             aria-labelledby="pills-participant-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <ParticipantsContainer />
           </div>
@@ -132,7 +132,7 @@ function SingleWorkshopPage() {
             id="pills-form"
             role="tabpanel"
             aria-labelledby="pills-form-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <WorkshopFormContainer />
           </div>
@@ -142,7 +142,7 @@ function SingleWorkshopPage() {
             id="pills-space"
             role="tabpanel"
             aria-labelledby="pills-space-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <WorkshopSpaceContainer />
           </div>

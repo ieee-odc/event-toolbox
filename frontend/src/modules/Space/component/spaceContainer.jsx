@@ -100,19 +100,6 @@ function SpaceContainer() {
                 className="card-header border-0 pt-4 pb-2 d-flex justify-content-end"
                 style={{ alignItems: "center" }}
               >
-                {/* <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    dispatch(toggleSpaceModal());
-                  }}
-                >
-                   <span>
-              <i className="bx bx-plus me-md-1 mrt-1" />
-              <span className="d-md-inline-block d-none">
-                Create Space
-              </span>
-            </span>
-                </button> */}
                 <CustomButton
                   text="Add Venue"
                   iconClass="bx bx-plus me-md-1 mrt-1"
