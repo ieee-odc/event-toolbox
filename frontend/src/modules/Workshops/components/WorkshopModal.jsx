@@ -62,9 +62,7 @@ function WorkshopModal() {
       selectedWorkshop.startTime &&
       selectedWorkshop.endTime &&
       selectedWorkshop.numberOfAttendees > 0 &&
-      selectedWorkshop.spaceId &&
-      selectedWorkshop.numberOfAttendees <= selectedWorkshop.space.capacity;
-
+      selectedWorkshop.spaceId;
     setIsFormComplete(allFieldsFilled);
   }, [
     selectedWorkshop.name,
@@ -78,7 +76,10 @@ function WorkshopModal() {
   ]);
 
   const handleAddWorkshop = () => {
-    if (selectedWorkshop.numberOfAttendees > selectedWorkshop.space.capacity) {
+    if (
+      selectedWorkshop.numberOfAttendees >
+      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
+    ) {
       toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
@@ -116,7 +117,10 @@ function WorkshopModal() {
   };
 
   const handleEditWorkshop = () => {
-    if (selectedWorkshop.numberOfAttendees > selectedWorkshop.space.capacity) {
+    if (
+      selectedWorkshop.numberOfAttendees >
+      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
+    ) {
       toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }

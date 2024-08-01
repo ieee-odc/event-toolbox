@@ -145,7 +145,8 @@ const getWorkshopParticipants = async (req, res) => {
 };
 const register = async (req, res) => {
   try {
-    const { workshopId, ...participantData } = req.body;
+    const { workshopId, eventId, email, ...participantData } = req.body;
+
     // Find and update the workshop by incrementing the currentParticipants
     const workshop = await Workshop.findOneAndUpdate(
       { id: workshopId },
@@ -178,6 +179,8 @@ const register = async (req, res) => {
     const participant = new Participant({
       id: counter.seq,
       workshopId,
+      eventId,
+      email,
       status: "Pending",
       ...participantData,
     });
