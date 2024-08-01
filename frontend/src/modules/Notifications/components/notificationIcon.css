@@ -1,19 +1,21 @@
 /* NotificationIcon.css */
 .dropdown-menu.show {
-    display: block;
-    position: absolute;
-    will-change: transform;
-    top: 100%;
-    left: 0;
-    margin-top: 0.125rem;
-    font-size: 0.875rem;
-    color: #212529;
-    text-align: left;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 0.25rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
-  }
-  
-  
+  display: block;
+  position: absolute;
+  will-change: transform;
+  top: 100%;
+  right: 0; /* Aligns the dropdown menu to the right */
+  left: auto; /* Ensures the menu is positioned based on the right property */
+  margin-top: 0.125rem;
+  font-size: 0.875rem;
+  color: #212529;
+  text-align: left;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+  width: 300px; /* Adjust the width as needed */
+  max-height: 400px; /* Adjust the height as needed */
+  overflow-y: auto; /* Adds a scrollbar if the content exceeds the height */
+}

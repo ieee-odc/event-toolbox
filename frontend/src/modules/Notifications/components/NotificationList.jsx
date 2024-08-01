@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { jwtDecode } from "jwt-decode";
 import './NotificationList.css';
-import { FaRegCalendarCheck, FaRegClipboard } from 'react-icons/fa'; // Import icons
+import { FaCalendarAlt, FaChalkboardTeacher } from 'react-icons/fa'; // Updated icons
 
 // Function to fetch notifications
 const fetchNotifications = async () => {
@@ -59,7 +59,10 @@ const NotificationPage = () => {
     const { data: notifications = [], isLoading, isError, error } = useQuery({
         queryKey: ['notifications'],
         queryFn: fetchNotifications,
-        onSuccess: () => {
+        onSuccess:  (data) => {
+            if (!Array.isArray(data)) {
+                console.error('Unexpected data format:', data);
+            }
             console.log('Notifications fetched successfully');
             console.log('Type of notifications:', typeof notifications);
             console.log('Is array:', Array.isArray(notifications));
@@ -79,9 +82,10 @@ const NotificationPage = () => {
 
     // Additional check for notifications being an array
     if (!Array.isArray(notifications)) {
-        return <div>Unexpected data format</div>;
+        console.error('Unexpected data format:', notifications);
+        return [];
     }
-
+    
     const notificationCount = notifications.length; // Get the count of notifications
     const notificationUnreadStyle = {
         backgroundColor: '#f5f5f5',
@@ -107,14 +111,15 @@ const NotificationPage = () => {
                                 className="list-group-item list-group-item-action dropdown-notifications-item"
                                 style={!notification.read ? notificationUnreadStyle : {}}
                             >
-                                <div className="d-flex">
+                               <div className="d-flex">
                                     <div className="flex-shrink-0 me-3">
                                         <div className="avatar">
-                                            <img
-                                                src={(notification.from && notification.from.avatar) || '../../assets/img/avatars/default.png'}
-                                                alt=""
-                                                className="w-px-40 h-auto rounded-circle"
-                                            />
+                                            {notification.type === 'EventRegistration' && (
+                                                 <FaCalendarAlt className="notification-icon" />
+                                            )}
+                                            {notification.type === 'WorkshopRegistration' && (
+                                                <FaChalkboardTeacher className="notification-icon" />
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex-grow-1">

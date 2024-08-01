@@ -7,3 +7,8 @@
 .notification-unread .font-weight-bold {
     font-weight: bold; /* Make text bold for unread notifications */
 }
+/* NotificationList.css */
+.notification-icon {
+    font-size: 1.5rem;
+    color: #0d2d4f; /* Change color if needed */
+}
