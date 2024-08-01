@@ -1,32 +1,32 @@
 const  Notification = require("../models/notificationModel.js");
 
 
-// Static method to create a test notification
-const createTestNotification = async (req, res) => {
-    try {
-        const userId = req.user_id; // Organizer's ID (authenticated user)
-        console.log(userId);
-        const notificationType = 'EventRegistration'; // Static notification type for testing
-        const participantId ='66854bb54caee387c81e1740';
+// // Static method to create a test notification
+// const createTestNotification = async (req, res) => {
+//     try {
+//         const userId = req.user_id; // Organizer's ID (authenticated user)
+//         console.log(userId);
+//         const notificationType = 'EventRegistration'; // Static notification type for testing
+//         const participantId ='66854bb54caee387c81e1740';
 
-        // Create a static notification
-        const newNotification = new Notification({
-            from: participantId,
-            to: userId, // This should be a number, not an ObjectId
-            type: notificationType
-            // message: "Test notification: A participant has registered for your event."
-        });
+//         // Create a static notification
+//         const newNotification = new Notification({
+//             from: participantId,
+//             to: userId, // This should be a number, not an ObjectId
+//             type: notificationType
+//             // message: "Test notification: A participant has registered for your event."
+//         });
 
-        // Save the notification to the database
-        await newNotification.save();
+//         // Save the notification to the database
+//         await newNotification.save();
 
-        // Send success response
-        res.status(200).json({ message: "Test notification created successfully" });
-    } catch (error) {
-        console.log("Error in createTestNotification controller:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-};
+//         // Send success response
+//         res.status(200).json({ message: "Test notification created successfully" });
+//     } catch (error) {
+//         console.log("Error in createTestNotification controller:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// };
 
 const getNotifications = async (req, res) => {
     try {
@@ -95,6 +95,6 @@ const deleteNotifications = async (req,res) => {
                 res.status(500).json({error: "Internal serevr error"});
     }
 };
-module.exports = { getNotifications, markAllNotificationsAsRead, deleteNotifications, createTestNotification };
+module.exports = { getNotifications, markAllNotificationsAsRead, deleteNotifications };
 
 
