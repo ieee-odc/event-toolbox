@@ -8,6 +8,13 @@ on:
 
 jobs:
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test frontend of the application
+        run: cd ./frontend && npm test
+
+
   sonar-checks:
     name: analyze
     runs-on: ubuntu-latest
