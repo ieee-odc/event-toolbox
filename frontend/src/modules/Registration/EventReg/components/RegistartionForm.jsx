@@ -96,7 +96,6 @@ const RegistrationForm = () => {
       try {
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
-        console.log(downloadURL);
         dispatch(updateFormData({ field: id, value: downloadURL }));
       } catch (error) {
         console.error("Error uploading file: ", error);
@@ -120,7 +119,7 @@ const RegistrationForm = () => {
     });
     if (!isEventForm) {
       const emailIsAllowed = formData.event.allowedList.some(
-        (email) => email === e.target.value
+        (e) => e === email
       );
       if (!emailIsAllowed) {
         setValidated(false); // Ensure form is marked as invalid
@@ -152,24 +151,7 @@ const RegistrationForm = () => {
     };
 
     try {
-      for (const workshop of formWorkshops) {
-        const submissionData = {
-          ...baseSubmissionData,
-          workshopId: workshop.id,
-        };
 
-        const response = await axiosRequest.post(
-          "/participant/submit",
-          submissionData
-        );
-
-        if (socket) {
-          socket.emit("addEventParticipant", {
-            participant: response.data.participant,
-            roomId: `${eventId}/${workshop.id}`,
-          });
-        }
-      }
       if (isEventForm) {
         try {
           const response = await axiosRequest.post(
@@ -186,6 +168,25 @@ const RegistrationForm = () => {
         } catch (err) {
           toast.error("Participant already registered for this event");
           return;
+        }
+      } else {
+        for (const workshop of formWorkshops) {
+          const submissionData = {
+            ...baseSubmissionData,
+            workshopId: workshop.id,
+          };
+
+          const response = await axiosRequest.post(
+            "/participant/submit",
+            submissionData
+          );
+
+          if (socket) {
+            socket.emit("addEventParticipant", {
+              participant: response.data.participant,
+              roomId: `${eventId}/${workshop.id}`,
+            });
+          }
         }
       }
 
@@ -228,6 +229,7 @@ const RegistrationForm = () => {
   }, [eventId, workshopsIds]);
 
   useEffect(() => {
+    console.log(workshopsIds)
     if (workshopsIds && workshopsIds.length !== 0) {
       axiosRequest
         .post("/workshop/get-many", {
@@ -244,7 +246,6 @@ const RegistrationForm = () => {
             }
           }
           dispatch(setAllFull(allFull));
-          console.log(allFull);
         })
         .catch((err) => {
           console.log(err);
@@ -257,6 +258,13 @@ const RegistrationForm = () => {
       dispatch(setAllFull(false));
     }
   }, [workshopsIds]);
+
+  useEffect(() => {
+    if (workshopsIds && workshopsIds.length !== 0) {
+      dispatch(setIsEventForm(false));
+      dispatch(setAllFull(false));
+    }
+  }, [workshopsIds])
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -311,9 +319,8 @@ const RegistrationForm = () => {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className={`needs-validation ${
-                    validated ? "was-validated" : ""
-                  }`}
+                  className={`needs-validation ${validated ? "was-validated" : ""
+                    }`}
                   noValidate
                 >
                   <div className="mb-3">
@@ -409,7 +416,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                  !checkboxValidation[field.question]
+                                    !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
@@ -550,7 +557,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                  !checkboxValidation[field.question]
+                                    !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}

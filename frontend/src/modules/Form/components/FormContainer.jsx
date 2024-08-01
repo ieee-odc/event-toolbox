@@ -15,11 +15,10 @@ import { UserData } from "../../../utils/UserData";
 import { initializeWorkshops } from "../../../core/Features/Workshops";
 import CustomButton from "../../../core/components/Button/Button";
 
-
 function FormContainer() {
   const dispatch = useDispatch();
   const userData = UserData();
-  const { filteredForms, forms } = useSelector((store) => store.formsStore);
+  const { filteredForms } = useSelector((store) => store.formsStore);
   const { workshops } = useSelector((store) => store.workshopsStore);
   function formatDate(originalDate) {
     const date = new Date(originalDate);
@@ -48,13 +47,13 @@ function FormContainer() {
 
   const handleDeleteForm = (formId) => {
     axiosRequest.delete(`/form/delete/${formId}`).then((res) => {
-      const updatedWorkshops = workshops.map(workshop => {
+      const updatedWorkshops = workshops.map((workshop) => {
         if (workshop.formId === formId) {
           return { ...workshop, formId: null }; // Update the formId to null
         }
         return workshop;
       });
-      dispatch(initializeWorkshops(updatedWorkshops))
+      dispatch(initializeWorkshops(updatedWorkshops));
       dispatch(deleteForm(formId));
       toast.success("Form deleted successfully");
     });
@@ -159,69 +158,78 @@ function FormContainer() {
                 <tr>
                   <th scope="col">Name</th>
                   <th>Deadline</th>
-                  <th>Event</th>
+                  <th>Workshop</th>
                   <th style={{ textAlign: "right" }}></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredForms &&
-                  filteredForms.map((form) => (
-                    <tr key={form.id}>
-                      <td>
-                        <a href="">{form.name}</a>
-                      </td>
-                      <td>
-                        <a href="">{formatDate(form.deadline)}</a>
-                      </td>
-                      <td></td>
-                      <td style={{ textAlign: "right" }}>
-                        <button
-                          className="btn btn-link p-0"
-                          onClick={() => handleEditClick(form)}
-                        >
-                          <i
-                            className={`bx bx-edit-alt bx-sm ${hoveredIcon === `edit_${form._id}`
-                                ? "transform"
-                                : ""
+                  filteredForms.map((form) => {
+                    const relatedWorkshop = form.workshopId
+                      ? workshops.find(
+                          (workshop) => workshop.id === form.workshopId
+                        )
+                      : null;
+                    return (
+                      <tr key={form.id}>
+                        <td>
+                          <a href="">{form.name}</a>
+                        </td>
+                        <td>
+                          <a href="">{formatDate(form.deadline)}</a>
+                        </td>
+                        <td>{relatedWorkshop ? relatedWorkshop.name : ""}</td>
+                        <td style={{ textAlign: "right" }}>
+                          <button
+                            className="btn btn-link p-0"
+                            onClick={() => handleEditClick(form)}
+                          >
+                            <i
+                              className={`bx bx-edit-alt bx-sm ${
+                                hoveredIcon === `edit_${form._id}`
+                                  ? "transform"
+                                  : ""
                               }`}
-                            onMouseEnter={() =>
-                              handleMouseEnter(`edit_${form._id}`)
-                            }
-                            onMouseLeave={handleMouseLeave}
-                          ></i>
-                        </button>
-                        <button
-                          className="btn btn-link p-0"
-                          onClick={() => handleDeleteForm(form.id)}
-                        >
-                          <i
-                            className={`bx bx-trash bx-sm ${hoveredIcon === `delete_${form._id}`
-                                ? "transform"
-                                : ""
+                              onMouseEnter={() =>
+                                handleMouseEnter(`edit_${form._id}`)
+                              }
+                              onMouseLeave={handleMouseLeave}
+                            ></i>
+                          </button>
+                          <button
+                            className="btn btn-link p-0"
+                            onClick={() => handleDeleteForm(form.id)}
+                          >
+                            <i
+                              className={`bx bx-trash bx-sm ${
+                                hoveredIcon === `delete_${form._id}`
+                                  ? "transform"
+                                  : ""
                               }`}
-                            onMouseEnter={() =>
-                              handleMouseEnter(`delete_${form._id}`)
-                            }
-                            onMouseLeave={handleMouseLeave}
-                          ></i>
-                        </button>
-                        <button className="btn btn-link p-0">
-                          <i
-                            className={`bx bx-share bx-sm ${
-                              hoveredIcon === `share_${form._id}`
-                                ? "transform"
-                                : ""
-                            }`}
-                            onMouseEnter={() =>
-                              handleMouseEnter(`share_${form._id}`)
-                            }
-                            onMouseLeave={handleMouseLeave}
-                            onClick={() => handleShareClick(form.id)}
-                          ></i>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                              onMouseEnter={() =>
+                                handleMouseEnter(`delete_${form._id}`)
+                              }
+                              onMouseLeave={handleMouseLeave}
+                            ></i>
+                          </button>
+                          <button className="btn btn-link p-0">
+                            <i
+                              className={`bx bx-share bx-sm ${
+                                hoveredIcon === `share_${form._id}`
+                                  ? "transform"
+                                  : ""
+                              }`}
+                              onMouseEnter={() =>
+                                handleMouseEnter(`share_${form._id}`)
+                              }
+                              onMouseLeave={handleMouseLeave}
+                              onClick={() => handleShareClick(form.id)}
+                            ></i>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
 
                 {filteredForms && filteredForms.length === 0 && (
                   <tr>

@@ -13,8 +13,7 @@ import CustomButton from "../../../core/components/Button/Button";
 
 function SpaceContainer() {
   const dispatch = useDispatch();
-  const { spaces, isLoading } = useSelector((store) => store.spacesStore);
-  const userData = UserData();
+  const { spaces } = useSelector((store) => store.spacesStore);
 
   return (
     <div className="flex-grow-1">

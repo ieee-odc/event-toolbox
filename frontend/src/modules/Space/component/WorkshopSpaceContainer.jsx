@@ -2,10 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "../../../utils/UserData";
-import {
-  selectSpace,
-  toggleSpaceModal,
-} from "../../../core/Features/Spaces";
+import { selectSpace, toggleSpaceModal } from "../../../core/Features/Spaces";
 import SpaceModal from "./SpaceModal";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -15,19 +12,18 @@ function WorkshopSpaceContainer() {
   const { workshopId } = useParams();
   const dispatch = useDispatch();
   const { spaces, isLoading } = useSelector((store) => store.spacesStore);
-  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore);
+  const { selectedWorkshop } = useSelector((store) => store.workshopsStore);
 
   const handleSpaceClick = (space) => {
-    Promise.all([
-      axiosRequest.post(`/space/edit/${space.id}`, {
+    axiosRequest
+      .post(`/workshop/select-space`, {
         workshopId,
-      }),
-      axiosRequest.post(`/workshop/edit/${workshopId}`, {
         spaceId: space.id,
-      }),
-    ])
+      })
       .then(() => {
-        dispatch(updateSelectedWorkshopField({ id: "spaceId", value: space.id }));
+        dispatch(
+          updateSelectedWorkshopField({ id: "spaceId", value: space.id })
+        );
         toast.success(`Selected ${space.name} space`);
       })
       .catch((error) => {
