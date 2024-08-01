@@ -1,37 +1,44 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 
+
 const groupParticipantsByEmail = (participants) => {
   const emailToParticipant = {};
   participants.forEach((participant) => {
     if (!emailToParticipant[participant.email]) {
-      emailToParticipant[participant.email] = { ...participant };
-    } else {
-      // Aggregate statuses
-      if (!emailToParticipant[participant.email].statuses) {
-        emailToParticipant[participant.email].statuses = [emailToParticipant[participant.email].status];
-      }
-      emailToParticipant[participant.email].statuses.push(participant.status);
+      emailToParticipant[participant.email] = { ...participant, workshops: [] };
+    }
 
-      // Aggregate phone numbers
-      if (!emailToParticipant[participant.email].phoneNumbers) {
-        emailToParticipant[participant.email].phoneNumbers = [emailToParticipant[participant.email].phoneNumber];
-      }
-      if (participant.phoneNumber && !emailToParticipant[participant.email].phoneNumbers.includes(participant.phoneNumber)) {
-        emailToParticipant[participant.email].phoneNumbers.push(participant.phoneNumber);
-      }
+    emailToParticipant[participant.email].workshops.push({
+      workshopId: participant.workshopId,
+      responses: participant.responses || [],
+    });
 
-      // Aggregate responses
-      if (!emailToParticipant[participant.email].responses) {
-        emailToParticipant[participant.email].responses = [];
-      }
-      if (participant.responses) {
-        emailToParticipant[participant.email].responses = emailToParticipant[participant.email].responses.concat(participant.responses);
-      }
+    // Aggregate statuses
+    if (!emailToParticipant[participant.email].statuses) {
+      emailToParticipant[participant.email].statuses = [emailToParticipant[participant.email].status];
+    }
+    emailToParticipant[participant.email].statuses.push(participant.status);
+
+    // Aggregate phone numbers
+    if (!emailToParticipant[participant.email].phoneNumbers) {
+      emailToParticipant[participant.email].phoneNumbers = [emailToParticipant[participant.email].phoneNumber];
+    }
+    if (participant.phoneNumber && !emailToParticipant[participant.email].phoneNumbers.includes(participant.phoneNumber)) {
+      emailToParticipant[participant.email].phoneNumbers.push(participant.phoneNumber);
+    }
+
+    // Aggregate responses
+    if (!emailToParticipant[participant.email].responses) {
+      emailToParticipant[participant.email].responses = [];
+    }
+    if (participant.responses) {
+      emailToParticipant[participant.email].responses = emailToParticipant[participant.email].responses.concat(participant.responses);
     }
   });
   return Object.values(emailToParticipant);
 };
+
 
 const ParticipantsSlice = createSlice({
   name: "Participants",
@@ -136,20 +143,20 @@ const ParticipantsSlice = createSlice({
       state.filterStatus = action.payload;
       state.filteredParticipants = action.payload
         ? state.participants.filter(
-            (participant) => participant.status === action.payload
-          )
+          (participant) => participant.status === action.payload
+        )
         : state.participants;
     },
     setSearchQuery: (state, action) => {
       const query = action.payload.toLowerCase();
       state.searchQuery = query;
-      
+
       state.filteredParticipants = state.participants.filter((participant) =>
         participant.fullName.toLowerCase().includes(query) ||
         participant.email.toLowerCase().includes(query)
       );
     }
-    
+
   },
 });
 

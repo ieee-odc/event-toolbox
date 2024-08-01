@@ -23,7 +23,7 @@ const Register = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const newUser = new User({ 
+    const newUser = new User({
       id: counter.seq,
       username,
       email,
@@ -51,14 +51,14 @@ const SignIn = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
+    if (!user) return res.status(400).json({ msg: 'Invalid credentials email' });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
     const payload = { id: user.id, username: user.username };
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
-    
+
     user.lastLoginAt = new Date();
     await user.save();
 

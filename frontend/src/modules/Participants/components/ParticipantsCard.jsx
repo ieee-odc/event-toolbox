@@ -1,3 +1,4 @@
+// File: ParticipantsCard.jsx
 import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
@@ -5,7 +6,6 @@ import ParticipantModal from "./ParticipantModal";
 import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -118,10 +118,40 @@ const ParticipantsCard = () => {
     dispatch(setSearchQuery(query));
     setCurrentPage(1);
   };
+
   const handleEditClick = (participant) => {
     dispatch(setSelectedParticipant(participant));
     dispatch(toggleParticipantModal());
   };
+
+  const formatResponses = (responses) => {
+    return responses.map(({ question, answer }) => `${question}: ${answer}`).join("; ");
+  };
+
+  const generateCSV = () => {
+    const csvHeader = ["ID", "Full Name", "Email", "Created At", "Status", "Responses"];
+    const csvRows = participants.map((participant) =>
+      [
+        participant.id,
+        participant.fullName,
+        participant.email,
+        formatDateWithShort(participant.createdAt),
+        participant.status,
+        formatResponses(participant.responses)
+      ].join(",")
+    );
+
+    const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", "participants.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -143,6 +173,12 @@ const ParticipantsCard = () => {
                 <option value="Pending">Pending</option>
                 <option value="Canceled">Canceled</option>
               </select>
+              <button
+                className="btn btn-primary"
+                onClick={generateCSV}
+              >
+                Download CSV
+              </button>
             </div>
           </div>
           <div className="table-responsive">
