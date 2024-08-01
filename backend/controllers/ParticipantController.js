@@ -3,18 +3,34 @@ const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
 const Notification = require("../models/notificationModel");
-const mongoose = require('mongoose'); // Ensure mongoose is imported
+// const mongoose = require('mongoose'); // Ensure mongoose is imported
 
 
 
 
 const addParticipant = async (req, res) => {
   try {
+    const { eventId, email, ...participantData } = req.body;
+
+    const existingParticipant = await Participant.findOne({ email, eventId });
+    if (existingParticipant) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email is already registered for this event.",
+      });
+    }
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
+    const event = await Event.findOne({ id: eventId });
+    if (event.allowedList) {
+      event.allowedList.push(email);
+    } else {
+      event.allowedList = [email];
+    }
+    await event.save();
 
     const participant = new Participant({
       id: counter.seq,
@@ -24,12 +40,12 @@ const addParticipant = async (req, res) => {
 
     await participant.save();
     // Fetch event details to get the organizerId
-    const event = await Event.findOne({ id: participant.eventId });
-    if (!event) {
+    const event1 = await Event.findOne({ id: participant.eventId });
+    if (!event1) {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    const organizerId = event.organizerId;
+    const organizerId = event1.organizerId;
 
     // Create a notification for the organizer
     const newNotification = new Notification({
