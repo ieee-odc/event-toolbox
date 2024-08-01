@@ -64,8 +64,20 @@ const WorkshopsCard = () => {
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-          <WorkshopTableHeader />
-
+<div className="d-flex justify-content-between align-items-center mb-4">
+            <WorkshopTableHeader />
+            <div className="d-flex align-items-center gap-2">
+              <select
+                id="participantStatusFilter"
+                className="form-select"
+                // onChange={handleStatusChange}
+              >
+                <option value="">All Workshops</option>
+                <option value="Paid">Done</option>
+                <option value="Pending">Starting Soon</option>
+              </select>
+            </div>
+          </div>
           <div className="row g-4" style={{ justifyContent: "center" }}>
             {isLoading ? (
               <p>Loading workshops...</p>

@@ -134,14 +134,14 @@ function FormContainer() {
         </div>
       </div>
       <div className="card">
-        <div className="container-fluid mt-4">
+        <div className="container-fluid">
           <div
-            className="mb-4"
-            style={{ display: "flex", justifyContent: "end" }}
+            className="card-header border-0 d-flex justify-content-end"
+            style={{ alignItems: "center" }}
           >
             <CustomButton
               text="Create Form"
-              iconClass="bx bx-plus me-md-1 mb-2"
+              iconClass="bx bx-plus me-md-1 mrt-1 mrt-1"
               backgroundColor="var(--primary-color)"
               textColor="white"
               hoverBackgroundColor="#0F205D"

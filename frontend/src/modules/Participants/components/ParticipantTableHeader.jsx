@@ -18,7 +18,7 @@ function ParticipantTableHeader({ onSearchChange }) {
     <div className="row mx-1">
       <div
         id="create-workshop-container"
-        className="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start gap-3"
+        className="col-12 col-md-10 d-flex align-items-center justify-content-center justify-content-md-start gap-3"
       >
         <div
           style={{ width: "auto" }}
@@ -43,7 +43,7 @@ function ParticipantTableHeader({ onSearchChange }) {
           <div className="dt-buttons btn-group flex-wrap">
             <CustomButton
               text="Create Participant"
-              iconClass="bx bx-plus me-md-1"
+              iconClass="bx bx-plus me-md-1 mrt-1"
               style={{ padding: "5px" }}
               backgroundColor="var(--primary-color)"
               textColor="white"
@@ -55,9 +55,9 @@ function ParticipantTableHeader({ onSearchChange }) {
               }}
             />
           </div>
+          
         </div>
-      </div>
-      <div className="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
+        <div className="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
         <div id="DataTables_Table_0_filter" className="dataTables_filter">
           <label>
             <input
@@ -70,6 +70,8 @@ function ParticipantTableHeader({ onSearchChange }) {
           </label>
         </div>
       </div>
+      </div>
+     
     </div>
   );
 }

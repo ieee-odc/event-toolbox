@@ -1,6 +1,7 @@
 .google-button {
     display: flex;
     align-items: center;
+    height: 40px;
     background-color: white;
     border: 1px solid #ccc;
     padding: 10px 20px;
