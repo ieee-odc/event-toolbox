@@ -1,6 +1,8 @@
 const Counter = require("../models/CounterModel");
 const Participant = require("../models/ParticipantModel");
-const Workshop = require('../models/WorkshopModel');
+const Workshop = require("../models/WorkshopModel");
+const Event = require("../models/EventModel");
+const Notification = require("../models/notificationModel");
 
 
 
@@ -124,7 +126,6 @@ const getEventParticipants = async (req, res) => {
   }
 };
 
-    
 const getWorkshopParticipants = async (req, res) => {
   try {
     const workshopId = req.params.workshopId;
@@ -210,4 +211,5 @@ module.exports = {
   editParticipant,
   getEventParticipants,
   register,
-  getWorkshopParticipants,};
+  getWorkshopParticipants,
+};

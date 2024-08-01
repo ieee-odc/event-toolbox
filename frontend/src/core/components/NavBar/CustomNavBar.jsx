@@ -120,7 +120,7 @@ function CustomNavBar({ toggleSideBar }) {
           </li>
           {/* / Style Switcher*/}
           {/* Notification */}
-          <NotificationIcon/>
+            <NotificationIcon/>
           {/*/ Notification */}
           {/* User */}
           <li className="nav-item navbar-dropdown dropdown-user dropdown">

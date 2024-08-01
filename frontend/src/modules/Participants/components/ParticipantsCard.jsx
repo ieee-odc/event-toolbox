@@ -16,6 +16,7 @@ import {
   editParticipant,
   filterParticipants,
   setSearchQuery,
+  addParticipant,
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
@@ -28,21 +29,19 @@ const ParticipationStatus = Object.freeze({
 });
 
 const ParticipantsCard = () => {
-  const { eventId } = useParams();
+  const { eventId, workshopId } = useParams();
   const {
     participants,
     filteredParticipants,
     participantsPerPage,
     groupedParticipants,
     searchQuery,
-    isEdit
+    isEdit,
   } = useSelector((store) => store.participantsStore);
 
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [currentParticipant, setCurrentParticipant] = useState(null);
 
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
@@ -71,8 +70,6 @@ const ParticipantsCard = () => {
     });
   };
 
-  const [socket, setSocket] = useState(null);
-
   const handleOpenDetails = (participant) => {
     dispatch(setSelectedParticipant(participant));
     dispatch(toggleParticipantDetails());
@@ -91,14 +88,14 @@ const ParticipantsCard = () => {
       });
   };
 
-
-
   useEffect(() => {
-    const newSocket = io(import.meta.env.VITE_BACKEND);
+    const newSocket = io(import.meta.env.VITE_BACKEND.split("/api")[0]);
 
     newSocket.on("connect", () => {
+      const roomId = workshopId ? `${eventId}/${workshopId}` : `${eventId}`;
+      console.log(roomId);
       if (eventId) {
-        newSocket.emit("joinRoom", eventId);
+        newSocket.emit("joinRoom", roomId);
       }
     });
 
@@ -110,7 +107,7 @@ const ParticipantsCard = () => {
       newSocket.off("EventParticipantAdded");
       newSocket.disconnect();
     };
-  }, [eventId]);
+  }, [eventId, workshopId]);
 
   const handleStatusChange = (e) => {
     dispatch(filterParticipants(e.target.value));
@@ -247,11 +244,10 @@ const ParticipantsCard = () => {
                           <a
                             className="dropdown-item"
                             onClick={() =>
-                              
-                             { console.log(isEdit), handleChangeStatus(
+                              handleChangeStatus(
                                 participant,
                                 ParticipationStatus.PAID
-                              )}
+                              )
                             }
                           >
                             Mark as Paid

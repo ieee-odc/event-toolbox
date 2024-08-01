@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosRequest from "../../utils/AxiosConfig";
+import { act } from "react";
 
 // Async thunk to fetch form data by form ID
 export const fetchFormData = createAsyncThunk(
@@ -25,7 +26,9 @@ const registrationSlice = createSlice({
     workshopsIds: [],
     formWorkshops: [],
     eventId: null,
-    workshopId: null,
+    hasMultiSelectForm: false,
+    allFull: true,
+    isEventForm: false,
   },
   reducers: {
     updateFormData: (state, action) => {
@@ -38,6 +41,12 @@ const registrationSlice = createSlice({
     initializeWorkshops: (state, action) => {
       state.formWorkshops = action.payload;
     },
+    setAllFull: (state, action) => {
+      state.allFull = action.payload;
+    },
+    setIsEventForm: (state, action) => {
+      state.isEventForm = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -49,24 +58,32 @@ const registrationSlice = createSlice({
         state.loading = false;
         state.formFields = action.payload.form.data;
 
-        const workshopIdsSet = new Set(state.workshopsIds); // Create a Set to store unique workshop IDs
+        const workshopIdsSet = new Set(); // Create an empty Set to store unique workshop IDs
 
         for (let i = 0; i < action.payload.form.data.length; i++) {
           if (action.payload.form.data[i].type === "workshop-selection") {
             action.payload.form.data[i].options.forEach((option) => {
-              workshopIdsSet.add(option);
+              if (option !== undefined) {
+                workshopIdsSet.add(option);
+              }
             });
           }
         }
 
-        state.workshopsIds = Array.from(workshopIdsSet);
+        if (action.payload.form.workshopId !== undefined) {
+          workshopIdsSet.add(action.payload.form.workshopId);
+        }
+
+        // Convert the Set to an array and filter out undefined values
+        state.workshopsIds = Array.from(workshopIdsSet).filter(
+          (id) => id !== undefined
+        );
+
         state.eventId = action.payload.form.eventId;
-        state.workshopId = action.payload.form.workshopId;
-        state.formData = {
-          name: action.payload.form.name,
-          description: action.payload.form.description,
-          deadline: action.payload.form.deadline,
-        };
+        state.hasMultiSelectForm = action.payload.form.data.some(
+          (question) => question.type === "workshop-selection"
+        );
+        state.formData = action.payload.form;
       })
 
       .addCase(fetchFormData.rejected, (state, action) => {
@@ -80,7 +97,9 @@ export const {
   updateFormData,
   initializeWorkshops,
   resetFormData,
+  setAllFull,
   setHeadData,
+  setIsEventForm,
 } = registrationSlice.actions;
 
 export default registrationSlice.reducer;

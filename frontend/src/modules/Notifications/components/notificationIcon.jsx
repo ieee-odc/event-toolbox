@@ -130,9 +130,9 @@ const NotificationIcon = () => {
             </div>
           </li>
           <NotificationList notifications={notifications} />
-          <li className="dropdown-menu-footer border-top p-3">
+          {/* <li className="dropdown-menu-footer border-top p-3">
             <button className="btn btn-primary text-uppercase w-100">View All Notifications</button>
-          </li>
+          </li> */}
         </ul>
       )}
     </li>
