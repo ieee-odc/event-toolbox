@@ -32,11 +32,15 @@ const addParticipant = async (req, res) => {
     }
     await event.save();
 
-    const participant = new Participant({
+     // Create and save the new participant
+     const participant = new Participant({
       id: counter.seq,
       status: "Pending",
-      ...req.body,
+      eventId,
+      email,
+      ...participantData,
     });
+    await participant.save();
 
     await participant.save();
     // Fetch event details to get the organizerId
