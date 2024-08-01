@@ -146,7 +146,6 @@ function WorkshopModal() {
       .then((res) => {
         toast.success("Successfully Edited!");
         dispatch(toggleWorkshopModal());
-        console.log(res.data.workshop);
         dispatch(editWorkshop(res.data.workshop));
       })
       .catch((err) => {

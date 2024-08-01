@@ -96,7 +96,6 @@ const RegistrationForm = () => {
       try {
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
-        console.log(downloadURL);
         dispatch(updateFormData({ field: id, value: downloadURL }));
       } catch (error) {
         console.error("Error uploading file: ", error);
@@ -244,7 +243,6 @@ const RegistrationForm = () => {
             }
           }
           dispatch(setAllFull(allFull));
-          console.log(allFull);
         })
         .catch((err) => {
           console.log(err);
