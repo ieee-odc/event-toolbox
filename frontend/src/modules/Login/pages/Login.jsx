@@ -39,8 +39,7 @@ function Login() {
     }
     try {
       const res = await axiosRequest.post("/auth/login", formData);
-     localStorage.setItem("token", res.data.token);
-     
+      localStorage.setItem("token", res.data.token);
       navigate("/events");
     } catch (err) {
       console.error(err.response.data);
