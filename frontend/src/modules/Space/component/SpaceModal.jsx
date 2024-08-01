@@ -83,6 +83,18 @@ function SpaceModal() {
         organizerId: userData.id,
       })
       .then((res) => {
+        const updatedWorkshops = workshops.map((workshop) => {
+          if (workshop.spaceId === selectedSpace.id) {
+            return {
+              ...workshop,
+              spaceId: selectedSpace.id,
+              space: res.data.space,
+            };
+          }
+          return workshop;
+        });
+
+        dispatch(initializeWorkshops(updatedWorkshops));
         dispatch(editSpace(res.data.space));
         dispatch(toggleSpaceModal());
         dispatch(resetSpaceModal());
@@ -170,7 +182,7 @@ function SpaceModal() {
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-label-secondary me-2"
+                className="btn btn-label-secondary ms-2"
                 onClick={() => {
                   dispatch(toggleSpaceModal());
                   dispatch(resetSpaceModal());

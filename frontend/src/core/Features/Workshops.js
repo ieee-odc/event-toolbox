@@ -17,7 +17,7 @@ const WorkshopsSlice = createSlice({
       spaceId: "",
       formId: "",
       numberOfAttendees: null,
-      date: new Date(),
+      date: "",
     },
     workshopsPerPage: 6,
   },
@@ -61,9 +61,6 @@ const WorkshopsSlice = createSlice({
     updateSelectedWorkshopField: (state, action) => {
       const { id, value } = action.payload;
       state.selectedWorkshop[id] = value;
-      if (id === "startDate") {
-        state.selectedWorkshop.endDate = "";
-      }
     },
     resetWorkshopModal: (state) => {
       state.isEdit = false;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ParticipantsContainer from "../../Participants/components/ParticipantsContainer";
 import WorkshopsContainer from "../../Workshops/components/WorkshopsContainer";
 import FormContainer from "../../Form/components/FormContainer";
@@ -15,7 +15,7 @@ import { initializeWorkshops } from "../../../core/Features/Workshops";
 
 function SingleEventPage() {
   const { eventId } = useParams();
-
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Participants");
   const [event, setEvent] = useState({});
   const dispatch = useDispatch();
@@ -54,10 +54,20 @@ function SingleEventPage() {
     <DashboardLayout>
       <div style={{ padding: 20 }}>
         <div className="d-flex flex-column flex-md-row justify-content-between">
-          <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">{event?.name} /</span>{" "}
-            {activeTab}
-          </h4>
+          <div className="d-flex">
+            <button
+              className="btn btn-link pe-3 mrrt-1 mb-4"
+              onClick={() => navigate(-1)}
+            >
+              <h4><i className="bx bx-arrow-back m-0"></i> </h4>
+            </button>
+            <h4 className="py-3 mb-4">
+              <span className="text-muted fw-light">
+                {event?.name} /
+              </span>{" "}
+              {activeTab}
+            </h4>
+          </div>
           <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li className="nav-item" role="presentation">
               <button
@@ -92,42 +102,42 @@ function SingleEventPage() {
               >
                 Venue
               </button>
-              </li>
+            </li>
 
-              <li className="nav-item" role="presentation">
-                <button
-                  className="nav-link active"
-                  id="pills-participant-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-participant"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-participant"
-                  aria-selected="true"
-                  onClick={() => {
-                    setActiveTab("Participants");
-                  }}
-                >
-                  Participants
-                </button>
-              </li>
-              <li className="nav-item" role="presentation">
-                <button
-                  className="nav-link"
-                  id="pills-workshop-tab"
-                  data-bs-toggle="pill"
-                  data-bs-target="#pills-workshop"
-                  type="button"
-                  role="tab"
-                  aria-controls="pills-workshop"
-                  aria-selected="false"
-                  onClick={() => {
-                    setActiveTab("Workshops");
-                  }}
-                >
-                  Workshops
-                </button>
-              </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link active"
+                id="pills-participant-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#pills-participant"
+                type="button"
+                role="tab"
+                aria-controls="pills-participant"
+                aria-selected="true"
+                onClick={() => {
+                  setActiveTab("Participants");
+                }}
+              >
+                Participants
+              </button>
+            </li>
+            <li className="nav-item" role="presentation">
+              <button
+                className="nav-link"
+                id="pills-workshop-tab"
+                data-bs-toggle="pill"
+                data-bs-target="#pills-workshop"
+                type="button"
+                role="tab"
+                aria-controls="pills-workshop"
+                aria-selected="false"
+                onClick={() => {
+                  setActiveTab("Workshops");
+                }}
+              >
+                Workshops
+              </button>
+            </li>
 
 
           </ul>

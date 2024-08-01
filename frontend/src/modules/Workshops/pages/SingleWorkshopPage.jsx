@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ParticipantsContainer from "../../Participants/components/ParticipantsContainer";
 import FormContainer from "../../Form/components/FormContainer";
 import DashboardLayout from "../../../core/components/DashboardLayout/DashboardLayout";
@@ -9,18 +9,20 @@ import axiosRequest from "../../../utils/AxiosConfig";
 import { initializeForms } from "../../../core/Features/Forms";
 import { initializeParticipants } from "../../../core/Features/Participants";
 import { initializeSpaces } from "../../../core/Features/Spaces";
-import { initializeWorkshops, setSelectedWorkshop } from "../../../core/Features/Workshops";
+import {
+  initializeWorkshops,
+  setSelectedWorkshop,
+} from "../../../core/Features/Workshops";
 import WorkshopSpaceContainer from "../../Space/component/WorkshopSpaceContainer";
 import WorkshopFormContainer from "../../Form/components/WorkshopFormContainer";
 
 function SingleWorkshopPage() {
   const { workshopId, eventId } = useParams();
-
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Participants");
   const dispatch = useDispatch();
 
-  const {selectedWorkshop}=useSelector((store)=>store.workshopsStore)
-
+  const { selectedWorkshop } = useSelector((store) => store.workshopsStore);
 
   useEffect(() => {
     axiosRequest.get(`/workshop/${workshopId}`).then((res) => {
@@ -33,7 +35,6 @@ function SingleWorkshopPage() {
       dispatch(initializeParticipants(res.data.participants));
     });
   }, [workshopId]);
-
 
   useEffect(() => {
     axiosRequest.get(`/form/get-event/${eventId}`).then((res) => {
@@ -49,12 +50,22 @@ function SingleWorkshopPage() {
 
   return (
     <DashboardLayout>
-      <div id="u-container" style={{ padding: 5 }}>
+      <div id="u-container" style={{ padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h4 className="py-3 mb-4">
-            <span className="text-muted fw-light">{selectedWorkshop?.name} /</span>{" "}
-            {activeTab}
-          </h4>
+          <div className="d-flex">
+            <button
+              className="btn btn-link pe-3 mrrt-1 mb-4"
+              onClick={() => navigate(-1)}
+            >
+              <h4><i className="bx bx-arrow-back m-0"></i> </h4>
+            </button>
+            <h4 className="py-3 mb-4">
+              <span className="text-muted fw-light">
+                {selectedWorkshop?.name} /
+              </span>{" "}
+              {activeTab}
+            </h4>
+          </div>
           <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li className="nav-item" role="presentation">
               <button
@@ -104,7 +115,7 @@ function SingleWorkshopPage() {
                   setActiveTab("Spaces");
                 }}
               >
-                Spaces
+                Venues
               </button>
             </li>
           </ul>
@@ -120,7 +131,7 @@ function SingleWorkshopPage() {
             id="pills-participant"
             role="tabpanel"
             aria-labelledby="pills-participant-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <ParticipantsContainer />
           </div>
@@ -129,7 +140,7 @@ function SingleWorkshopPage() {
             id="pills-form"
             role="tabpanel"
             aria-labelledby="pills-form-tab"
-            tabindex="0"
+            tabIndex="0"
           >
             <WorkshopFormContainer />
           </div>
@@ -139,9 +150,9 @@ function SingleWorkshopPage() {
             id="pills-space"
             role="tabpanel"
             aria-labelledby="pills-space-tab"
-            tabindex="0"
+            tabIndex="0"
           >
-            <WorkshopSpaceContainer/>
+            <WorkshopSpaceContainer />
           </div>
         </div>
       </div>

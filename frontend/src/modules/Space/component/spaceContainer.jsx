@@ -13,8 +13,7 @@ import CustomButton from "../../../core/components/Button/Button";
 
 function SpaceContainer() {
   const dispatch = useDispatch();
-  const { spaces, isLoading } = useSelector((store) => store.spacesStore);
-  const userData = UserData();
+  const { spaces } = useSelector((store) => store.spacesStore);
 
   return (
     <div className="flex-grow-1">
@@ -101,22 +100,9 @@ function SpaceContainer() {
                 className="card-header border-0 pt-4 pb-2 d-flex justify-content-end"
                 style={{ alignItems: "center" }}
               >
-                {/* <button
-                  className="btn btn-primary"
-                  onClick={() => {
-                    dispatch(toggleSpaceModal());
-                  }}
-                >
-                   <span>
-              <i className="bx bx-plus me-md-1" />
-              <span className="d-md-inline-block d-none">
-                Create Space
-              </span>
-            </span>
-                </button> */}
                 <CustomButton
                   text="Add Venue"
-                  iconClass="bx bx-plus me-md-1"
+                  iconClass="bx bx-plus me-md-1 mrt-1"
                   backgroundColor="var(--primary-color)"
                   textColor="white"
                   hoverBackgroundColor="#0F205D"

@@ -40,7 +40,6 @@ function ParticipantModal() {
       });
   };
   const handleEditParticipant = () => {
-    console.log(isEdit)
     const reqBody = {
       email: selectedParticipant.email,
       fullName: selectedParticipant.fullName,
@@ -181,7 +180,7 @@ function ParticipantModal() {
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleParticipantModal());
-                    dispatch(resetParticipantModal())
+                    dispatch(resetParticipantModal());
                   }}
                 >
                   Close
@@ -189,7 +188,9 @@ function ParticipantModal() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={isEdit ? handleEditParticipant : handleAddParticipant}
+                  onClick={
+                    isEdit ? handleEditParticipant : handleAddParticipant
+                  }
                 >
                   {isEdit ? "Save Changes" : "Create"}
                 </button>
