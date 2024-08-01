@@ -29,6 +29,8 @@ import { initializeEvents } from "../../../core/Features/Events";
 import { useParams } from "react-router-dom";
 
 function FormModal() {
+  const flatpickrRef = useRef();
+
   const dispatch = useDispatch();
   const userData = UserData();
   const { eventId, workshopId } = useParams();
@@ -153,6 +155,7 @@ function FormModal() {
       updateQuestionOptions({ index: questionIndex, options: newOptions })
     );
   };
+
   const handleClickOutside = (event) => {
     const flatpickrNode = flatpickrRef.current?.flatpickr?.calendarContainer;
     if (
@@ -238,6 +241,7 @@ function FormModal() {
               <div className="mb-3">
                 <label className="form-label">Deadline</label>
                 <Flatpickr
+                  ref={flatpickrRef}
                   id="deadline"
                   value={selectedForm?.deadline}
                   options={{

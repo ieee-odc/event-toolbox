@@ -163,7 +163,7 @@ function CustomNavBar({ toggleSideBar }) {
                 <div className="dropdown-divider" />
               </li>
               <li>
-                <a className="dropdown-item" >
+                <a className="dropdown-item">
                   <i className="bx bx-user me-2" />
                   <span className="align-middle">My Profile</span>
                 </a>

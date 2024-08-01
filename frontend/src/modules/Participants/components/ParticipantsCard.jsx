@@ -93,7 +93,6 @@ const ParticipantsCard = () => {
 
     newSocket.on("connect", () => {
       const roomId = workshopId ? `${eventId}/${workshopId}` : `${eventId}`;
-      console.log(roomId);
       if (eventId) {
         newSocket.emit("joinRoom", roomId);
       }
