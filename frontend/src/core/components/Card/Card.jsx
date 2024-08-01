@@ -37,12 +37,13 @@ const Card = ({
     });
   };
   const handleEditWorkshop = (workshop) => {
+    const newDate = new Date(workshop.startTime).toISOString();
     dispatch(
       setSelectedWorkshop({
         ...workshop,
-        startTime: formatTime(workshop.startTime),
-        endTime: formatTime(workshop.endTime),
-        date: new Date(workshop.startTime),
+        startTime: workshop.startTime,
+        endTime: workshop.endTime,
+        date: newDate,
       })
     );
     dispatch(toggleWorkshopModal());

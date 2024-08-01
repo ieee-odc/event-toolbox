@@ -185,6 +185,10 @@ function WorkshopModal() {
     };
   }, [isModalOpen]);
 
+  useEffect(() => {
+    console.log(selectedWorkshop);
+  }, [selectedWorkshop]);
+
   return (
     <>
       {isModalOpen && <div className="modal-backdrop fade show"></div>}
@@ -334,14 +338,15 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"startTime"}
                       value={selectedWorkshop.startTime}
-                      onChange={(time) =>
+                      onChange={(time) => {
+                        const myType = time[0].toISOString();
                         dispatch(
                           updateSelectedWorkshopField({
                             id: "startTime",
-                            value: time[0],
+                            value: myType,
                           })
-                        )
-                      }
+                        );
+                      }}
                       options={{
                         enableTime: true,
                         noCalendar: true,
@@ -358,14 +363,16 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"endTime"}
                       value={selectedWorkshop.endTime}
-                      onChange={(time) =>
+                      onChange={(time) => {
+                        const myType = time[0].toISOString();
+
                         dispatch(
                           updateSelectedWorkshopField({
                             id: "endTime",
-                            value: time[0],
+                            value: myType,
                           })
-                        )
-                      }
+                        );
+                      }}
                       options={{
                         enableTime: true,
                         noCalendar: true,
@@ -387,14 +394,15 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"date"}
                       value={selectedWorkshop.date}
-                      onChange={(date) =>
+                      onChange={(date) => {
+                        const myDate = date[0].toISOString();
                         dispatch(
                           updateSelectedWorkshopField({
                             id: "date",
-                            value: date[0],
+                            value: myDate,
                           })
-                        )
-                      }
+                        );
+                      }}
                       options={{ dateFormat: "Y-m-d" }}
                       className="form-control"
                       required
