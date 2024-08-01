@@ -11,77 +11,97 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Test frontend of the application
-        run: cd app/frontend && ls
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+      working-directory: ./frontend
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: ./test_results
 
 
-  sonar-checks:
-    name: analyze
-    runs-on: ubuntu-latest
+
+  # sonar-checks:
+  #   name: analyze
+  #   runs-on: ubuntu-latest
     
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis    
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis    
+  #     - uses: sonarsource/sonarqube-scan-action@master
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-  build-front:
-    runs-on: ubuntu-latest
-    needs: sonar-checks
+  # build-front:
+  #   runs-on: ubuntu-latest
+  #   needs: sonar-checks
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      - name: login to dockerhub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME}} 
-          password: ${{secrets.DOCKER_PASSWORD}}
+  #     - name: login to dockerhub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME}} 
+  #         password: ${{secrets.DOCKER_PASSWORD}}
 
-      - name: publish to dockerhub
-        uses: docker/build-push-action@v2
-        with:
-          context: ./frontend
-          push: true
-          tags: chayma02/event-management-platform-front:latest
+  #     - name: publish to dockerhub
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         context: ./frontend
+  #         push: true
+  #         tags: chayma02/event-management-platform-front:latest
 
-  build-back:
-    runs-on: ubuntu-latest
-    needs: [sonar-checks, build-front]
+  # build-back:
+  #   runs-on: ubuntu-latest
+  #   needs: [sonar-checks, build-front]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      - name: login to dockerhub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME}} 
-          password: ${{secrets.DOCKER_PASSWORD}}
+  #     - name: login to dockerhub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME}} 
+  #         password: ${{secrets.DOCKER_PASSWORD}}
 
-      - name: Extract metadata for the Docker image
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: chayma02/event-management-platform-back
+  #     - name: Extract metadata for the Docker image
+  #       id: meta
+  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+  #       with:
+  #         images: chayma02/event-management-platform-back
 
-      - name: Build and push the Docker image
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}-${{ github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Build and push the Docker image
+  #       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+  #       with:
+  #         context: ./backend
+  #         push: true
+  #         tags: ${{ steps.meta.outputs.tags }}-${{ github.sha }}
+  #         labels: ${{ steps.meta.outputs.labels }}
     
 
 
@@ -118,20 +138,20 @@ jobs:
 
 
 
-        ##### create an artifact for local download 
-        ########## this is not the main goal
+  #       ##### create an artifact for local download 
+  #       ########## this is not the main goal
       
 
-      # - name: build docker image for frontend
-      #   run: cd ./frontend && ls && npm install && npm run build
+  #     # - name: build docker image for frontend
+  #     #   run: cd ./frontend && ls && npm install && npm run build
 
         
 
-      # - name: upload artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: MernStack
-      #     path: ./frontend
+  #     # - name: upload artifacts
+  #     #   uses: actions/upload-artifact@v4
+  #     #   with:
+  #     #     name: MernStack
+  #     #     path: ./frontend
 
 
 
@@ -149,41 +169,41 @@ jobs:
 
 
 
-          ########## this part is meant for docker compose which is not taken in consideration for the moment
+  #         ########## this part is meant for docker compose which is not taken in consideration for the moment
 
-      # - name: Build Docker images
-      #   run: |
-      #     docker-compose -f compose.yml build
+  #     # - name: Build Docker images
+  #     #   run: |
+  #     #     docker-compose -f compose.yml build
 
-      # - name: Run Docker Compose
-      #   run: |
-      #     docker-compose -f compose.yml up -d
-      #     docker-compose -f compose.yml ps
+  #     # - name: Run Docker Compose
+  #     #   run: |
+  #     #     docker-compose -f compose.yml up -d
+  #     #     docker-compose -f compose.yml ps
 
-      # - name: npm run dev
-      #   run: nmp run dev
-
-
+  #     # - name: npm run dev
+  #     #   run: nmp run dev
 
 
 
-      # - name: upload artifacts
-      #   # working-directory: /app/backend
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: MernStack
-      #     path: .git/
-      # - name: Wait for services to start
-      #   run: sleep 30
+
+
+  #     # - name: upload artifacts
+  #     #   # working-directory: /app/backend
+  #     #   uses: actions/upload-artifact@v4
+  #     #   with:
+  #     #     name: MernStack
+  #     #     path: .git/
+  #     # - name: Wait for services to start
+  #     #   run: sleep 30
 
 
 
       
 
-      # - name: Verify Docker Containers
-      #   run: |
-      #     docker ps -a
+  #     # - name: Verify Docker Containers
+  #     #   run: |
+  #     #     docker ps -a
 
-    #  - name: Tear down
-    #    if: always()
-    #    run: docker-compose -f compose.yml down
+  #   #  - name: Tear down
+  #   #    if: always()
+  #   #    run: docker-compose -f compose.yml down
