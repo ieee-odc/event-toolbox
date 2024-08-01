@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 import DatePicker from "react-datepicker";
+import Flatpickr from "react-flatpickr";
 
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +14,6 @@ import {
   toggleWorkshopModal,
   updateSelectedWorkshopField,
 } from "../../../core/Features/Workshops";
-import { initializeSpaces } from "../../../core/Features/Spaces";
 import { useParams } from "react-router-dom";
 
 function WorkshopModal() {
@@ -22,43 +22,36 @@ function WorkshopModal() {
     (state) => state.workshopsStore
   );
   const { spaces } = useSelector((state) => state.spacesStore);
+  const flatpickrRef = useRef();
+
   const dispatch = useDispatch();
   const userData = UserData();
 
-  const [selectedSpace, setSelectedSpace] = useState(null);
-  const [attendees, setAttendees] = useState(0);
   const [capacityMessage, setCapacityMessage] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const modalRef = useRef(null);
 
   useEffect(() => {
-    axiosRequest.get(`/space/get-event/${eventId}`).then((res) => {
-      dispatch(initializeSpaces(res.data.spaces));
-      if (res.data.spaces.length > 0) {
-        dispatch(
-          updateSelectedWorkshopField({
-            id: "spaceId",
-            value: res.data.spaces[0].id,
-          })
-        );
-        setSelectedSpace(res.data.spaces[0]);
-      }
-    });
-  }, [dispatch, eventId]);
+    dispatch(
+      updateSelectedWorkshopField({
+        id: "spaceId",
+        value: spaces[0]?.id,
+      })
+    );
+  }, [spaces]);
 
   useEffect(() => {
-    if (selectedSpace && attendees) {
-      if (attendees > selectedSpace.capacity) {
-        setCapacityMessage(
-          "The selected space does not have enough capacity for the attendees."
-        );
-      } else {
-        setCapacityMessage("The selected space has enough capacity.");
-      }
+    if (
+      selectedWorkshop.numberOfAttendees >
+      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
+    ) {
+      setCapacityMessage(
+        "The selected space does not have enough capacity for the numberOfAttendees."
+      );
     } else {
-      setCapacityMessage("");
+      setCapacityMessage("The selected space has enough capacity.");
     }
-  }, [selectedSpace, attendees]);
+  }, [selectedWorkshop.space, selectedWorkshop.numberOfAttendees]);
 
   useEffect(() => {
     const allFieldsFilled =
@@ -68,9 +61,9 @@ function WorkshopModal() {
       selectedWorkshop.date &&
       selectedWorkshop.startTime &&
       selectedWorkshop.endTime &&
-      attendees > 0 &&
-      selectedSpace &&
-      attendees <= selectedSpace.capacity;
+      selectedWorkshop.numberOfAttendees > 0 &&
+      selectedWorkshop.spaceId &&
+      selectedWorkshop.numberOfAttendees <= selectedWorkshop.space.capacity;
 
     setIsFormComplete(allFieldsFilled);
   }, [
@@ -80,88 +73,13 @@ function WorkshopModal() {
     selectedWorkshop.date,
     selectedWorkshop.startTime,
     selectedWorkshop.endTime,
-    attendees,
-    selectedSpace,
+    selectedWorkshop.numberOfAttendees,
+    selectedWorkshop.space,
   ]);
 
-  const validateTime = (value, length) => {
-    if (length === 1) {
-      return value === "0" || value === "1" || value === "2";
-    } else if (length === 3) {
-      const firstChar = value.charAt(0);
-      if (firstChar === "2") {
-        const secondChar = value.charAt(1);
-        return (
-          secondChar === "0" ||
-          secondChar === "1" ||
-          secondChar === "2" ||
-          secondChar === "3"
-        );
-      }
-    } else if (length === 4) {
-      const minutesFirstChar = value.charAt(3);
-      return ["0", "1", "2", "3", "4", "5"].includes(minutesFirstChar);
-    } else if (length === 5) {
-      const minutesSecondChar = value.charAt(4);
-      return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(
-        minutesSecondChar
-      );
-    }
-    return true;
-  };
-
-  const handleChangeTime = (field, value, dispatch, selectedWorkshopField) => {
-    let isDelete = selectedWorkshopField.length > value.length;
-    if (isDelete) {
-      dispatch(
-        updateSelectedWorkshopField({
-          id: field,
-          value: value,
-        })
-      );
-      return;
-    }
-
-    if (value.length >= 6) {
-      return;
-    }
-    if (value.length === 2) {
-      value += ":";
-    }
-
-    if (!validateTime(value, value.length)) {
-      return;
-    }
-
-    dispatch(
-      updateSelectedWorkshopField({
-        id: field,
-        value: value,
-      })
-    );
-  };
-
-  const handleChangeStartTime = (e) => {
-    handleChangeTime(
-      "startTime",
-      e.target.value,
-      dispatch,
-      selectedWorkshop.startTime
-    );
-  };
-
-  const handleChangeEndTime = (e) => {
-    handleChangeTime(
-      "endTime",
-      e.target.value,
-      dispatch,
-      selectedWorkshop.endTime
-    );
-  };
-
   const handleAddWorkshop = () => {
-    if (attendees > selectedSpace.capacity) {
-      toast.error("Number of attendees exceeds the space capacity.");
+    if (selectedWorkshop.numberOfAttendees > selectedWorkshop.space.capacity) {
+      toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
     const startDate = new Date(selectedWorkshop.date);
@@ -182,14 +100,13 @@ function WorkshopModal() {
       endTime: endDate.toISOString(),
       spaceId: selectedWorkshop.spaceId,
       eventId,
-      attendees,
+      numberOfAttendees: selectedWorkshop.numberOfAttendees,
     };
     axiosRequest
       .post("/workshop/add", reqBody)
       .then((res) => {
         toast.success("Successfully created!");
         dispatch(toggleWorkshopModal());
-        resetAttendees();
         dispatch(addWorkshop(res.data.workshop));
       })
       .catch((err) => {
@@ -199,8 +116,8 @@ function WorkshopModal() {
   };
 
   const handleEditWorkshop = () => {
-    if (attendees > selectedSpace.capacity) {
-      toast.error("Number of attendees exceeds the space capacity.");
+    if (selectedWorkshop.numberOfAttendees > selectedWorkshop.space.capacity) {
+      toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
     const startDate = new Date(selectedWorkshop.date);
@@ -221,7 +138,7 @@ function WorkshopModal() {
       endTime: endDate.toISOString(),
       spaceId: selectedWorkshop.spaceId,
       eventId,
-      attendees,
+      numberOfAttendees: selectedWorkshop.numberOfAttendees,
     };
 
     axiosRequest
@@ -229,7 +146,6 @@ function WorkshopModal() {
       .then((res) => {
         toast.success("Successfully Edited!");
         dispatch(toggleWorkshopModal());
-        resetAttendees();
         dispatch(editWorkshop(res.data.workshop));
       })
       .catch((err) => {
@@ -239,40 +155,22 @@ function WorkshopModal() {
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    if (id === "attendees") {
-      setAttendees(value);
-    } else {
-      dispatch(updateSelectedWorkshopField({ id, value }));
-      if (id === "spaceId") {
-        const selected = spaces.find((space) => space.id === Number(value));
-        if (selected) {
-          setSelectedSpace(selected);
-        } else {
-          console.error("Selected space not found or spaces array is empty.", {
-            value,
-            spaces,
-          });
-        }
-      }
-    }
-  };
-
-  const handleDateChange = (date) => {
-    dispatch(updateSelectedWorkshopField({ id: "date", value: date }));
+    dispatch(updateSelectedWorkshopField({ id, value }));
   };
 
   const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      dispatch(toggleWorkshopModal());
-      resetAttendees();
+    const flatpickrNode = flatpickrRef.current?.flatpickr?.calendarContainer;
+    if (
+      modalRef.current &&
+      !modalRef.current.contains(event.target) &&
+      flatpickrNode &&
+      !flatpickrNode.contains(event.target)
+    ) {
+      dispatch(toggleFormModal());
       if (isEdit) {
-        dispatch(resetWorkshopModal());
+        dispatch(resetFormModal());
       }
     }
-  };
-
-  const resetAttendees = () => {
-    setAttendees(0);
   };
 
   useEffect(() => {
@@ -280,7 +178,6 @@ function WorkshopModal() {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
-      resetAttendees();
     }
 
     return () => {
@@ -318,7 +215,6 @@ function WorkshopModal() {
                   aria-label="Close"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
-                    resetAttendees();
                     if (isEdit) {
                       dispatch(resetWorkshopModal());
                     }
@@ -394,28 +290,33 @@ function WorkshopModal() {
                       type="text"
                       id="spaceCapacity"
                       className="form-control"
-                      value={selectedSpace ? selectedSpace.capacity : ""}
+                      value={
+                        spaces.find(
+                          (space) => space.id == selectedWorkshop.spaceId
+                        )?.capacity
+                      }
                       readOnly
                     />
                   </div>
                 </div>
                 <div className="row">
                   <div className="col mb-3">
-                    <label htmlFor="attendees" className="form-label">
+                    <label htmlFor="numberOfAttendees" className="form-label">
                       Number of Attendees
                     </label>
                     <input
                       type="number"
-                      id="attendees"
+                      id="numberOfAttendees"
                       className="form-control"
-                      value={attendees}
+                      value={selectedWorkshop.numberOfAttendees}
                       onChange={handleInputChange}
                       placeholder="Enter number of attendees"
                     />
                     {capacityMessage && (
                       <p
                         className={`mt-2 ${
-                          attendees > selectedSpace?.capacity
+                          selectedWorkshop.numberOfAttendees >
+                          selectedWorkshop.space?.capacity
                             ? "text-danger"
                             : "text-success"
                         }`}
@@ -430,26 +331,51 @@ function WorkshopModal() {
                     <label htmlFor="start-time" className="form-label">
                       Start Time
                     </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="startTime"
-                      placeholder="HH:MM"
+                    <Flatpickr
+                      id={"startTime"}
                       value={selectedWorkshop.startTime}
-                      onChange={handleChangeStartTime}
+                      onChange={(time) => {
+                        const myType = time[0].toISOString();
+                        dispatch(
+                          updateSelectedWorkshopField({
+                            id: "startTime",
+                            value: myType,
+                          })
+                        );
+                      }}
+                      options={{
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                      }}
+                      className="form-control"
+                      required
                     />
                   </div>
                   <div className="col mb-0">
                     <label htmlFor="end-time" className="form-label">
                       End Time
                     </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="endTime"
-                      placeholder="HH:MM"
+                    <Flatpickr
+                      id={"endTime"}
                       value={selectedWorkshop.endTime}
-                      onChange={handleChangeEndTime}
+                      onChange={(time) => {
+                        const myType = time[0].toISOString();
+
+                        dispatch(
+                          updateSelectedWorkshopField({
+                            id: "endTime",
+                            value: myType,
+                          })
+                        );
+                      }}
+                      options={{
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                      }}
+                      className="form-control"
+                      required
                     />
                   </div>
                 </div>
@@ -461,17 +387,21 @@ function WorkshopModal() {
                     <label htmlFor="nameWithTitle" className="form-label">
                       Date
                     </label>
-                    <DatePicker
-                      selected={selectedWorkshop.date}
-                      onChange={handleDateChange}
-                      dateFormat="dd/MM/yyyy"
-                      locale="en"
-                      placeholderText="Choose a date"
-                      minDate={new Date()}
-                      type="date"
-                      id="nameWithTitle"
+                    <Flatpickr
+                      id={"date"}
+                      value={selectedWorkshop.date}
+                      onChange={(date) => {
+                        const myDate = date[0].toISOString();
+                        dispatch(
+                          updateSelectedWorkshopField({
+                            id: "date",
+                            value: myDate,
+                          })
+                        );
+                      }}
+                      options={{ dateFormat: "Y-m-d" }}
                       className="form-control"
-                      placeholder="Enter Name"
+                      required
                     />
                   </div>
                 </div>
@@ -483,7 +413,6 @@ function WorkshopModal() {
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
-                    resetAttendees();
                   }}
                 >
                   Close
