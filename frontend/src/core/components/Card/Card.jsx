@@ -3,7 +3,11 @@ import "./Card.css"; // Assuming you put the provided styles in this CSS file
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import axiosRequest from "../../../utils/AxiosConfig";
-import { setSelectedWorkshop } from "../../Features/Workshops";
+import {
+  deleteWorkshop,
+  setSelectedWorkshop,
+  toggleWorkshopModal,
+} from "../../Features/Workshops";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast"; // Add this import
@@ -32,9 +36,24 @@ const Card = ({
       [workshopId]: !dropdownStates[workshopId],
     });
   };
-
+  const handleEditWorkshop = (workshop) => {
+    const newDate = new Date(workshop.startTime).toISOString();
+    dispatch(
+      setSelectedWorkshop({
+        ...workshop,
+        startTime: workshop.startTime,
+        endTime: workshop.endTime,
+        date: newDate,
+      })
+    );
+    dispatch(toggleWorkshopModal());
+    setDropdownStates({
+      ...dropdownStates,
+      [workshop.id]: false,
+    });
+  };
   const handleDeleteWorkshop = (workshopId) => {
-    axiosRequest.post(`/workshop/delete/${workshopId}`).then(() => {
+    axiosRequest.post(`/workshop/delete/${workshopId}`).then((res) => {
       dispatch(deleteWorkshop(workshopId));
       toast.success("Workshop deleted successfully");
     });
@@ -77,7 +96,6 @@ const Card = ({
           <div className="ms-auto">
             <div className="dropdown" ref={dropdownRef}>
               <a
-                href="javascript:;"
                 className="btn dropdown-toggle hide-arrow text-body p-0"
                 onClick={() => toggleDropdown(workshop.id)}
                 aria-expanded={dropdownStates[workshop.id]}
@@ -92,9 +110,7 @@ const Card = ({
                     flexDirection: "column",
                   }}
                 >
-                  <a href="javascript:;" className="dropdown-item">
-                    Download
-                  </a>
+                  <a className="dropdown-item">Download</a>
                   <a
                     onClick={() => {
                       handleEditWorkshop(workshop);
@@ -103,9 +119,7 @@ const Card = ({
                   >
                     Edit
                   </a>
-                  <a href="javascript:;" className="dropdown-item">
-                    Duplicate
-                  </a>
+                  <a className="dropdown-item">Duplicate</a>
                   <div className="dropdown-divider" />
                   <a
                     onClick={() => {

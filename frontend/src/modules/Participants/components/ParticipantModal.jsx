@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addParticipant,
+  editParticipant,
   resetParticipantModal,
   toggleParticipantModal,
   updateSelectedParticipantField,
@@ -36,6 +37,26 @@ function ParticipantModal() {
       })
       .catch((err) => {
         toast.error("Failed to add participant");
+      });
+  };
+  const handleEditParticipant = () => {
+    const reqBody = {
+      email: selectedParticipant.email,
+      fullName: selectedParticipant.fullName,
+      phoneNumber: selectedParticipant.phoneNumber,
+      eventId,
+      workshopId,
+    };
+
+    axiosRequest
+      .post(`/participant/edit/${selectedParticipant.id}`, reqBody)
+      .then((res) => {
+        toast.success("Successfully Edited!");
+        dispatch(toggleParticipantModal());
+        dispatch(editParticipant(res.data.participant));
+      })
+      .catch((err) => {
+        toast.error("Failed to edit participant");
       });
   };
 
@@ -88,7 +109,7 @@ function ParticipantModal() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
-                  Add Participant
+                  {isEdit ? "Edit" : "Add"} Participant
                 </h5>
                 <button
                   type="button"
@@ -96,6 +117,10 @@ function ParticipantModal() {
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   onClick={() => {
+                    dispatch(resetParticipantModal());
+                    if (isEdit) {
+                      dispatch(changeFormState(false));
+                    }
                     dispatch(toggleParticipantModal());
                   }}
                 />
@@ -156,6 +181,7 @@ function ParticipantModal() {
                   data-bs-dismiss="modal"
                   onClick={() => {
                     dispatch(toggleParticipantModal());
+                    dispatch(resetParticipantModal());
                   }}
                 >
                   Close
@@ -163,7 +189,9 @@ function ParticipantModal() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={handleAddParticipant}
+                  onClick={
+                    isEdit ? handleEditParticipant : handleAddParticipant
+                  }
                 >
                   {isEdit ? "Save Changes" : "Create"}
                 </button>

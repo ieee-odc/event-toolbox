@@ -135,7 +135,6 @@ function CustomNavBar({ toggleSideBar }) {
                 <div className="dropdown-header d-flex align-items-center py-3">
                   <h5 className="text-body mb-0 me-auto">Notification</h5>
                   <a
-                    href="javascript:void(0)"
                     className="dropdown-notifications-all text-body"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
@@ -167,16 +166,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">1h ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -197,16 +190,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">12hr ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -231,16 +218,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">1h ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -261,16 +242,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">1 day ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -297,16 +272,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">2 days ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -329,16 +298,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">3 days ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -363,16 +326,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">4 days ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -395,16 +352,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">5 days ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -427,16 +378,10 @@ function CustomNavBar({ toggleSideBar }) {
                         <small className="text-muted">5 days ago</small>
                       </div>
                       <div className="flex-shrink-0 dropdown-notifications-actions">
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-read"
-                        >
+                        <a className="dropdown-notifications-read">
                           <span className="badge badge-dot" />
                         </a>
-                        <a
-                          href="javascript:void(0)"
-                          className="dropdown-notifications-archive"
-                        >
+                        <a className="dropdown-notifications-archive">
                           <span className="bx bx-x" />
                         </a>
                       </div>
@@ -507,7 +452,7 @@ function CustomNavBar({ toggleSideBar }) {
                 <div className="dropdown-divider" />
               </li>
               <li>
-                <a className="dropdown-item" >
+                <a className="dropdown-item">
                   <i className="bx bx-user me-2" />
                   <span className="align-middle">My Profile</span>
                 </a>

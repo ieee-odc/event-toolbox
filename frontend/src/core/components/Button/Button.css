@@ -8,6 +8,9 @@
   border: transparent 1px solid;
   border-radius: 5px;
   transition: background-color 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .custom-button p {
