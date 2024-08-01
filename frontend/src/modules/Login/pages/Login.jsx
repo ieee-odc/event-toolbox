@@ -39,11 +39,8 @@ function Login() {
     }
     try {
       const res = await axiosRequest.post("/auth/login", formData);
-      if (rememberMe) {
-        localStorage.setItem("token", res.data.token);
-      } else {
-        sessionStorage.setItem("token", res.data.token);
-      }
+     localStorage.setItem("token", res.data.token);
+     
       navigate("/events");
     } catch (err) {
       console.error(err.response.data);
@@ -91,44 +88,22 @@ function Login() {
   });
 
   return (
-    <div
-      className="container-xxl"
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
+    <div className="container-xxl d-flex flex-column align-items-center">
       <div className="authentication-wrapper authentication-basic container-p-y">
         <div className="authentication-inner">
           <div className="card">
-            <div
-              className="card-body"
-              style={{
-                flexDirection: "column",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <h4 className="mb-2">Welcome to Event Box! 👋</h4>
-              <p className="mb-4">
-                Please sign-in to your account and start the adventure
-              </p>
+            <div className="card-body d-flex flex-column justify-content-center">
+              <h4 className="mb-4">Welcome to Event Box! 👋</h4>
+              <p className="mb-6">Please sign-in to your account and start the adventure</p>
               {errors.server && (
                 <div className="alert alert-danger">{errors.server}</div>
               )}
-              <form
-                id="formAuthentication"
-                onSubmit={onSubmit}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <div className="mb-3 form-email-toggle w-100">
-                  <label htmlFor="email" className="col-auto col-form-label">
-                    Email or Username
-                  </label>
+              <form id="formAuthentication" onSubmit={onSubmit} className="w-100">
+                <div className="mb-6 w-100">
+                  <label htmlFor="email" className="form-label">Email or Username</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control w-100"
                     id="email"
                     name="email"
                     autoComplete="username"
@@ -141,17 +116,12 @@ function Login() {
                     <div className="text-danger">{errors.email}</div>
                   )}
                 </div>
-
-                <div className="mb-3 form-password-toggle w-100">
+  
+                <div className="mb-3 w-100">
                   <div className="d-flex justify-content-between">
-                    <label className="form-label" htmlFor="password">
-                      Password
-                    </label>
-                    <a href="/forgetpassword">
-                      <small>Forgot Password?</small>
-                    </a>
+                    <label className="form-label" htmlFor="password">Password</label>
                   </div>
-                  <div className="input-group input-group-merge">
+                  <div className="input-group input-group-merge d-flex align-items-start w-100">
                     <input
                       type={obscureText ? "password" : "text"}
                       id="password"
@@ -163,49 +133,50 @@ function Login() {
                       value={password}
                       onChange={onChange}
                     />
-                    <span
+                    <a
+                    style={{height: "40px"}}
                       className="input-group-text cursor-pointer"
                       onClick={toggleObscureText}
                     >
-                      <i
-                        className={`bx ${obscureText ? "bx-hide" : "bx-show"}`}
-                      ></i>
-                    </span>
+                      <i className={`bx ${obscureText ? "bx-hide" : "bx-show"}`}></i>
+                    </a>
                   </div>
+                  
                   {errors.password && (
                     <div className="text-danger">{errors.password}</div>
                   )}
                 </div>
-
-                <div className="mb-3">
-                  <div
-                    className="form-check"
-                    style={{ display: "flex", gap: "10px" }}
-                  >
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="remember-me"
-                      checked={rememberMe}
-                      onChange={onRememberMeChange}
-                    />
-                    <label className="form-check-label" htmlFor="remember-me">
-                      Remember Me
-                    </label>
+  
+                <div className="mb-8 w-100">
+                  <div className="d-flex justify-content-between">
+                    <div className="form-check mb-0 ms-2">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="remember-me"
+                        checked={rememberMe}
+                        onChange={onRememberMeChange}
+                      />
+                      <label className="form-check-label" htmlFor="remember-me">
+                        Remember Me
+                      </label>
+                    </div>
+                    <a href="auth-forgot-password-basic.html"><span>Forgot Password?</span></a>
                   </div>
                 </div>
-                <div className="mb-3">
-                  <Button
-                    color={"primary"}
-                    label="Sign in"
+  
+                <div className="mb-2 w-100">
+                  <button
                     onClick={onSubmit}
-                  />
+                    className="btn d-grid w-100"
+                    style={{ background: "var(--primary-color)", color: "white" }}
+                    type="submit"
+                  >
+                    Login
+                  </button>
                 </div>
               </form>
-              <div
-                className="google-login-container"
-                style={{ display: "flex", justifyContent: "center" }}
-              >
+              <div className="google-login-container d-flex justify-content-center w-100">
                 <GoogleLoginButton
                   className="google-login-button"
                   buttonText="Sign in with Google"
@@ -221,11 +192,9 @@ function Login() {
                   }}
                 />
               </div>
-              <p className="text-center move-down">
-                <span className="space-right">New on our platform?</span>
-                <a href="/SignUp">
-                  <span className="link">Create an account</span>
-                </a>
+              <p className="text-center d-flex align-items-center mt-3">
+                <span>New on our platform?</span>{" "}
+                <a href="/SignUp" className="ms-1"><span>Create an account</span></a>
               </p>
             </div>
           </div>
