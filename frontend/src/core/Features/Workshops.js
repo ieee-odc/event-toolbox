@@ -17,7 +17,7 @@ const WorkshopsSlice = createSlice({
       spaceId: "",
       formId: "",
       numberOfAttendees: null,
-      date: new Date(),
+      date: null,
     },
     workshopsPerPage: 6,
   },
