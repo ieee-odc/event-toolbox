@@ -30,7 +30,8 @@ const Register = async (req, res) => {
       password,
       provider: 'local',
       createdAt: new Date(),
-      lastLoginAt: new Date()
+      lastLoginAt: new Date(),
+      googleId: email
     });
 
     const salt = await bcrypt.genSalt(10);
