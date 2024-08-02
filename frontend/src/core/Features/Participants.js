@@ -24,7 +24,6 @@ export const initializeParticipants = createAsyncThunk(
   "Participants/initializeParticipants",
   async (participants, { dispatch }) => {
     const emailToParticipant = {};
-    console.log(participants)
     for (const participant of participants) {
       const eventId = participant.eventId;
       const workshopId = participant.workshopId;
@@ -55,16 +54,16 @@ const ParticipantsSlice = createSlice({
   name: "Participants",
   initialState: {
     participants: [],
-    isLoading: false,
+    isLoading: true,
     isEdit: false,
     isParticipantModalOpen: false,
     isParticipantDetailsOpen: false,
     filterStatus: "",
     filteredParticipants: [],
     selectedParticipant: {
-      email: '',
-      fullName: '',
-      phoneNumber: '',
+      email: "",
+      fullName: "",
+      phoneNumber: "",
     },
     participantsPerPage: 10,
     searchQuery: "",
@@ -104,7 +103,7 @@ const ParticipantsSlice = createSlice({
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
     },
     resetParticipantModal: (state) => {
-      state.selectedParticipant = { email: '', fullName: '', phoneNumber: '' };
+      state.selectedParticipant = { email: "", fullName: "", phoneNumber: "" };
       state.isEdit = false;
     },
     toggleParticipantsIsLoading: (state) => {
@@ -152,54 +151,39 @@ const ParticipantsSlice = createSlice({
       state.filterStatus = action.payload;
       state.filteredParticipants = action.payload
         ? state.participants.filter(
-          (participant) => participant.status === action.payload
-        )
+            (participant) => participant.status === action.payload
+          )
         : state.participants;
     },
     setSearchQuery: (state, action) => {
       const query = action.payload.toLowerCase();
       state.searchQuery = query;
 
-      state.filteredParticipants = state.participants.filter((participant) =>
-        participant.fullName.toLowerCase().includes(query) ||
-        participant.email.toLowerCase().includes(query)
+      state.filteredParticipants = state.participants.filter(
+        (participant) =>
+          participant.fullName.toLowerCase().includes(query) ||
+          participant.email.toLowerCase().includes(query)
       );
-    }
+    },
+    setIsParticipantLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(initializeParticipants.pending, (state) => {
-        state.isLoading = true;
-      })
+      .addCase(initializeParticipants.pending, (state) => {})
       .addCase(initializeParticipants.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.participants = action.payload;
         state.filteredParticipants = action.payload;
       })
-      .addCase(initializeParticipants.rejected, (state) => {
-        state.isLoading = false;
-      })
-      .addCase(fetchEventData.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchEventData.fulfilled, (state, action) => {
-        state.isLoading = false;
-        // Process event data if needed
-      })
-      .addCase(fetchEventData.rejected, (state) => {
-        state.isLoading = false;
-      })
-      .addCase(fetchWorkshopData.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchWorkshopData.fulfilled, (state, action) => {
-        state.isLoading = false;
-        // Process workshop data if needed
-      })
-      .addCase(fetchWorkshopData.rejected, (state) => {
-        state.isLoading = false;
-      });
-  }
+      .addCase(initializeParticipants.rejected, (state) => {})
+      .addCase(fetchEventData.pending, (state) => {})
+      .addCase(fetchEventData.fulfilled, (state, action) => {})
+      .addCase(fetchEventData.rejected, (state) => {})
+      .addCase(fetchWorkshopData.pending, (state) => {})
+      .addCase(fetchWorkshopData.fulfilled, (state, action) => {})
+      .addCase(fetchWorkshopData.rejected, (state) => {});
+  },
 });
 
 export const {
@@ -209,7 +193,6 @@ export const {
   editParticipant,
   toggleParticipantModal,
   toggleParticipantDetails,
-  toggleParticipantsIsLoading,
   selectParticipant,
   setSelectedParticipant,
   updateSelectedParticipantField,
@@ -221,6 +204,7 @@ export const {
   setParticipantsPerPage,
   filterParticipants,
   setSearchQuery,
+  setIsParticipantLoading,
 } = ParticipantsSlice.actions;
 
 export default ParticipantsSlice.reducer;

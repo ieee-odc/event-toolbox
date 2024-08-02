@@ -22,6 +22,7 @@ import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import CustomButton from "../../../core/components/Button/Button";
+import { Spinner } from "react-bootstrap";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -31,13 +32,8 @@ const ParticipationStatus = Object.freeze({
 
 const ParticipantsCard = () => {
   const { eventId, workshopId } = useParams();
-  const {
-    participants,
-    filteredParticipants,
-    participantsPerPage,
-    searchQuery,
-    isEdit,
-  } = useSelector((store) => store.participantsStore);
+  const { participants, filteredParticipants, participantsPerPage, isLoading } =
+    useSelector((store) => store.participantsStore);
 
   const dispatch = useDispatch();
 
@@ -212,153 +208,165 @@ const ParticipantsCard = () => {
               </div>
             </div>
           </div>
-          <div className="table-responsive">
-            <table
-              className="invoice-list-table table border-top dataTable no-footer dtr-column"
-              id="DataTables_Table_0"
-              aria-describedby="DataTables_Table_0_info"
-              style={{ width: "100%" }}
+          {isLoading ? (
+            <div
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                display: "flex",
+              }}
             >
-              <thead>
-                <tr>
-                  <th>#ID</th>
-                  <th>Client</th>
-                  <th>Email</th>
-                  <th>Issued Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentParticipants.map((participant, index) => (
-                  <tr
-                    key={participant.id}
-                    className={`${index % 2 === 0 ? "even" : "odd"}`}
-                  >
-                    <td>
-                      <span
-                        className="fw-medium"
-                        style={{
-                          fontWeight: "500",
-                          color: "#646cff",
-                          textDecoration: "inherit",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleOpenDetails(participant)}
-                      >
-                        #{participant.id}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="d-flex justify-content-start align-items-center">
-                        <div className="avatar-wrapper">
-                          <div className="avatar avatar-sm me-2">
-                            <span className="avatar-initial rounded-circle bg-label-dark">
-                              <i className="bx bx-user"></i>
+              <Spinner />
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table
+                className="invoice-list-table table border-top dataTable no-footer dtr-column"
+                id="DataTables_Table_0"
+                aria-describedby="DataTables_Table_0_info"
+                style={{ width: "100%" }}
+              >
+                <thead>
+                  <tr>
+                    <th>#ID</th>
+                    <th>Client</th>
+                    <th>Email</th>
+                    <th>Issued Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentParticipants.map((participant, index) => (
+                    <tr
+                      key={participant.id}
+                      className={`${index % 2 === 0 ? "even" : "odd"}`}
+                    >
+                      <td>
+                        <span
+                          className="fw-medium"
+                          style={{
+                            fontWeight: "500",
+                            color: "#646cff",
+                            textDecoration: "inherit",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleOpenDetails(participant)}
+                        >
+                          #{participant.id}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="d-flex justify-content-start align-items-center">
+                          <div className="avatar-wrapper">
+                            <div className="avatar avatar-sm me-2">
+                              <span className="avatar-initial rounded-circle bg-label-dark">
+                                <i className="bx bx-user"></i>
+                              </span>
+                            </div>
+                          </div>
+                          <div className="d-flex flex-column">
+                            <span
+                              className="text-body text-truncate fw-medium"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleOpenDetails(participant)}
+                            >
+                              {participant.fullName}
                             </span>
                           </div>
                         </div>
-                        <div className="d-flex flex-column">
-                          <span
-                            className="text-body text-truncate fw-medium"
+                      </td>
+                      <td>
+                        <div className="d-flex justify-content-start align-items-center">
+                          <div className="d-flex flex-column">
+                            <a className="text-body text-truncate">
+                              <span className="fw-medium">
+                                {participant.email}
+                              </span>
+                            </a>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{formatDateWithShort(participant.createdAt)}</td>
+                      <td>{getStatusIcon(participant.status)}</td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <a
+                            href={`mailto:${participant.email}`}
+                            className="text-body"
+                          >
+                            <i className="bx bx-send mx-1" />
+                          </a>
+                          <a
+                            className="text-body"
                             style={{ cursor: "pointer" }}
                             onClick={() => handleOpenDetails(participant)}
                           >
-                            {participant.fullName}
-                          </span>
+                            <i className="bx bx-show mx-1" />
+                          </a>
+                          <CustomDropdown
+                            toggleContent={
+                              <i className="bx bx-dots-vertical-rounded" />
+                            }
+                          >
+                            <a
+                              className="dropdown-item"
+                              onClick={() => handleEditClick(participant)}
+                            >
+                              Edit
+                            </a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() =>
+                                handleChangeStatus(
+                                  participant,
+                                  ParticipationStatus.PAID
+                                )
+                              }
+                            >
+                              Mark as Paid
+                            </a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() =>
+                                handleChangeStatus(
+                                  participant,
+                                  ParticipationStatus.PENDING
+                                )
+                              }
+                            >
+                              Mark as Pending
+                            </a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() =>
+                                handleChangeStatus(
+                                  participant,
+                                  ParticipationStatus.CANCELED
+                                )
+                              }
+                            >
+                              Mark as Canceled
+                            </a>
+                            <hr className="dropdown-divider" />
+                            <a
+                              onClick={() =>
+                                handleDeleteParticipant(participant.id)
+                              }
+                              style={{ cursor: "pointer" }}
+                              className="dropdown-item text-danger"
+                            >
+                              Delete
+                            </a>
+                          </CustomDropdown>
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="d-flex justify-content-start align-items-center">
-                        <div className="d-flex flex-column">
-                          <a className="text-body text-truncate">
-                            <span className="fw-medium">
-                              {participant.email}
-                            </span>
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{formatDateWithShort(participant.createdAt)}</td>
-                    <td>{getStatusIcon(participant.status)}</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <a
-                          href={`mailto:${participant.email}`}
-                          className="text-body"
-                        >
-                          <i className="bx bx-send mx-1" />
-                        </a>
-                        <a
-                          className="text-body"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleOpenDetails(participant)}
-                        >
-                          <i className="bx bx-show mx-1" />
-                        </a>
-                        <CustomDropdown
-                          toggleContent={
-                            <i className="bx bx-dots-vertical-rounded" />
-                          }
-                        >
-                          <a
-                            className="dropdown-item"
-                            onClick={() => handleEditClick(participant)}
-                          >
-                            Edit
-                          </a>
-                          <a
-                            className="dropdown-item"
-                            onClick={() =>
-                              handleChangeStatus(
-                                participant,
-                                ParticipationStatus.PAID
-                              )
-                            }
-                          >
-                            Mark as Paid
-                          </a>
-                          <a
-                            className="dropdown-item"
-                            onClick={() =>
-                              handleChangeStatus(
-                                participant,
-                                ParticipationStatus.PENDING
-                              )
-                            }
-                          >
-                            Mark as Pending
-                          </a>
-                          <a
-                            className="dropdown-item"
-                            onClick={() =>
-                              handleChangeStatus(
-                                participant,
-                                ParticipationStatus.CANCELED
-                              )
-                            }
-                          >
-                            Mark as Canceled
-                          </a>
-                          <hr className="dropdown-divider" />
-                          <a
-                            onClick={() =>
-                              handleDeleteParticipant(participant.id)
-                            }
-                            style={{ cursor: "pointer" }}
-                            className="dropdown-item text-danger"
-                          >
-                            Delete
-                          </a>
-                        </CustomDropdown>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           <div className="row mx-2" id="pagination-section">
             <div className="col-sm-12 col-md-6">
               <div
