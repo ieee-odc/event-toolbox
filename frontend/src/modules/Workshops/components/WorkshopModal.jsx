@@ -23,6 +23,7 @@ function WorkshopModal() {
   );
   const { spaces } = useSelector((state) => state.spacesStore);
   const flatpickrRef = useRef();
+  const [selectedSpace, setSelectedSpace] = useState();
 
   const dispatch = useDispatch();
   const userData = UserData();
@@ -41,12 +42,17 @@ function WorkshopModal() {
   }, [spaces]);
 
   useEffect(() => {
-    if (
-      selectedWorkshop.numberOfAttendees >
-      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
-    ) {
+    if (selectedWorkshop.spaceId) {
+      setSelectedSpace(
+        spaces.find((space) => space.id == selectedWorkshop.spaceId)
+      );
+    }
+  }, [selectedWorkshop.spaceId]);
+
+  useEffect(() => {
+    if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
       setCapacityMessage(
-        "The selected space does not have enough capacity for the numberOfAttendees."
+        "The selected space does not have enough capacity for the attendees."
       );
     } else {
       setCapacityMessage("The selected space has enough capacity.");
@@ -76,10 +82,7 @@ function WorkshopModal() {
   ]);
 
   const handleAddWorkshop = () => {
-    if (
-      selectedWorkshop.numberOfAttendees >
-      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
-    ) {
+    if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
       toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
@@ -117,10 +120,7 @@ function WorkshopModal() {
   };
 
   const handleEditWorkshop = () => {
-    if (
-      selectedWorkshop.numberOfAttendees >
-      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
-    ) {
+    if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
       toast.error("Number of numberOfAttendees exceeds the space capacity.");
       return;
     }
@@ -294,11 +294,7 @@ function WorkshopModal() {
                       type="text"
                       id="spaceCapacity"
                       className="form-control"
-                      value={
-                        spaces.find(
-                          (space) => space.id == selectedWorkshop.spaceId
-                        )?.capacity
-                      }
+                      value={selectedSpace?.capacity}
                       readOnly
                     />
                   </div>
@@ -320,7 +316,7 @@ function WorkshopModal() {
                       <p
                         className={`mt-2 ${
                           selectedWorkshop.numberOfAttendees >
-                          selectedWorkshop.space?.capacity
+                          selectedSpace?.capacity
                             ? "text-danger"
                             : "text-success"
                         }`}
@@ -393,7 +389,7 @@ function WorkshopModal() {
                     </label>
                     <Flatpickr
                       id={"date"}
-                      value={selectedWorkshop.date}
+                      value={selectedWorkshop.date || new Date()}
                       onChange={(date) => {
                         const myDate = date[0].toISOString();
                         dispatch(
