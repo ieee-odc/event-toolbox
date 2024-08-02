@@ -21,6 +21,7 @@ import {
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
+import CustomButton from "../../../core/components/Button/Button";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -125,7 +126,9 @@ const ParticipantsCard = () => {
   };
 
   const formatResponses = (responses) => {
-    return responses.map(({ question, answer }) => `${question}: ${answer}`).join("; ");
+    return responses
+      .map(({ question, answer }) => `${question}: ${answer}`)
+      .join("; ");
   };
 
   const generateCSV = () => {
@@ -137,15 +140,17 @@ const ParticipantsCard = () => {
       "Status",
       "Event Name",
       "Event Questions & Responses",
-      "Workshop Details"
+      "Workshop Details",
     ];
 
     const csvRows = participants.map((participant) => {
       const eventResponses = formatResponses(participant.eventResponses);
-      const workshopDetails = participant.workshops.map(workshop => {
-        const workshopResponses = formatResponses(workshop.responses);
-        return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
-      }).join("; ");
+      const workshopDetails = participant.workshops
+        .map((workshop) => {
+          const workshopResponses = formatResponses(workshop.responses);
+          return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
+        })
+        .join("; ");
 
       return [
         participant.id,
@@ -155,7 +160,7 @@ const ParticipantsCard = () => {
         participant.status,
         participant.eventName,
         eventResponses,
-        workshopDetails
+        workshopDetails,
       ].join(",");
     });
 
@@ -191,12 +196,20 @@ const ParticipantsCard = () => {
                 <option value="Pending">Pending</option>
                 <option value="Canceled">Canceled</option>
               </select>
-              <button
-                className="btn btn-primary"
-                onClick={generateCSV}
-              >
-                Download CSV
-              </button>
+              <div className="dt-buttons btn-group flex-wrap">
+                <CustomButton
+                  text="Download"
+                  iconClass="bx bx-download me-md-1"
+                  style={{ padding: "5px" }}
+                  backgroundColor="var(--primary-color)"
+                  textColor="white"
+                  hoverBackgroundColor="#0F205D"
+                  hoverTextColor="white"
+                  onClick={() => {
+                    generateCSV();
+                  }}
+                />
+              </div>
             </div>
           </div>
           <div className="table-responsive">
