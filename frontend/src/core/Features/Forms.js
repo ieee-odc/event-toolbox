@@ -16,6 +16,7 @@ const FormsSlice = createSlice({
       description: "",
       data: [],
     },
+    optionsArray: ["checkbox", "radio", "dropdown", "workshop-selection"],
     selectedWorkshops: [],
   },
   reducers: {
@@ -95,8 +96,7 @@ const FormsSlice = createSlice({
       const { index, newType } = action.payload;
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].type = newType;
-        const optionsArray = ["checkbox", "radio", "dropdown"];
-        if (optionsArray.includes(newType)) {
+        if (state.optionsArray.includes(newType)) {
           state.selectedForm.data[index].options = [
             "First Option",
             "Second Option",
