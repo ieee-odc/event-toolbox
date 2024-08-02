@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 import "../Events.css";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import Flatpickr from "react-flatpickr";
+
 import {
   addEvent,
   changeFormState,
@@ -18,6 +20,8 @@ function EventModal() {
   const userData = UserData();
   const modalRef = useRef(null);
 
+  const flatpickrRefStart = useRef(null);
+  const flatpickrRefEnd = useRef(null);
   const { isModalOpen, selectedEvent, isEdit } = useSelector(
     (state) => state.eventsStore
   );
@@ -98,10 +102,21 @@ function EventModal() {
     );
   };
   const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      dispatch(toggleEventModal());
+    const flatpickrNodeStart =
+      flatpickrRefStart.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeEnd =
+      flatpickrRefEnd.current?.flatpickr?.calendarContainer;
+    if (
+      modalRef.current &&
+      !modalRef.current.contains(event.target) &&
+      flatpickrNodeStart &&
+      !flatpickrNodeStart.contains(event.target) &&
+      flatpickrNodeEnd &&
+      !flatpickrNodeEnd.contains(event.target)
+    ) {
+      dispatch(toggleFormModal());
       if (isEdit) {
-        dispatch(resetEventModal());
+        dispatch(resetFormModal());
       }
     }
   };
@@ -193,26 +208,45 @@ function EventModal() {
                   <label htmlFor="startDate" className="form-label">
                     Start Date
                   </label>
-                  {typeof selectedEvent.startDate}
-                  <input
-                    type="date"
-                    id="startDate"
+
+                  <Flatpickr
+                    id={"date"}
+                    ref={flatpickrRefStart}
+                    value={selectedEvent.date || new Date()}
+                    onChange={(date) => {
+                      const myDate = date[0].toISOString();
+                      dispatch(
+                        updateSelectedWorkshopField({
+                          id: "startDate",
+                          value: myDate,
+                        })
+                      );
+                    }}
+                    options={{ dateFormat: "Y-m-d" }}
                     className="form-control"
-                    value={selectedEvent.startDate}
-                    onChange={handleInputChange}
+                    required
                   />
                 </div>
                 <div className="col">
                   <label htmlFor="endDate" className="form-label">
                     End Date
                   </label>
-                  <input
-                    type="date"
-                    id="endDate"
+                  <Flatpickr
+                    id={"date"}
+                    ref={flatpickrRefEnd}
+                    value={selectedEvent.date || new Date()}
+                    onChange={(date) => {
+                      const myDate = date[0].toISOString();
+                      dispatch(
+                        updateSelectedWorkshopField({
+                          id: "endDate",
+                          value: myDate,
+                        })
+                      );
+                    }}
+                    options={{ dateFormat: "Y-m-d" }}
                     className="form-control"
-                    value={selectedEvent.endDate}
-                    onChange={handleInputChange}
-                    min={selectedEvent.startDate}
+                    required
                   />
                 </div>
               </div>
