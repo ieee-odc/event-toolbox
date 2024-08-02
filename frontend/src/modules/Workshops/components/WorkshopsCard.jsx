@@ -64,7 +64,7 @@ const WorkshopsCard = () => {
           className="dataTables_wrapper dt-bootstrap5 no-footer"
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
-<div className="d-flex justify-content-between align-items-center mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <WorkshopTableHeader />
             <div className="d-flex align-items-center gap-2">
               <select
@@ -88,7 +88,6 @@ const WorkshopsCard = () => {
                   (workshop.currentParticipants / workshop?.numberOfAttendees) *
                   100
                 ).toFixed(2);
-
                 return (
                   <div className=" col-md-4" key={workshop.id}>
                     <Card
