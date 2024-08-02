@@ -70,6 +70,7 @@ const WorkshopsSlice = createSlice({
         description: "",
         startTime: "",
         endTime: "",
+        date: null,
         organizerId: "",
         numberOfAttendees: null,
       };
