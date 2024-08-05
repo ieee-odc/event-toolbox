@@ -11,10 +11,7 @@ import formsStore from "./core/Features/Forms.js";
 import participantsStore from "./core/Features/Participants.js";
 import registrationStore from "./core/Features/Registration.js";
 import notificationStore from "./core/Features/Notifications.js";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Create a QueryClient instance
-const queryClient = new QueryClient();
 import { Provider } from "react-redux";
 const store = configureStore({
   reducer: {
@@ -32,9 +29,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
-        <QueryClientProvider client={queryClient}>
-          <App />
-        </QueryClientProvider>
+        <App />
       </Router>
     </Provider>
   </React.StrictMode>
