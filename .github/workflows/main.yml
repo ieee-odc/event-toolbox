@@ -67,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dependency-check-report
-          path: dependency-check-report.xml
+          path: ./frontend/dependency-check-report.xml
 
   sonar-checks:
     name: quality gate
