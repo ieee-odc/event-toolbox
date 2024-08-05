@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { resetParticipantModal, toggleParticipantDetails } from "../../../core/Features/Participants";
+import {
+  resetParticipantModal,
+  toggleParticipantDetails,
+} from "../../../core/Features/Participants";
+import { Modal, Button, ListGroup, Badge } from "react-bootstrap";
 
 const ParticipantDetails = () => {
   const dispatch = useDispatch();
@@ -27,94 +31,147 @@ const ParticipantDetails = () => {
     };
   }, [isParticipantDetailsOpen, dispatch]);
 
-
   const getStatusColor = (status) => {
     switch (status) {
       case "Paid":
-        return "#56C28B";
+        return "success";
       case "Pending":
-        return "#FFC107";
+        return "warning";
       case "Canceled":
-        return "#FF5A5F";
+        return "danger";
       default:
-        return "#566A7F";
+        return "secondary";
     }
   };
 
   return (
+    <>
+      {isParticipantDetailsOpen && (
+        <div className="modal-backdrop fade show"></div>
+      )}
 
-    isParticipantDetailsOpen && <div className="modal show" style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-      <div className="modal-dialog">
-        <div className="modal-content" style={{ backgroundColor: "#f5f5f9", borderRadius: "8px" }}>
-          <div className="modal-header" style={{ borderBottom: "1px solid #A1ACB8" }}>
-            <h5 className="modal-title" style={{ color: "#566A7F" }}>{selectedParticipant.fullName}</h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => {
-                dispatch(resetParticipantModal())
-                dispatch(toggleParticipantDetails())
-              }}
-            ></button>
-          </div>
-          <div className="modal-body" style={{ color: "#566A7F" }}>
-            <p>
-              <strong>ID:</strong> {selectedParticipant.id}
-            </p>
-            <p>
-              <strong>Email:</strong> {selectedParticipant.email}
-            </p>
-            <p>
-              <strong>Phone Number:</strong> {selectedParticipant.phoneNumber}
-            </p>
-            <p>
-              <strong>Status:</strong>
-              <span
-                style={{ color: getStatusColor(selectedParticipant.status) }}
-              >
-                {selectedParticipant.status}
-              </span>
-            </p>
-            <p>
-              <strong>Event ID:</strong> {selectedParticipant.eventId}
-            </p>
-            {selectedParticipant.workshopId && (
-              <p>
-                <strong>Workshop ID:</strong> {selectedParticipant.workshopId}
-              </p>
-            )}
-            {selectedParticipant.responses &&
-              selectedParticipant.responses.length > 0 && (
-                <div>
-                  <h6 style={{ color: "#566A7F" }}>Responses:</h6>
-                  <ul style={{ listStyleType: "none", padding: 0 }}>
-                    {selectedParticipant.responses.map((response, index) => (
-                      <li key={index} style={{ marginBottom: "10px" }}>
-                        <strong>{response.question}:</strong> {response.answer}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-          </div>
+      {isParticipantDetailsOpen && (
+        <div
+          className="modal fade show"
+          id="modalCenter"
+          tabIndex={-1}
+          style={{ display: "block" }}
+          aria-modal="true"
+          role="dialog"
+        >
           <div
-            className="modal-footer"
-            style={{ borderTop: "1px solid #A1ACB8" }}
+            className="modal-dialog modal-dialog-centered"
+            role="document"
+            ref={modalRef}
           >
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => {
-                dispatch(resetParticipantModal())
-                dispatch(toggleParticipantDetails())
-              }}            >
-              Close
-            </button>
+            <div className="modal-content">
+              <Modal.Header
+                style={{ display: "flex", justifyContent: "space-between" }}
+              >
+                <Modal.Title>{selectedParticipant.fullName}</Modal.Title>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => {
+                    dispatch(toggleParticipantDetails());
+                  }}
+                />
+              </Modal.Header>
+              <Modal.Body>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>
+                    <strong>ID:</strong> {selectedParticipant.id}
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <strong>Email:</strong> {selectedParticipant.email}
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <strong>Phone Number:</strong>{" "}
+                    {selectedParticipant.phoneNumber}
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <strong>Status:</strong>
+                    <Badge
+                      bg={getStatusColor(selectedParticipant.status)}
+                      className="ms-2"
+                    >
+                      {selectedParticipant.status}
+                    </Badge>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <strong>Event Name:</strong> {selectedParticipant.eventName}
+                  </ListGroup.Item>
+                  {selectedParticipant.eventResponses &&
+                    selectedParticipant.eventResponses.length > 0 && (
+                      <ListGroup.Item>
+                        <strong>Event Responses:</strong>
+                        <ul className="mt-2">
+                          {selectedParticipant.eventResponses.map(
+                            (response, index) => (
+                              <li key={index}>
+                                <strong>{response.question}:</strong>{" "}
+                                {response.answer}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </ListGroup.Item>
+                    )}
+                  {selectedParticipant.workshops &&
+                    selectedParticipant.workshops.length > 0 && (
+                      <ListGroup.Item>
+                        <strong>Workshops:</strong>
+                        <ul className="mt-2">
+                          {selectedParticipant.workshops.map(
+                            (workshop, index) => (
+                              <li key={index}>
+                                <div className="border p-2 rounded">
+                                  <p>
+                                    <strong>Workshop Name:</strong>{" "}
+                                    {workshop.workshopName}
+                                  </p>
+                                  {workshop.responses &&
+                                    workshop.responses.length > 0 && (
+                                      <ul className="mt-2">
+                                        {workshop.responses.map(
+                                          (response, i) => (
+                                            <li key={i}>
+                                              <strong>
+                                                {response.question}:
+                                              </strong>{" "}
+                                              {response.answer}
+                                            </li>
+                                          )
+                                        )}
+                                      </ul>
+                                    )}
+                                </div>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </ListGroup.Item>
+                    )}
+                </ListGroup>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    dispatch(resetParticipantModal());
+                    dispatch(toggleParticipantDetails());
+                  }}
+                >
+                  Close
+                </Button>
+              </Modal.Footer>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
+      )}
+    </>
   );
 };
 

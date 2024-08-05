@@ -32,8 +32,8 @@ const addParticipant = async (req, res) => {
     }
     await event.save();
 
-     // Create and save the new participant
-     const participant = new Participant({
+    // Create and save the new participant
+    const participant = new Participant({
       id: counter.seq,
       status: "Pending",
       eventId,
@@ -169,8 +169,8 @@ const getWorkshopParticipants = async (req, res) => {
 };
 const register = async (req, res) => {
   try {
-    const { workshopId, ...participantData } = req.body;
-    console.log(workshopId)
+    const { workshopId, eventId, email, ...participantData } = req.body;
+
     // Find and update the workshop by incrementing the currentParticipants
     const workshop = await Workshop.findOneAndUpdate(
       { id: workshopId },
@@ -210,32 +210,32 @@ const register = async (req, res) => {
     await participant.save();
     console.log(participant);
 
-     // Create a notification for the workshop organizer
-     const organizerId = workshop.organizerId; // Assuming organizerId is stored in the workshop document
+    // Create a notification for the workshop organizer
+    const organizerId = workshop.organizerId; // Assuming organizerId is stored in the workshop document
 
-     const newNotification = new Notification({
-       from: participant.id, // Participant's ID
-       to: organizerId, // Organizer's ID
-       type: 'WorkshopRegistration',
-       message: `A new participant has registered for your workshop: ${workshop.name}`,
-       read: false,
-     });
- 
-     await newNotification.save();
- 
-     res.status(201).json({
-       status: 'success',
-       message: 'Added Participant and created notification',
-       participant: participant,
-     });
-   } catch (error) {
-     console.error(error);
-     res.status(500).json({
-       message: 'Server Error!',
-     });
-   }
-   
-    
+    const newNotification = new Notification({
+      from: participant.id, // Participant's ID
+      to: organizerId, // Organizer's ID
+      type: 'WorkshopRegistration',
+      message: `A new participant has registered for your workshop: ${workshop.name}`,
+      read: false,
+    });
+
+    await newNotification.save();
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Added Participant and created notification',
+      participant: participant,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Server Error!',
+    });
+  }
+
+
 };
 
 module.exports = {

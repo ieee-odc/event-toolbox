@@ -35,8 +35,13 @@ function FormModal() {
   const userData = UserData();
   const { eventId, workshopId } = useParams();
   const { workshops } = useSelector((store) => store.workshopsStore);
-  const { isFormModalOpen, selectedForm, isEdit, selectedWorkshops } =
-    useSelector((store) => store.formsStore);
+  const {
+    isFormModalOpen,
+    selectedForm,
+    isEdit,
+    selectedWorkshops,
+    optionsArray,
+  } = useSelector((store) => store.formsStore);
   const modalClassName = isFormModalOpen ? "modal fade show" : "modal fade";
   const modalRef = useRef(null);
 
@@ -55,9 +60,7 @@ function FormModal() {
         return false;
       }
 
-      if (
-        ["checkbox", "radio", "dropdown", "workshop-selection"].includes(type)
-      ) {
+      if (optionsArray.includes(type)) {
         if (
           !options ||
           options.length < 2 ||
@@ -477,25 +480,23 @@ function FormModal() {
                         </select>
                       )}
 
-                    {element.type !== "input" &&
-                      element.type !== "workshop-selection" &&
-                      element.type !== "file" && (
-                        <button
-                          type="button"
-                          id="addOption"
-                          className="btn btn-primary mt-3"
-                          onClick={() =>
-                            dispatch(
-                              addOption({
-                                index,
-                                value: "",
-                              })
-                            )
-                          }
-                        >
-                          Add Option
-                        </button>
-                      )}
+                    {optionsArray.includes() && (
+                      <button
+                        type="button"
+                        id="addOption"
+                        className="btn btn-primary mt-3"
+                        onClick={() =>
+                          dispatch(
+                            addOption({
+                              index,
+                              value: "",
+                            })
+                          )
+                        }
+                      >
+                        Add Option
+                      </button>
+                    )}
                   </div>
                 ))}
               </>

@@ -1,3 +1,4 @@
+// File: ParticipantsCard.jsx
 import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
@@ -5,7 +6,6 @@ import ParticipantModal from "./ParticipantModal";
 import ParticipantDetails from "./ParticipantDetails";
 import { toast } from "react-hot-toast";
 import { formatDateWithShort } from "../../../utils/helpers/FormatDate";
-
 import Pagination from "../../../core/components/Pagination/Pagination";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -16,11 +16,12 @@ import {
   editParticipant,
   filterParticipants,
   setSearchQuery,
-  addParticipant,
+  initializeParticipants,
 } from "../../../core/Features/Participants";
 import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
+import CustomButton from "../../../core/components/Button/Button";
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -34,7 +35,6 @@ const ParticipantsCard = () => {
     participants,
     filteredParticipants,
     participantsPerPage,
-    groupedParticipants,
     searchQuery,
     isEdit,
   } = useSelector((store) => store.participantsStore);
@@ -89,6 +89,8 @@ const ParticipantsCard = () => {
   };
 
   useEffect(() => {
+    dispatch(initializeParticipants(participants));
+
     const newSocket = io(import.meta.env.VITE_BACKEND.split("/api")[0]);
 
     newSocket.on("connect", () => {
@@ -99,14 +101,14 @@ const ParticipantsCard = () => {
     });
 
     newSocket.on("EventParticipantAdded", (data) => {
-      dispatch(addParticipant(data));
+      dispatch(initializeParticipants([...participants, data]));
     });
 
     return () => {
       newSocket.off("EventParticipantAdded");
       newSocket.disconnect();
     };
-  }, [eventId, workshopId]);
+  }, [eventId, workshopId, dispatch]);
 
   const handleStatusChange = (e) => {
     dispatch(filterParticipants(e.target.value));
@@ -117,10 +119,62 @@ const ParticipantsCard = () => {
     dispatch(setSearchQuery(query));
     setCurrentPage(1);
   };
+
   const handleEditClick = (participant) => {
     dispatch(setSelectedParticipant(participant));
     dispatch(toggleParticipantModal());
   };
+
+  const formatResponses = (responses) => {
+    return responses
+      .map(({ question, answer }) => `${question}: ${answer}`)
+      .join("; ");
+  };
+
+  const generateCSV = () => {
+    const csvHeader = [
+      "ID",
+      "Full Name",
+      "Email",
+      "Created At",
+      "Status",
+      "Event Name",
+      "Event Questions & Responses",
+      "Workshop Details",
+    ];
+
+    const csvRows = participants.map((participant) => {
+      const eventResponses = formatResponses(participant.eventResponses);
+      const workshopDetails = participant.workshops
+        .map((workshop) => {
+          const workshopResponses = formatResponses(workshop.responses);
+          return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
+        })
+        .join("; ");
+
+      return [
+        participant.id,
+        participant.fullName,
+        participant.email,
+        formatDateWithShort(participant.createdAt),
+        participant.status,
+        participant.eventName,
+        eventResponses,
+        workshopDetails,
+      ].join(",");
+    });
+
+    const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", "participants.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -142,6 +196,20 @@ const ParticipantsCard = () => {
                 <option value="Pending">Pending</option>
                 <option value="Canceled">Canceled</option>
               </select>
+              <div className="dt-buttons btn-group flex-wrap">
+                <CustomButton
+                  text="Download"
+                  iconClass="bx bx-download me-md-1"
+                  style={{ padding: "5px" }}
+                  backgroundColor="var(--primary-color)"
+                  textColor="white"
+                  hoverBackgroundColor="#0F205D"
+                  hoverTextColor="white"
+                  onClick={() => {
+                    generateCSV();
+                  }}
+                />
+              </div>
             </div>
           </div>
           <div className="table-responsive">

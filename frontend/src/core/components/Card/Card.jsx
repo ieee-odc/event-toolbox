@@ -171,8 +171,8 @@ const Card = ({
               Ends: &nbsp;
               <span className="text-body fw-normal">
                 {" "}
-                {formatTime(workshop.startTime)}{" "}
-                {formatDateWithNumbers(workshop.startTime)}{" "}
+                {formatTime(workshop.endTime)}{" "}
+                {formatDateWithNumbers(workshop.endTime)}{" "}
               </span>
             </h6>
           </div>
