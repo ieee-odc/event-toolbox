@@ -61,7 +61,7 @@ jobs:
         run: |
           curl -sLO https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.3/dependency-check-10.0.3-release.zip
           unzip dependency-check-10.0.3-release.zip
-          npm install
+          cd ./frontend && npm install
           ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan ./backend --format "XML" --out "dependency-check-report.xml"   
       
       
