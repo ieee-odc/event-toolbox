@@ -62,7 +62,7 @@ jobs:
           cd ./frontend && npm install
           curl -sLO https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.3/dependency-check-10.0.3-release.zip
           unzip dependency-check-10.0.3-release.zip
-          ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan ./backend --format "XML" --out "dependency-check-report.xml"   
+          ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan . --format "XML" --out "dependency-check-report.xml"   
       
       
       - uses: sonarsource/sonarqube-scan-action@master
