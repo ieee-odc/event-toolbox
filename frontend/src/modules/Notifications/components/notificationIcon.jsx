@@ -1,141 +1,149 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import './notificationIcon.css'; // Ensure you create this CSS file for basic styling
-import NotificationList from './NotificationList';
-import axios from 'axios';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FaCalendarAlt, FaChalkboardTeacher, FaBell, FaEnvelopeOpen, FaTimes } from 'react-icons/fa';
 import { jwtDecode } from "jwt-decode";
-
-// Function to mark all notifications as read
-const markAllAsRead = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.id;
-
-    await axios.patch('http://localhost:6001/notification/mark-all-as-read', {
-      userId
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    console.log('All notifications marked as read');
-  } catch (error) {
-    console.error('Error marking notifications as read:', error);
-    throw error;
-  }
-};
-
-// Function to fetch notifications
-const fetchNotifications = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.id;
-
-    const response = await axios.get(`http://localhost:6001/notification?userId=${userId}`);
-    
-    console.log('Response data:', response.data);
-
-    // Ensure the response data is an array
-    if (!Array.isArray(response.data)) {
-      throw new Error('Invalid data format');
-    }
-
-    const unreadCount = response.data.filter(notification => !notification.read).length;
-
-    return { notifications: response.data, unreadCount };
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-    throw error;
-  }
-};
+import { formatDistanceToNow } from 'date-fns';
+import axiosRequest from '../../../utils/AxiosConfig';
+import { UserData } from '../../../utils/UserData';
+import io from 'socket.io-client';
+import {
+  toggleShowNotifications,
+  setNotifications,
+  setLoading,
+  setError,
+  markAllAsReadSuccess,
+  deleteNotificationSuccess,
+  addNotification,
+} from "../../../core/Features/Notifications";
+import './notificationIcon.css';
 
 const NotificationIcon = () => {
-  const [showNotifications, setShowNotifications] = useState(false);
+  const dispatch = useDispatch();
+  const { notifications, unreadCount, showNotifications, isLoading, error } = useSelector((state) => state.notificationStore);
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['notifications'],
-    queryFn: fetchNotifications,
-    onSuccess: () => {
-      console.log('Notifications fetched successfully');
-    },
-    onError: (error) => {
-      console.error('Error fetching notifications:', error);
-    },
-  });
+  const userData = UserData();
+  const organizerId = userData.id;
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    fetchNotifications();
 
-  if (isError) {
-    return <div>Error: {error.message}</div>;
-  }
+    const socket = io('http://localhost:6001');
 
-  const { notifications = [], unreadCount } = data || {};
+    socket.on('new-notification', (notification) => {
+      dispatch(addNotification(notification));
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      dispatch(setLoading(true));
+      const response = await axiosRequest.get(`http://localhost:6001/notification?userId=${organizerId}`);
+      if (!Array.isArray(response.data)) throw new Error('Invalid data format');
+      const unreadCount = response.data.filter(notification => !notification.read).length;
+      dispatch(setNotifications({ notifications: response.data, unreadCount }));
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setError(error.message));
+      dispatch(setLoading(false));
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No token found');
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+      await axiosRequest.patch('http://localhost:6001/notification/mark-all-as-read', {
+        userId,
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      dispatch(markAllAsReadSuccess());
+    } catch (error) {
+      dispatch(setError(error.message));
+    }
+  };
+
+  const deleteNotification = async (notificationId) => {
+    try {
+      await axiosRequest.delete(`http://localhost:6001/notification/${notificationId}`);
+      dispatch(deleteNotificationSuccess(notificationId));
+    } catch (error) {
+      dispatch(setError(error.message));
+    }
+  };
 
   const handleIconClick = () => {
-    console.log('Notification icon clicked');
-    setShowNotifications(!showNotifications);
+    dispatch(toggleShowNotifications());
   };
 
   const handleMarkAllAsRead = async () => {
     try {
       await markAllAsRead();
-      // Refetch notifications to update the unread count
-      refetch();
+      fetchNotifications();
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
     }
   };
 
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
-    <li className="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
-      <a
-        className="nav-link dropdown-toggle hide-arrow"
-        data-bs-toggle="dropdown"
-        data-bs-auto-close="outside"
-        aria-expanded={showNotifications}
-        onClick={handleIconClick}
-      >
-        <i className="bx bx-bell bx-sm"></i>
-        <span className="badge bg-danger rounded-pill badge-notifications">{unreadCount}</span>
-      </a>
+    <div className="notification-icon-container">
+      <div className="notification-icon" onClick={handleIconClick}>
+        <FaBell size={24} />
+        {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
+      </div>
       {showNotifications && (
-        <ul className="dropdown-menu dropdown-menu-end py-0 show">
-          <li className="dropdown-menu-header border-bottom">
-            <div className="dropdown-header d-flex align-items-center py-3">
-              <h5 className="text-body mb-0 me-auto">Notifications</h5>
-              <a
-                href="javascript:void(0)"
-                className="dropdown-notifications-all text-body"
-                data-bs-toggle="tooltip"
-                data-bs-placement="top"
-                aria-label="Mark all as read"
-                data-bs-original-title="Mark all as read"
-                onClick={handleMarkAllAsRead} // Added onClick handler
-              >
-                <i className="bx fs-4 bx-envelope-open"></i>
-              </a>
-            </div>
-          </li>
-          <NotificationList notifications={notifications} />
-          {/* <li className="dropdown-menu-footer border-top p-3">
-            <button className="btn btn-primary text-uppercase w-100">View All Notifications</button>
-          </li> */}
-        </ul>
+        <div className="notifications-dropdown">
+          <div className="dropdown-header">
+            <span className="header-title">Notifications</span>
+            <span className="mark-all-read" onClick={handleMarkAllAsRead}>
+              <FaEnvelopeOpen /> Mark all as read
+            </span>
+          </div>
+          <div className="dropdown-list">
+            {notifications.length === 0 ? (
+              <div className="dropdown-item">No notifications available</div>
+            ) : (
+              notifications.map((notification) => (
+                <div
+                  key={notification._id}
+                  className={`dropdown-item ${!notification.read ? 'unread' : ''}`}
+                >
+                  <div className="item-icon">
+                    {notification.type === 'EventRegistration' && <FaCalendarAlt />}
+                    {notification.type === 'WorkshopRegistration' && <FaChalkboardTeacher />}
+                  </div>
+                  <div className="item-content">
+                    <div className="item-title">
+                      {(notification.from && notification.from.fullName) || 'Unknown User'}
+                    </div>
+                    <div className="item-text">
+                      {notification.type === 'EventRegistration'
+                        ? 'Registered for an event'
+                        : 'Registered for a workshop'}
+                    </div>
+                    <div className="item-time">
+                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                    </div>
+                  </div>
+                  <div className="item-action">
+                    <FaTimes onClick={() => deleteNotification(notification._id)} />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       )}
-    </li>
+    </div>
   );
 };
 

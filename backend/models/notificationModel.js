@@ -1,28 +1,35 @@
 const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema({
-    from :{
-        type : mongoose.Schema.Types.ObjectId, // Reference to a User document
-        ref : 'Participant', // The referenced model is 'Participant'
-        required : true
+    id: {
+        type: mongoose.Schema.Types.ObjectId, // Automatically managed by MongoDB
+        auto: true, // Automatically generate the ID
+        required: true,
+        unique: true // Ensure uniqueness
     },
-    to :{
-        type : Number,
-        ref : 'User',
-        required : true
+
+    from: {
+        type: mongoose.Schema.Types.ObjectId, // Reference to a User document
+        ref: 'Participant', // The referenced model is 'Participant'
+        required: true
     },
-    type :{
+    to: {
+        type: Number,
+        ref: 'User',
+        required: true
+    },
+    type: {
         type: String,
-        required:true,
-        enum: ['EventRegistration','WorkshopRegistration']
+        required: true,
+        enum: ['EventRegistration', 'WorkshopRegistration']
     },
-    read :{
+    read: {
         type: Boolean,
-        default :false
+        default: false
     }
-    
-},{timestamps:true});
-const Notification =mongoose.model('Notifiaction',notificationSchema);
+
+}, { timestamps: true });
+const Notification = mongoose.model('Notifiaction', notificationSchema);
 
 module.exports = Notification;
 

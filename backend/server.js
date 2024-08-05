@@ -101,6 +101,10 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("EventParticipantAdded", data.participant);
   });
 
+  socket.on('create-notification', (notification) => {
+    io.emit('new-notification', notification);
+  });
+
   // Handle disconnection
   socket.on("disconnect", () => {
     console.log("A user disconnected");

@@ -10,6 +10,7 @@ import spacesStore from "./core/Features/Spaces.js";
 import formsStore from "./core/Features/Forms.js";
 import participantsStore from "./core/Features/Participants.js";
 import registrationStore from "./core/Features/Registration.js";
+import notificationStore from "./core/Features/Notifications.js";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Create a QueryClient instance
@@ -23,6 +24,7 @@ const store = configureStore({
     formsStore: formsStore,
     participantsStore: participantsStore,
     registrationStore: registrationStore,
+    notificationStore: notificationStore
   },
 });
 
@@ -30,9 +32,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
-      <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
           <App />
-      </QueryClientProvider>
+        </QueryClientProvider>
       </Router>
     </Provider>
   </React.StrictMode>
