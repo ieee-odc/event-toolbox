@@ -49,6 +49,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
+          distribution: 'temurin'  # Specify the JDK distribution to use
 
       - name: Run OWASP Dependency-Check
         run: |
