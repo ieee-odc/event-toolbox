@@ -212,11 +212,11 @@ function EventModal() {
                   <Flatpickr
                     id={"date"}
                     ref={flatpickrRefStart}
-                    value={selectedEvent.date || new Date()}
+                    value={selectedEvent.startDate || new Date()}
                     onChange={(date) => {
                       const myDate = date[0].toISOString();
                       dispatch(
-                        updateSelectedWorkshopField({
+                        updateSelectedEventField({
                           id: "startDate",
                           value: myDate,
                         })
@@ -234,11 +234,11 @@ function EventModal() {
                   <Flatpickr
                     id={"date"}
                     ref={flatpickrRefEnd}
-                    value={selectedEvent.date || new Date()}
+                    value={selectedEvent.endDate || new Date()}
                     onChange={(date) => {
                       const myDate = date[0].toISOString();
                       dispatch(
-                        updateSelectedWorkshopField({
+                        updateSelectedEventField({
                           id: "endDate",
                           value: myDate,
                         })
