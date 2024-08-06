@@ -69,7 +69,7 @@ const NotificationIcon = () => {
       if (!token) throw new Error("No token found");
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.id;
-      await axiosRequest.patch(
+      await axiosRequest.post(
         "/notification/mark-all-as-read",
         {
           userId,
@@ -148,7 +148,7 @@ const NotificationIcon = () => {
                   </div>
                   <div className="item-content">
                     <div className="item-title">
-                      {(notification.from && notification.from.fullName) ||
+                      {(notification.user && notification.user.fullName) ||
                         "Unknown User"}
                     </div>
                     <div className="item-text">
