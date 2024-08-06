@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { formatDistanceToNow } from "date-fns";
@@ -23,6 +23,7 @@ const NotificationIcon = () => {
 
   const userData = UserData();
   const organizerId = userData.id;
+  const dropdownRef = useRef(null); // Create a ref for the dropdown
 
   useEffect(() => {
     fetchNotifications();
@@ -106,6 +107,19 @@ const NotificationIcon = () => {
     }
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        dispatch(toggleShowNotifications());
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  });
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -119,7 +133,7 @@ const NotificationIcon = () => {
         {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
       </div>
       {showNotifications && (
-        <div className="notifications-dropdown">
+        <div className="notifications-dropdown" ref={dropdownRef}>
           <div className="dropdown-header">
             <span className="header-title">Notifications</span>
             <span className="mark-all-read" onClick={handleMarkAllAsRead}>
