@@ -96,8 +96,8 @@ const NotificationIcon = () => {
 
   return (
     <div className="notification-icon-container">
-      <div className="notification-icon" onClick={handleIconClick}>
-        <FaBell size={24} />
+      <div className="notification-icon me-3" onClick={handleIconClick}>
+        <i className="bx bx-bell bx-sm" style={{ color: "var(--primary-color)" }}></i>
         {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
       </div>
       {showNotifications && (

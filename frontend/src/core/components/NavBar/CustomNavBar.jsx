@@ -1,6 +1,6 @@
 import React from "react";
 import NotificationIcon from '../../../modules/Notifications/components/notificationIcon'
-
+import "./NavBar.css"
 
 function CustomNavBar({ toggleSideBar }) {
   return (
@@ -120,7 +120,7 @@ function CustomNavBar({ toggleSideBar }) {
           </li>
           {/* / Style Switcher*/}
           {/* Notification */}
-            <NotificationIcon/>
+          <NotificationIcon />
           {/*/ Notification */}
           {/* User */}
           <li className="nav-item navbar-dropdown dropdown-user dropdown">

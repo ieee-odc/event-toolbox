@@ -129,3 +129,7 @@
 .item-action:hover {
   color: #c82333;
 }
+
+.mark-all-read svg {
+  margin: 0px 5px 1px 5px;
+}
