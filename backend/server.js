@@ -21,19 +21,10 @@ const allowedOrigins = [
   "https://secure-totally-doberman.ngrok-free.app",
 ];
 
-// Create a function to check if the origin is allowed
-
 app.use(cors());
-// app.use(helmet());
 
 const _dirname = path.dirname("");
 const buildPath = path.join(_dirname, "../frontend/dist");
-
-// app.use((req, res, next) => {
-//   res.header("Cross-Origin-Opener-Policy", "same-origin; allow-popups");
-//   res.header("Cross-Origin-Embedder-Policy", "require-corp");
-//   next();
-// });
 
 app.use(express.static(buildPath));
 
@@ -65,8 +56,8 @@ router.use("/space", SpaceRouter);
 const FormRouter = require("./routes/FormRoutes");
 router.use("/form", FormRouter);
 
-const NotificationRouter = require("./routes/notificationRoutes");
-app.use("/notification", NotificationRouter);
+const NotificationRouter = require("./routes/NotificationRoutes");
+router.use("/notification", NotificationRouter);
 
 app.use("/api", router);
 app.get("/*", function (req, res) {
@@ -96,13 +87,18 @@ io.on("connection", (socket) => {
     socket.join(eventId.toString());
   });
 
+  socket.on("joinOrganizer", (organizerId) => {
+    socket.join(organizerId.toString());
+  });
+
   socket.on("addEventParticipant", async (data) => {
     const roomId = data.roomId;
     io.to(roomId).emit("EventParticipantAdded", data.participant);
   });
 
-  socket.on('create-notification', (notification) => {
-    io.emit('new-notification', notification);
+  socket.on("create-notification", (data) => {
+    const organizerId = data.organizerId;
+    io.to(organizerId.toString()).emit("new-notification", data.notification);
   });
 
   // Handle disconnection

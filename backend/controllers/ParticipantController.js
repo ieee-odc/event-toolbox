@@ -2,11 +2,7 @@ const Counter = require("../models/CounterModel");
 const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
-const Notification = require("../models/notificationModel");
-// const mongoose = require('mongoose'); // Ensure mongoose is imported
-
-
-
+const Notification = require("../models/NotificationModel");
 
 const addParticipant = async (req, res) => {
   try {
@@ -40,28 +36,8 @@ const addParticipant = async (req, res) => {
       email,
       ...participantData,
     });
-    await participant.save();
 
     await participant.save();
-    // Fetch event details to get the organizerId
-    const event1 = await Event.findOne({ id: participant.eventId });
-    if (!event1) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    const organizerId = event1.organizerId;
-
-    // Create a notification for the organizer
-    const newNotification = new Notification({
-      from: participant._id, // Participant's ID
-      to: organizerId, // Organizer's ID
-      type: 'EventRegistration',
-      message: `A new participant has registered for your event: ${event.name}`,
-      read: false,
-    });
-
-    await newNotification.save();
-
 
     res.status(201).json({
       status: "success",
@@ -179,7 +155,7 @@ const register = async (req, res) => {
     );
 
     if (!workshop) {
-      return res.status(404).json({ message: 'Workshop not found' });
+      return res.status(404).json({ message: "Workshop not found" });
     }
 
     const existingParticipant = await Participant.findOne({
@@ -195,7 +171,7 @@ const register = async (req, res) => {
 
     // Create the participant with an auto-incremented id
     const counter = await Counter.findOneAndUpdate(
-      { id: 'autovalParticipant' },
+      { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
@@ -203,7 +179,7 @@ const register = async (req, res) => {
     const participant = new Participant({
       id: counter.seq,
       workshopId,
-      status: 'Pending',
+      status: "Pending",
       ...participantData,
     });
 
@@ -216,7 +192,7 @@ const register = async (req, res) => {
     const newNotification = new Notification({
       from: participant.id, // Participant's ID
       to: organizerId, // Organizer's ID
-      type: 'WorkshopRegistration',
+      type: "WorkshopRegistration",
       message: `A new participant has registered for your workshop: ${workshop.name}`,
       read: false,
     });
@@ -224,18 +200,16 @@ const register = async (req, res) => {
     await newNotification.save();
 
     res.status(201).json({
-      status: 'success',
-      message: 'Added Participant and created notification',
+      status: "success",
+      message: "Added Participant and created notification",
       participant: participant,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      message: 'Server Error!',
+      message: "Server Error!",
     });
   }
-
-
 };
 
 module.exports = {
