@@ -3,15 +3,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import Pagination from '../../../core/components/Pagination/Pagination';
 import { UserData } from '../../../utils/UserData';
 import axiosRequest from '../../../utils/AxiosConfig';
-import { fetchStatsStart, fetchStatsSuccess, fetchStatsFailure } from '../../../core/Features/Stats';
-
+import { fetchStatsStart, fetchStatsSuccess, fetchStatsFailure, setEventsPerPage } from '../../../core/Features/Stats';
+import "../Dashboard.css"
 function EventsTable() {
     const dispatch = useDispatch();
     const userData = UserData();
     const userId = userData.id;
-    const { events, isLoading } = useSelector((state) => state.statsStore);
-
-
+    const { events, isLoading, eventsPerPage } = useSelector((state) => state.statsStore);
+    const [currentPage, setCurrentPage] = useState(1);
+    const indexOfLastEvent = currentPage * eventsPerPage;
+    const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+    const currentEvents = events.slice(
+        indexOfFirstEvent,
+        indexOfLastEvent
+    );
+    const handleEventsPageChange = (e) => {
+        dispatch(setEventsPerPage(Number(e.target.value)));
+    };
     useEffect(() => {
 
         const fetchEventsAndWorkshops = async () => {
@@ -85,10 +93,31 @@ function EventsTable() {
                         <div className="head-label text-center">
                             <h5 className="card-title mb-0 text-nowrap">Your Events</h5>
                         </div>
-                        <div id="DataTables_Table_0_filter" className="dataTables_filter">
-                            <label>
-                                <input type="search" className="form-control" placeholder="Search Course" aria-controls="DataTables_Table_0" />
-                            </label>
+                        <div className="d-flex">
+                            <div id="DataTables_Table_0_filter" className="dataTables_filter me-2">
+                                <label>
+                                    <input type="search" className="form-control" placeholder="Search Event" aria-controls="DataTables_Table_0" />
+                                </label>
+                            </div>
+                            <div
+                                style={{ width: "auto" }}
+                                className="dataTables_length"
+                                id="DataTables_Table_0_length"
+                            >
+                                <label>
+                                    <select
+                                        name="DataTables_Table_0_length"
+                                        aria-controls="DataTables_Table_0"
+                                        className="form-select extend-select"
+                                        onChange={handleEventsPageChange}
+                                    >
+                                        <option value={5}>5</option>
+                                        <option value={10}>10</option>
+                                        <option value={15}>15</option>
+                                        <option value={20}>20</option>
+                                    </select>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     {isLoading ? (
@@ -106,69 +135,70 @@ function EventsTable() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {events.map((event) => (
-                                    <tr key={event.id} className="odd">
-                                        <td className="control dtr-hidden" tabIndex="0" style={{ display: 'none' }}></td>
+                                {currentEvents &&
+                                    currentEvents.map((event) => (
+                                        <tr key={event.id} className="odd">
+                                            <td className="control dtr-hidden" tabIndex="0" style={{ display: 'none' }}></td>
 
-                                        <td className="sorting_1">
-                                            <div className="d-flex align-items-center">
-                                                <span className="me-4">
-                                                    <span className="badge bg-label-success rounded p-1_5">
-                                                        <i className="bx bxs-color bx-28px"></i>
-                                                    </span>
-                                                </span>
-                                                <div>
-                                                    <a className="text-heading text-truncate fw-medium mb-2 text-wrap" href="app-academy-course-details.html">{event.name}</a>
-
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span className="fw-medium text-nowrap text-heading">16h 15m</span>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex align-items-center gap-3">
-                                                <p className="fw-medium mb-0 text-heading">{event.overallProgress}%</p>
-                                                <div className="progress w-100" style={{ height: '8px' }}>
-                                                    <div className="progress-bar" style={{ width: `${event.overallProgress}%` }} aria-valuenow={event.overallProgress} aria-valuemin="0" aria-valuemax="100"></div>
-                                                </div>
-                                                <small>{event.currentParticipants}/{event.totalParticipants}</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex align-items-center justify-content-between">
+                                            <td className="sorting_1">
                                                 <div className="d-flex align-items-center">
-                                                    <i className="bx bx-user bx-md me-1_5 text-primary"></i><span>{event.currentParticipants}</span>
-                                                </div>
+                                                    <span className="me-4">
+                                                        <span className="badge bg-label-success rounded p-1_5">
+                                                            <i className="bx bxs-color bx-28px"></i>
+                                                        </span>
+                                                    </span>
+                                                    <div>
+                                                        <a className="text-heading text-truncate fw-medium mb-2 text-wrap" href="app-academy-course-details.html">{event.name}</a>
 
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className="fw-medium text-nowrap text-heading">16h 15m</span>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex align-items-center gap-3">
+                                                    <p className="fw-medium mb-0 text-heading">{event.overallProgress}%</p>
+                                                    <div className="progress w-100" style={{ height: '8px' }}>
+                                                        <div className="progress-bar" style={{ width: `${event.overallProgress}%` }} aria-valuenow={event.overallProgress} aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                    <small>{event.currentParticipants}/{event.totalParticipants}</small>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex align-items-center justify-content-between">
+                                                    <div className="d-flex align-items-center">
+                                                        <i className="bx bx-user bx-sm me-1_5 text-primary"></i><span>{event.currentParticipants}</span>
+                                                    </div>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
                             </tbody>
                         </table>
                     )}
-                    {/* <div className="row mx-2" id="pagination-section">
-                                <div className="col-sm-12 col-md-6">
-                                    <div
-                                        className="dataTables_info"
-                                        id="DataTables_Table_0_info"
-                                        role="status"
-                                        aria-live="polite"
-                                    >
-                                        {`Showing ${indexOfFirstWorkshop + 1} to ${Math.min(
-                                            indexOfLastWorkshop,
-                                            filteredWorkshops.length
-                                        )} of ${filteredWorkshops.length} entries`}
-                                    </div>
-                                </div>
-                                <Pagination
-                                    unitsPerPage={workshopsPerPage}
-                                    totalUnits={filteredWorkshops.length}
-                                    currentPage={currentPage}
-                                    setCurrentPage={setCurrentPage}
-                                />
-                            </div> */}
+                    <div className="row mt-6" id="pagination-section">
+                        <div className="col-sm-12 col-md-6">
+                            <div
+                                className="dataTables_info"
+                                id="DataTables_Table_0_info"
+                                role="status"
+                                aria-live="polite"
+                            >
+                                {`Showing ${indexOfFirstEvent + 1} to ${Math.min(
+                                    indexOfLastEvent,
+                                    events.length
+                                )} of ${events.length} entries`}
+                            </div>
+                        </div>
+                        <Pagination
+                            unitsPerPage={eventsPerPage}
+                            totalUnits={events.length}
+                            currentPage={currentPage}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    </div>
                 </div>
             </div>
 
