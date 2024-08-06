@@ -94,10 +94,14 @@ const FormsSlice = createSlice({
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].type = newType;
         if (state.optionsArray.includes(newType)) {
-          state.selectedForm.data[index].options = [
-            "First Option",
-            "Second Option",
-          ];
+          if (newType !== "workshop-selection") {
+            state.selectedForm.data[index].options = [
+              "First Option",
+              "Second Option",
+            ];
+          } else {
+            state.selectedForm.data[index].options = [];
+          }
         } else {
           state.selectedForm.data[index].options = [];
         }

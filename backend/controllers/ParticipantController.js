@@ -147,13 +147,6 @@ const register = async (req, res) => {
   try {
     const { workshopId, eventId, email, ...participantData } = req.body;
 
-    // Find and update the workshop by incrementing the currentParticipants
-    const workshop = await Workshop.findOneAndUpdate(
-      { id: workshopId },
-      { $inc: { currentParticipants: 1 } },
-      { new: true }
-    );
-
     if (!workshop) {
       return res.status(404).json({ message: "Workshop not found" });
     }
@@ -169,11 +162,24 @@ const register = async (req, res) => {
       });
     }
 
+    if (workshop.currentParticipants >= workshop.numberOfAttendees) {
+      return res.status(400).json({
+        status: "error",
+        message: "Workshop is full.",
+      });
+    }
+
     // Create the participant with an auto-incremented id
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
+    );
+
+    const workshop = await Workshop.findOneAndUpdate(
+      { id: workshopId },
+      { $inc: { currentParticipants: 1 } },
+      { new: true }
     );
 
     const participant = new Participant({

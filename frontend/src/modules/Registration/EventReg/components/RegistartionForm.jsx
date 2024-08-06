@@ -12,7 +12,7 @@ import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
 import { Modal } from "react-bootstrap";
-import { storage } from "../../../../utils/firebaseConfig"; // Adjust the path as needed
+import { storage } from "../../../../utils/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./RegistrationForm.css";
 
@@ -46,22 +46,23 @@ const RegistrationForm = () => {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [validated, setValidated] = useState(false);
-  const [checkboxValidation, setCheckboxValidation] = useState({});
-  let tokenData;
+  const [tokenData, setTokenData] = useState();
 
-  try {
-    tokenData = JSON.parse(decodedToken);
-  } catch (error) {
-    console.error("Invalid token format", error);
-  }
+  const [validated, setValidated] = useState(false);
+  useEffect(() => {
+    try {
+      setTokenData(JSON.parse(decodedToken));
+    } catch (error) {
+      console.error("Invalid token format", error);
+    }
+  }, [token]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const action = dispatch(fetchFormData(tokenData.formId));
-    };
-    fetchData();
-  }, [tokenData.formId]);
+    if (!tokenData) {
+      return;
+    }
+    dispatch(fetchFormData(tokenData.formId));
+  }, [tokenData]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -75,11 +76,6 @@ const RegistrationForm = () => {
       ? [...currentValues, value]
       : currentValues.filter((val) => val !== value);
     dispatch(updateFormData({ field: field.question, value: newValues }));
-
-    setCheckboxValidation((prevState) => ({
-      ...prevState,
-      [field.question]: newValues.length > 0,
-    }));
   };
 
   const handleRadioChange = (e, field) => {
@@ -106,35 +102,23 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-
-    let valid = true;
-    const newCheckboxValidation = {};
-    formFields.forEach((field) => {
-      if (field.type === "checkbox") {
-        const isValid =
-          formData[field.question] && formData[field.question].length > 0;
-        newCheckboxValidation[field.question] = isValid;
-        if (!isValid) valid = false;
-      }
-    });
     if (!isEventForm) {
       const emailIsAllowed = formData.event.allowedList.some(
         (e) => e === email
       );
       if (!emailIsAllowed) {
-        setValidated(false); // Ensure form is marked as invalid
-        valid = false;
         toast.error("Email is not allowed.");
+        return;
       }
     }
 
-    setCheckboxValidation(newCheckboxValidation);
-
-    if (form.checkValidity() === false || !valid) {
+    if (!form.checkValidity()) {
       e.stopPropagation();
       setValidated(true);
       return;
     }
+
+    setValidated(false);
 
     const responses = formFields.map((field) => ({
       question: field.question,
@@ -151,7 +135,6 @@ const RegistrationForm = () => {
     };
 
     try {
-
       if (isEventForm) {
         try {
           const response = await axiosRequest.post(
@@ -170,10 +153,29 @@ const RegistrationForm = () => {
           return;
         }
       } else {
-        for (const workshop of formWorkshops) {
+        const workshopQuestions = formFields
+          .filter((field) => field.type === "workshop-selection")
+          .map((field) => field.question);
+        const selectedWorkshops = [];
+        workshopQuestions.forEach((question) => {
+          // Step 3: Accumulate the selected workshop IDs from formData
+          if (formData[question]) {
+            selectedWorkshops.push(...formData[question]);
+          }
+        });
+        console.log(workshopQuestions);
+        console.log(formData);
+        console.log(formWorkshops);
+        console.log(selectedWorkshops);
+        if (selectedWorkshops.length === 0) {
+          toast.error("Please select at least one workshop");
+          return;
+        }
+        for (const workshopId of selectedWorkshops) {
+          console.log(workshopId);
           const submissionData = {
             ...baseSubmissionData,
-            workshopId: workshop.id,
+            workshopId: workshopId,
           };
 
           const response = await axiosRequest.post(
@@ -184,7 +186,7 @@ const RegistrationForm = () => {
           if (socket) {
             socket.emit("addEventParticipant", {
               participant: response.data.participant,
-              roomId: `${eventId}/${workshop.id}`,
+              roomId: `${eventId}/${workshopId}`,
             });
           }
         }
@@ -199,11 +201,18 @@ const RegistrationForm = () => {
       setFullName("");
       setEmail("");
       setPhoneNumber("");
-      setCheckboxValidation({});
-      setValidated(false);
       setShowModal(true);
     } catch (error) {
-      console.error("Error submitting form data: ", error);
+      if (error.request && error.request.response) {
+        try {
+          const response = JSON.parse(error.request.response);
+          toast.error(response.message);
+        } catch (e) {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -229,7 +238,6 @@ const RegistrationForm = () => {
   }, [eventId, workshopsIds]);
 
   useEffect(() => {
-    console.log(workshopsIds)
     if (workshopsIds && workshopsIds.length !== 0) {
       axiosRequest
         .post("/workshop/get-many", {
@@ -264,7 +272,7 @@ const RegistrationForm = () => {
       dispatch(setIsEventForm(false));
       dispatch(setAllFull(false));
     }
-  }, [workshopsIds])
+  }, [workshopsIds]);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -319,9 +327,10 @@ const RegistrationForm = () => {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className={`needs-validation ${validated ? "was-validated" : ""
-                    }`}
                   noValidate
+                  className={`needs-validation ${
+                    validated ? "was-validated" : ""
+                  }`}
                 >
                   <div className="mb-3">
                     <label className="form-label" htmlFor="fullName">
@@ -402,6 +411,7 @@ const RegistrationForm = () => {
                                   onChange={(e) =>
                                     handleCheckboxChange(e, field)
                                   }
+                                  required
                                 />
                                 <label
                                   className="form-check-label"
@@ -411,16 +421,7 @@ const RegistrationForm = () => {
                                 </label>
                               </div>
                             ))}
-                            <div
-                              className="invalid-feedback"
-                              style={{
-                                display:
-                                  validated &&
-                                    !checkboxValidation[field.question]
-                                    ? "block"
-                                    : "none",
-                              }}
-                            >
+                            <div className="invalid-feedback">
                               {field.question} is required.
                             </div>
                           </div>
@@ -516,7 +517,7 @@ const RegistrationForm = () => {
                           />
                         )}
                         {field.type === "workshop-selection" && (
-                          <div>
+                          <div className="form-check" required>
                             {field.options.map((option, idx) => {
                               const workshop = formWorkshops.find(
                                 (element) =>
@@ -527,7 +528,7 @@ const RegistrationForm = () => {
                                 workshop?.currentParticipants;
                               return (
                                 !isFull && (
-                                  <div key={idx} className="form-check">
+                                  <div>
                                     <input
                                       type="checkbox"
                                       className="form-check-input"
@@ -541,6 +542,7 @@ const RegistrationForm = () => {
                                       onChange={(e) =>
                                         handleCheckboxChange(e, field)
                                       }
+                                      // required
                                     />
                                     <label
                                       className="form-check-label"
@@ -552,16 +554,7 @@ const RegistrationForm = () => {
                                 )
                               );
                             })}
-                            <div
-                              className="invalid-feedback"
-                              style={{
-                                display:
-                                  validated &&
-                                    !checkboxValidation[field.question]
-                                    ? "block"
-                                    : "none",
-                              }}
-                            >
+                            <div className="invalid-feedback">
                               {field.question} is required.
                             </div>
                           </div>
