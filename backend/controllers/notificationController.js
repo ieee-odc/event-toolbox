@@ -1,5 +1,6 @@
 const Counter = require("../models/CounterModel.js");
 const Notification = require("../models/NotificationModel.js");
+const Participant = require("../models/ParticipantModel.js");
 
 const addNotification = async (req, res) => {
   try {
@@ -8,8 +9,6 @@ const addNotification = async (req, res) => {
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
-    console.log(counter.seq);
-    console.log(req.body);
     const newNotification = new Notification({ id: counter.seq, ...req.body });
     await newNotification.save();
     res.status(201).json({
@@ -31,13 +30,23 @@ const getNotifications = async (req, res) => {
         .status(400)
         .json({ error: "Bad Request: No user ID provided" });
     }
-    const notifications = await Notification.find({ to: userId }).populate({
-      path: "from",
-      select: "fullName avatar",
-    });
+    const notifications = await Notification.find({ to: userId });
+
+    const notificationsWithUser = await Promise.all(
+      notifications.map(async (notification) => {
+        const notificationObj = notification.toObject();
+        const notificationParticipant = await Participant.findOne({
+          id: notification.from,
+        });
+        return {
+          ...notificationObj,
+          user: notificationParticipant,
+        };
+      })
+    );
     res.status(200).json({
       message: "Retrieved notifications",
-      notifications,
+      notifications: notificationsWithUser,
     });
   } catch (error) {
     console.log("Error in getNotifications controller:", error);
