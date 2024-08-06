@@ -61,13 +61,14 @@ jobs:
           cd ./frontend && npm install
           curl -sLO https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.3/dependency-check-10.0.3-release.zip
           unzip dependency-check-10.0.3-release.zip
-          ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan . --format "XML" --out "dependency-check-report.xml"   
+          ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan . --format "json" --out "dependency-check-report.json"   
       
       - name: Upload Dependency-Check Report
         uses: actions/upload-artifact@v2
         with:
           name: dependency-check-report
-          path: ./frontend/dependency-check-report.xml
+          path: ./frontend/dependency-check-report.json
+
 
   sonar-checks:
     name: quality gate
@@ -83,7 +84,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dependency-check-report
-          path: ./frontend/dependency-check-report.xml
+          path: ./frontend/dependency-check-report.json
 
       - name: Set up JDK 11
         uses: actions/setup-java@v2
