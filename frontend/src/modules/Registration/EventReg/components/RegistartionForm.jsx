@@ -151,13 +151,27 @@ const RegistrationForm = () => {
     };
 
     try {
-
       if (isEventForm) {
         try {
           const response = await axiosRequest.post(
             "/participant/add",
             baseSubmissionData
           );
+
+          axiosRequest
+            .post("/notification/add", {
+              from: response.data.participant.id,
+              to: formData.event.organizerId,
+              type: "EventRegistration",
+              message: `A new participant has registered for your event: ${formData.event.name}`,
+              read: false,
+            })
+            .then((res) => {
+              socket.emit("create-notification", {
+                organizerId: formData.event.organizerId,
+                notification: res.data.notification,
+              });
+            });
 
           if (socket) {
             socket.emit("addEventParticipant", {
@@ -229,7 +243,6 @@ const RegistrationForm = () => {
   }, [eventId, workshopsIds]);
 
   useEffect(() => {
-    console.log(workshopsIds)
     if (workshopsIds && workshopsIds.length !== 0) {
       axiosRequest
         .post("/workshop/get-many", {
@@ -264,7 +277,7 @@ const RegistrationForm = () => {
       dispatch(setIsEventForm(false));
       dispatch(setAllFull(false));
     }
-  }, [workshopsIds])
+  }, [workshopsIds]);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -319,8 +332,9 @@ const RegistrationForm = () => {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className={`needs-validation ${validated ? "was-validated" : ""
-                    }`}
+                  className={`needs-validation ${
+                    validated ? "was-validated" : ""
+                  }`}
                   noValidate
                 >
                   <div className="mb-3">
@@ -416,7 +430,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                    !checkboxValidation[field.question]
+                                  !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
@@ -557,7 +571,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                    !checkboxValidation[field.question]
+                                  !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
