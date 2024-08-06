@@ -2,6 +2,7 @@ const Counter = require("../models/CounterModel");
 const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
+const Notification = require("../models/NotificationModel");
 
 const addParticipant = async (req, res) => {
   try {
@@ -14,13 +15,11 @@ const addParticipant = async (req, res) => {
         message: "Email is already registered for this event.",
       });
     }
-
     const counter = await Counter.findOneAndUpdate(
       { id: "autovalParticipant" },
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
-
     const event = await Event.findOne({ id: eventId });
     if (event.allowedList) {
       event.allowedList.push(email);
@@ -37,6 +36,7 @@ const addParticipant = async (req, res) => {
       email,
       ...participantData,
     });
+
     await participant.save();
 
     res.status(201).json({
@@ -179,16 +179,29 @@ const register = async (req, res) => {
     const participant = new Participant({
       id: counter.seq,
       workshopId,
-      eventId,
-      email,
       status: "Pending",
       ...participantData,
     });
 
     await participant.save();
+    console.log(participant);
+
+    // Create a notification for the workshop organizer
+    const organizerId = workshop.organizerId; // Assuming organizerId is stored in the workshop document
+
+    const newNotification = new Notification({
+      from: participant.id, // Participant's ID
+      to: organizerId, // Organizer's ID
+      type: "WorkshopRegistration",
+      message: `A new participant has registered for your workshop: ${workshop.name}`,
+      read: false,
+    });
+
+    await newNotification.save();
+
     res.status(201).json({
       status: "success",
-      message: "Added Participant",
+      message: "Added Participant and created notification",
       participant: participant,
     });
   } catch (error) {
