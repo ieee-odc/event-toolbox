@@ -5,6 +5,7 @@ import { UserData } from '../../../utils/UserData';
 import { useDispatch, useSelector } from 'react-redux';
 import { setWorkshopId, fetchWorkshops } from '../../../core/Features/Stats';
 import axiosRequest from '../../../utils/AxiosConfig';
+import "../Dashboard.css"
 
 function SpaceChart() {
     const { workshopId, workshops } = useSelector((state) => state.statsStore);
@@ -74,6 +75,7 @@ function SpaceChart() {
                             value={workshop.currentParticipants}
                             valueMax={workshop.numberOfAttendees}
                             startAngle={-110}
+
                             endAngle={110}
                             sx={{
                                 [`& .${gaugeClasses.valueText}`]: {

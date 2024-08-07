@@ -144,7 +144,7 @@ function EventsTable() {
                                                 <div className="d-flex align-items-center">
                                                     <span className="me-4">
                                                         <span className="badge bg-label-success rounded p-1_5">
-                                                            <i className="bx bxs-color bx-28px"></i>
+                                                            <i className="bx bxs-color bx-28px m-0"></i>
                                                         </span>
                                                     </span>
                                                     <div>
