@@ -148,6 +148,7 @@ const ParticipantsCard = () => {
       const workshopDetails = participant.workshops
         .map((workshop) => {
           const workshopResponses = formatResponses(workshop.responses);
+
           return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
         })
         .join("; ");

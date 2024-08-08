@@ -34,7 +34,6 @@ const NotificationIcon = () => {
     });
 
     newSocket.on("new-notification", (notification) => {
-      console.log(notification);
       dispatch(addNotification(notification));
     });
 
