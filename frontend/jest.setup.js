@@ -1,1 +1,5 @@
-process.env.VITE_BACKEND = 'http://localhost:3000';
+globalThis.importMeta = {
+    env: {
+        VITE_BACKEND: process.env.VITE_BACKEND,
+    },
+};

@@ -1,4 +1,3 @@
-// File: ParticipantsCard.jsx
 import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
@@ -23,6 +22,7 @@ import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import CustomButton from "../../../core/components/Button/Button";
 import "../Participants.css"
+import * as XLSX from 'xlsx';
 
 const ParticipationStatus = Object.freeze({
   PAID: "Paid",
@@ -153,8 +153,8 @@ const ParticipantsCard = () => {
       .join("; ");
   };
 
-  const generateCSV = () => {
-    const csvHeader = [
+  const generateExcel = () => {
+    const excelHeader = [
       "ID",
       "Full Name",
       "Email",
@@ -165,11 +165,12 @@ const ParticipantsCard = () => {
       "Workshop Details",
     ];
 
-    const csvRows = participants.map((participant) => {
+    const excelRows = participants.map((participant) => {
       const eventResponses = formatResponses(participant.eventResponses);
       const workshopDetails = participant.workshops
         .map((workshop) => {
           const workshopResponses = formatResponses(workshop.responses);
+
           return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
         })
         .join("; ");
@@ -183,18 +184,13 @@ const ParticipantsCard = () => {
         participant.eventName,
         eventResponses,
         workshopDetails,
-      ].join(",");
+      ];
     });
 
-    const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.setAttribute("download", "participants.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const worksheet = XLSX.utils.aoa_to_sheet([excelHeader, ...excelRows]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Participants");
+    XLSX.writeFile(workbook, "participants.xlsx");
   };
   const sendEmailsToSelectedParticipants = () => {
     const emailList = selectedParticipants
@@ -265,7 +261,7 @@ const ParticipantsCard = () => {
                   hoverBackgroundColor="#0F205D"
                   hoverTextColor="white"
                   onClick={() => {
-                    generateCSV();
+                    generateExcel();
                   }}
                 />
               </div>
