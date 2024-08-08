@@ -21,6 +21,7 @@ import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import CustomButton from "../../../core/components/Button/Button";
+import "../Participants.css"
 import * as XLSX from 'xlsx';
 
 const ParticipationStatus = Object.freeze({
@@ -38,17 +39,38 @@ const ParticipantsCard = () => {
     searchQuery,
     isEdit,
   } = useSelector((store) => store.participantsStore);
-
   const dispatch = useDispatch();
-
   const [currentPage, setCurrentPage] = useState(1);
-
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
   const currentParticipants = filteredParticipants.slice(
     indexOfFirstParticipant,
     indexOfLastParticipant
   );
+  const [selectedParticipants, setSelectedParticipants] = useState([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const handleSelectParticipant = (id) => {
+    const updatedSelectedParticipants = selectedParticipants.includes(id)
+      ? selectedParticipants.filter((participantId) => participantId !== id)
+      : [...selectedParticipants, id];
+    setSelectedParticipants(updatedSelectedParticipants);
+    setIsSelecting(updatedSelectedParticipants.length > 0);
+  };
+
+  const handleSelectAll = () => {
+    if (areAllSelected) {
+      setSelectedParticipants([]);
+      setIsSelecting(false);
+    } else {
+      const allParticipantIds = filteredParticipants.map((p) => p.id);
+      setSelectedParticipants(allParticipantIds);
+      setIsSelecting(true);
+    }
+  };
+
+
+  const areAllSelected = selectedParticipants.length === filteredParticipants.length;
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -170,7 +192,23 @@ const ParticipantsCard = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Participants");
     XLSX.writeFile(workbook, "participants.xlsx");
   };
+  const sendEmailsToSelectedParticipants = () => {
+    const emailList = selectedParticipants
+      .map((participantId) => {
+        const participant = filteredParticipants.find(
+          (p) => p.id === participantId
+        );
+        return participant.email;
+      })
+      .join(",");
 
+    const subject = encodeURIComponent("Your Subject Here");
+    const body = encodeURIComponent("Your Email Body Here");
+
+    const mailtoLink = `mailto:${emailList}?subject=${subject}&body=${body}`;
+
+    window.location.href = mailtoLink;
+  };
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -180,8 +218,29 @@ const ParticipantsCard = () => {
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
           <div className="d-flex justify-content-between align-items-center mb-4">
+
+
             <ParticipantTableHeader onSearchChange={handleSearchChange} />
+
             <div className="d-flex align-items-center gap-2">
+              {isSelecting ? (
+                <>
+                  <div></div>
+                  <div className="d-flex align-items-center gap-2">
+                    <CustomButton
+                      text="Send Email"
+                      iconClass="bx bx-envelope me-md-1 mrt-1"
+                      style={{ padding: "5px" }}
+                      backgroundColor="var(--primary-color)"
+                      textColor="white"
+                      hoverBackgroundColor="#0F205D"
+                      hoverTextColor="white"
+                      onClick={() => {
+                        sendEmailsToSelectedParticipants()
+                      }}
+                    />
+                  </div> </>
+              ) : null}
               <select
                 id="participantStatusFilter"
                 className="form-select"
@@ -215,9 +274,16 @@ const ParticipantsCard = () => {
               aria-describedby="DataTables_Table_0_info"
               style={{ width: "100%" }}
             >
-              <thead>
+              <thead id="table-head">
                 <tr>
-                  <th>#ID</th>
+                  <th>
+                    <input
+                      type="checkbox"
+                      className="mt-1 "
+                      onChange={handleSelectAll}
+                      checked={areAllSelected}
+                    />
+                  </th>
                   <th>Client</th>
                   <th>Email</th>
                   <th>Issued Date</th>
@@ -232,25 +298,18 @@ const ParticipantsCard = () => {
                     className={`${index % 2 === 0 ? "even" : "odd"}`}
                   >
                     <td>
-                      <span
-                        className="fw-medium"
-                        style={{
-                          fontWeight: "500",
-                          color: "#646cff",
-                          textDecoration: "inherit",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleOpenDetails(participant)}
-                      >
-                        #{participant.id}
-                      </span>
+                      <input
+                        type="checkbox"
+                        checked={selectedParticipants.includes(participant.id)}
+                        onChange={() => handleSelectParticipant(participant.id)}
+                      />
                     </td>
                     <td>
                       <div className="d-flex justify-content-start align-items-center">
                         <div className="avatar-wrapper">
                           <div className="avatar avatar-sm me-2">
                             <span className="avatar-initial rounded-circle bg-label-dark">
-                              <i className="bx bx-user"></i>
+                              <i className="bx bx-user m-0"></i>
                             </span>
                           </div>
                         </div>
