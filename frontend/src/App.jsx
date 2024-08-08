@@ -16,6 +16,7 @@ import Spaces from "./modules/Space/page/Spaces";
 import Forms from "./modules/Form/pages/Forms";
 import SingleEventPage from "./modules/Events/pages/SingleEventPage";
 import SingleWorkshopPage from "./modules/Workshops/pages/SingleWorkshopPage";
+import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
 
 function App() {
@@ -36,7 +37,6 @@ function App() {
         <Route path="/spaces" element={<PrivateRoute><Spaces /></PrivateRoute>} />
         <Route path="/forms" element={<PrivateRoute><Forms /></PrivateRoute>} />
         <Route path="/form/:token" element={<RegistartionForm />} />
-
         <Route
           path="/event/:eventId/workshop/:workshopId"
           element={
@@ -45,6 +45,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       </Routes>
     </div>
   );
