@@ -62,7 +62,9 @@ jobs:
           curl -sLO https://github.com/jeremylong/DependencyCheck/releases/download/v10.0.3/dependency-check-10.0.3-release.zip
           unzip dependency-check-10.0.3-release.zip
           ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan . --format "JSON" --out "dependency-check-report.json"   
-      
+          ./dependency-check/bin/dependency-check.sh --project "GitHub Actions Project" --scan . --format "HTML" --out "dependency-check-report.html"   
+
+
       - name: Upload Dependency-Check Report
         uses: actions/upload-artifact@v2
         with:
