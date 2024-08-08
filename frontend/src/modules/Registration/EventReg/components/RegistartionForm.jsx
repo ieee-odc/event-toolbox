@@ -48,6 +48,8 @@ const RegistrationForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [validated, setValidated] = useState(false);
   const [checkboxValidation, setCheckboxValidation] = useState({});
+  const [fileError, setFileError] = useState("");
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
   let tokenData;
 
   try {
@@ -92,6 +94,15 @@ const RegistrationForm = () => {
     const file = files[0];
 
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setFileError("File size must not exceed 10MB.");
+        setIsSubmitDisabled(true);
+        return;
+      } else {
+        setFileError("");
+        setIsSubmitDisabled(false);
+      }
+
       const storageRef = ref(storage, `files/${file.name}`);
       try {
         await uploadBytes(storageRef, file);
@@ -122,7 +133,7 @@ const RegistrationForm = () => {
         (e) => e === email
       );
       if (!emailIsAllowed) {
-        setValidated(false); // Ensure form is marked as invalid
+        setValidated(false);
         valid = false;
         toast.error("Email is not allowed.");
       }
@@ -332,9 +343,8 @@ const RegistrationForm = () => {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className={`needs-validation ${
-                    validated ? "was-validated" : ""
-                  }`}
+                  className={`needs-validation ${validated ? "was-validated" : ""
+                    }`}
                   noValidate
                 >
                   <div className="mb-3">
@@ -430,7 +440,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                  !checkboxValidation[field.question]
+                                    !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
@@ -467,13 +477,19 @@ const RegistrationForm = () => {
                           </div>
                         )}
                         {field.type === "file" && (
-                          <input
-                            type="file"
-                            className="form-control"
-                            id={field.question}
-                            onChange={handleFileChange}
-                            required
-                          />
+                          <div>
+                            <input
+                              type="file"
+                              className="form-control"
+                              id={field.question}
+                              onChange={handleFileChange}
+                              required={field.required}
+                            />
+                            {fileError && (
+                              <div className="invalid-feedback d-block">
+                                {fileError}</div>
+                            )}
+                          </div>
                         )}
                         {field.type === "dropdown" && (
                           <select
@@ -571,7 +587,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                  !checkboxValidation[field.question]
+                                    !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
@@ -585,7 +601,7 @@ const RegistrationForm = () => {
                   ) : (
                     <div>No fields to display</div>
                   )}
-                  <button type="submit" className="btn btn-primary">
+                  <button type="submit" className="btn btn-primary" disabled={isSubmitDisabled}>
                     Submit
                   </button>
                 </form>
