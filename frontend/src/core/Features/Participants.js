@@ -24,7 +24,6 @@ export const initializeParticipants = createAsyncThunk(
   "Participants/initializeParticipants",
   async (participants, { dispatch }) => {
     const emailToParticipant = {};
-    console.log(participants)
     for (const participant of participants) {
       const eventId = participant.eventId;
       const workshopId = participant.workshopId;
@@ -62,9 +61,9 @@ const ParticipantsSlice = createSlice({
     filterStatus: "",
     filteredParticipants: [],
     selectedParticipant: {
-      email: '',
-      fullName: '',
-      phoneNumber: '',
+      email: "",
+      fullName: "",
+      phoneNumber: "",
     },
     participantsPerPage: 10,
     searchQuery: "",
@@ -104,7 +103,7 @@ const ParticipantsSlice = createSlice({
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
     },
     resetParticipantModal: (state) => {
-      state.selectedParticipant = { email: '', fullName: '', phoneNumber: '' };
+      state.selectedParticipant = { email: "", fullName: "", phoneNumber: "" };
       state.isEdit = false;
     },
     toggleParticipantsIsLoading: (state) => {
@@ -152,19 +151,20 @@ const ParticipantsSlice = createSlice({
       state.filterStatus = action.payload;
       state.filteredParticipants = action.payload
         ? state.participants.filter(
-          (participant) => participant.status === action.payload
-        )
+            (participant) => participant.status === action.payload
+          )
         : state.participants;
     },
     setSearchQuery: (state, action) => {
       const query = action.payload.toLowerCase();
       state.searchQuery = query;
 
-      state.filteredParticipants = state.participants.filter((participant) =>
-        participant.fullName.toLowerCase().includes(query) ||
-        participant.email.toLowerCase().includes(query)
+      state.filteredParticipants = state.participants.filter(
+        (participant) =>
+          participant.fullName.toLowerCase().includes(query) ||
+          participant.email.toLowerCase().includes(query)
       );
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -199,7 +199,7 @@ const ParticipantsSlice = createSlice({
       .addCase(fetchWorkshopData.rejected, (state) => {
         state.isLoading = false;
       });
-  }
+  },
 });
 
 export const {
