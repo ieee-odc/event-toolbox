@@ -91,6 +91,7 @@ jobs:
       #     distribution: 'temurin'
 
       - uses: sonarsource/sonarqube-scan-action@master
+        timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
