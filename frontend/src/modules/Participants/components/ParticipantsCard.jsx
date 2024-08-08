@@ -222,54 +222,54 @@ const ParticipantsCard = () => {
           style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         >
           <div className="d-flex justify-content-between align-items-center mb-4">
-            {isSelecting ? (
-              <>
-                <div></div>
-                <div className="d-flex align-items-center gap-2">
-                  <CustomButton
-                    text="Send Email"
-                    iconClass="bx bx-envelope me-md-1 mrt-1"
-                    style={{ padding: "5px" }}
-                    backgroundColor="var(--primary-color)"
-                    textColor="white"
-                    hoverBackgroundColor="#0F205D"
-                    hoverTextColor="white"
-                    onClick={() => {
-                      sendEmailsToSelectedParticipants()
-                    }}
-                  />
-                </div></>
-            ) : (
-              <>
 
-                <ParticipantTableHeader onSearchChange={handleSearchChange} />
-                <div className="d-flex align-items-center gap-2">
-                  <select
-                    id="participantStatusFilter"
-                    className="form-select"
-                    onChange={handleStatusChange}
-                  >
-                    <option value="">All Participants</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Canceled">Canceled</option>
-                  </select>
-                  <div className="dt-buttons btn-group flex-wrap">
+
+            <ParticipantTableHeader onSearchChange={handleSearchChange} />
+
+            <div className="d-flex align-items-center gap-2">
+              {isSelecting ? (
+                <>
+                  <div></div>
+                  <div className="d-flex align-items-center gap-2">
                     <CustomButton
-                      text="Download"
-                      iconClass="bx bx-download me-md-1"
+                      text="Send Email"
+                      iconClass="bx bx-envelope me-md-1 mrt-1"
                       style={{ padding: "5px" }}
                       backgroundColor="var(--primary-color)"
                       textColor="white"
                       hoverBackgroundColor="#0F205D"
                       hoverTextColor="white"
                       onClick={() => {
-                        generateCSV();
+                        sendEmailsToSelectedParticipants()
                       }}
                     />
-                  </div>
-                </div>
-              </>)}
+                  </div> </>
+              ) : null}
+              <select
+                id="participantStatusFilter"
+                className="form-select"
+                onChange={handleStatusChange}
+              >
+                <option value="">All Participants</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Canceled">Canceled</option>
+              </select>
+              <div className="dt-buttons btn-group flex-wrap">
+                <CustomButton
+                  text="Download"
+                  iconClass="bx bx-download me-md-1"
+                  style={{ padding: "5px" }}
+                  backgroundColor="var(--primary-color)"
+                  textColor="white"
+                  hoverBackgroundColor="#0F205D"
+                  hoverTextColor="white"
+                  onClick={() => {
+                    generateCSV();
+                  }}
+                />
+              </div>
+            </div>
           </div>
           <div className="table-responsive">
             <table
