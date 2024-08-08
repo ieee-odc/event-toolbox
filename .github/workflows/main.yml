@@ -72,7 +72,7 @@ jobs:
 
   sonar-checks:
     name: quality gate
-    runs-on: apache/cassandra-testing-ubuntu2004-java11:latest
+    runs-on: openjdk:19-jdk-alpine3.16
     needs: dependency-checks
     
     steps:
