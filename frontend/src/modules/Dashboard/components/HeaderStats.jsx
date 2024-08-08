@@ -27,7 +27,7 @@ export default function HeaderStats() {
                             <div className="d-flex justify-content-between align-items-start card-widget-1 border-end pb-3 pb-sm-0">
                                 <div>
                                     <h3 className="mb-1">{totalWorkshops}</h3>
-                                    <p className="mb-0">Workshops</p>
+                                    <p className="mb-0">Sessions</p>
                                 </div>
                                 <div className="avatar me-sm-4">
                                     <span className="avatar-initial rounded bg-label-secondary">

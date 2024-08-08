@@ -162,7 +162,7 @@ const ParticipantsCard = () => {
       "Status",
       "Event Name",
       "Event Questions & Responses",
-      "Workshop Details",
+      "Session Details",
     ];
 
     const excelRows = participants.map((participant) => {
@@ -171,7 +171,7 @@ const ParticipantsCard = () => {
         .map((workshop) => {
           const workshopResponses = formatResponses(workshop.responses);
 
-          return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
+          return `Session: ${workshop.workshopName} (${workshopResponses})`;
         })
         .join("; ");
 

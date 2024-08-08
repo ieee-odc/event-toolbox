@@ -46,7 +46,7 @@ function WorkshopTableHeader() {
         >
           <div className="dt-buttons btn-group flex-wrap">
             <CustomButton
-              text="Create Workshop"
+              text="Create Session"
               iconClass="bx bx-plus me-md-1 mrt-1"
               tabIndex={0}
               aria-controls="DataTables_Table_0"
@@ -62,25 +62,25 @@ function WorkshopTableHeader() {
           </div>
         </div>
         <div className="col-12 col-md-6 d-flex align-items-center justify-content-end flex-column flex-md-row pe-3 gap-md-3">
-       
-        <div
-          id="DataTables_Table_0_filter"
-          className="dataTables_filter"
-        >
-          <label className="w-200">
-            <input
-              type="search"
-              className="form-control"
-              placeholder="Search Workshop"
-              aria-controls="DataTables_Table_0"
-              onChange={handleSearchChange}
-            />
-          </label>
+
+          <div
+            id="DataTables_Table_0_filter"
+            className="dataTables_filter"
+          >
+            <label className="w-200">
+              <input
+                type="search"
+                className="form-control"
+                placeholder="Search Session"
+                aria-controls="DataTables_Table_0"
+                onChange={handleSearchChange}
+              />
+            </label>
+          </div>
         </div>
+
       </div>
-        
-      </div>
-      
+
     </div>
   );
 }

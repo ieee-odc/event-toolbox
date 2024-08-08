@@ -132,10 +132,10 @@ function SingleEventPage() {
                 aria-controls="pills-workshop"
                 aria-selected="false"
                 onClick={() => {
-                  setActiveTab("Workshops");
+                  setActiveTab("Sessions");
                 }}
               >
-                Workshops
+                Sessions
               </button>
             </li>
 

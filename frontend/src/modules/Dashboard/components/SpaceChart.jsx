@@ -49,7 +49,7 @@ function SpaceChart() {
             minWidth: '30%',
         }}>
             <div className='d-flex justify-content-between m-4 mb-1'>
-                <h5 className="card-title mb-0">Your Workshops</h5>
+                <h5 className="card-title mb-0">Your Sessions</h5>
                 <div style={{ width: "auto" }} className="dataTables_length" id="DataTables_Table_0_length">
                     <label>
                         <select
