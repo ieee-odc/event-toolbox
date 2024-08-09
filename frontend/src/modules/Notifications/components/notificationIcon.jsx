@@ -147,9 +147,8 @@ const NotificationIcon = () => {
               notifications.map((notification) => (
                 <div
                   key={notification._id}
-                  className={`dropdown-item ${
-                    !notification.read ? "unread" : ""
-                  }`}
+                  className={`dropdown-item ${!notification.read ? "unread" : ""
+                    }`}
                 >
                   <div className="item-icon">
                     {notification.type === "EventRegistration" && (
@@ -167,7 +166,7 @@ const NotificationIcon = () => {
                     <div className="item-text">
                       {notification.type === "EventRegistration"
                         ? "Registered for an event"
-                        : "Registered for a workshop"}
+                        : "Registered for a session"}
                     </div>
                     <div className="item-time">
                       {formatDistanceToNow(new Date(notification.createdAt), {

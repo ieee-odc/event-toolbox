@@ -122,14 +122,14 @@ const ParticipantDetails = () => {
                   {selectedParticipant.workshops &&
                     selectedParticipant.workshops.length > 0 && (
                       <ListGroup.Item>
-                        <strong>Workshops:</strong>
+                        <strong>Sessions:</strong>
                         <ul className="mt-2">
                           {selectedParticipant.workshops.map(
                             (workshop, index) => (
                               <li key={index}>
                                 <div className="border p-2 rounded">
                                   <p>
-                                    <strong>Workshop Name:</strong>{" "}
+                                    <strong>Session Name:</strong>{" "}
                                     {workshop.workshopName}
                                   </p>
                                   {workshop.responses &&

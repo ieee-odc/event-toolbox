@@ -336,8 +336,8 @@ const RegistrationForm = () => {
                 >
                   <span style={{ textAlign: "center" }}>
                     {hasMultiSelectForm
-                      ? "All workshops are full"
-                      : "Workshop is full"}
+                      ? "All sessions are full"
+                      : "Session is full"}
                   </span>
                 </div>
               ) : (

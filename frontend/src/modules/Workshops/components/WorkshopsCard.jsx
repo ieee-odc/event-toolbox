@@ -70,9 +70,9 @@ const WorkshopsCard = () => {
               <select
                 id="participantStatusFilter"
                 className="form-select"
-                // onChange={handleStatusChange}
+              // onChange={handleStatusChange}
               >
-                <option value="">All Workshops</option>
+                <option value="">All Sessions</option>
                 <option value="Paid">Done</option>
                 <option value="Pending">Starting Soon</option>
               </select>
@@ -80,7 +80,7 @@ const WorkshopsCard = () => {
           </div>
           <div className="row g-4" style={{ justifyContent: "center" }}>
             {isLoading ? (
-              <p>Loading workshops...</p>
+              <p>Loading sessions...</p>
             ) : (
               currentWorkshops &&
               currentWorkshops.map((workshop) => {

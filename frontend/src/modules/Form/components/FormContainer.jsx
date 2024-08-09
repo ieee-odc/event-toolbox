@@ -158,7 +158,7 @@ function FormContainer() {
                 <tr>
                   <th scope="col">Name</th>
                   <th>Deadline</th>
-                  <th>Workshop</th>
+                  <th>Session</th>
                   <th style={{ textAlign: "right" }}></th>
                 </tr>
               </thead>
@@ -167,8 +167,8 @@ function FormContainer() {
                   filteredForms.map((form) => {
                     const relatedWorkshop = form.workshopId
                       ? workshops.find(
-                          (workshop) => workshop.id === form.workshopId
-                        )
+                        (workshop) => workshop.id === form.workshopId
+                      )
                       : null;
                     return (
                       <tr key={form.id}>
@@ -185,11 +185,10 @@ function FormContainer() {
                             onClick={() => handleEditClick(form)}
                           >
                             <i
-                              className={`bx bx-edit-alt bx-sm ${
-                                hoveredIcon === `edit_${form._id}`
+                              className={`bx bx-edit-alt bx-sm ${hoveredIcon === `edit_${form._id}`
                                   ? "transform"
                                   : ""
-                              }`}
+                                }`}
                               onMouseEnter={() =>
                                 handleMouseEnter(`edit_${form._id}`)
                               }
@@ -201,11 +200,10 @@ function FormContainer() {
                             onClick={() => handleDeleteForm(form.id)}
                           >
                             <i
-                              className={`bx bx-trash bx-sm ${
-                                hoveredIcon === `delete_${form._id}`
+                              className={`bx bx-trash bx-sm ${hoveredIcon === `delete_${form._id}`
                                   ? "transform"
                                   : ""
-                              }`}
+                                }`}
                               onMouseEnter={() =>
                                 handleMouseEnter(`delete_${form._id}`)
                               }
@@ -214,11 +212,10 @@ function FormContainer() {
                           </button>
                           <button className="btn btn-link p-0">
                             <i
-                              className={`bx bx-share bx-sm ${
-                                hoveredIcon === `share_${form._id}`
+                              className={`bx bx-share bx-sm ${hoveredIcon === `share_${form._id}`
                                   ? "transform"
                                   : ""
-                              }`}
+                                }`}
                               onMouseEnter={() =>
                                 handleMouseEnter(`share_${form._id}`)
                               }
