@@ -8,6 +8,7 @@ const {
   getWorkshopParticipants,
   register,
   cancelRegistration,
+  getCancelationData,
 } = require("../controllers/ParticipantController");
 
 router.post("/add", addParticipant);
@@ -16,6 +17,7 @@ router.post("/delete/:participantId", deleteParticipant);
 router.get("/get-event/:eventId", getEventParticipants);
 router.get("/get-workshop/:workshopId", getWorkshopParticipants);
 router.post("/submit", register);
+router.post("/cancelation-data", getCancelationData);
 router.post("/cancel/:participantId", cancelRegistration);
 
 module.exports = router;

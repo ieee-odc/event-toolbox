@@ -190,8 +190,6 @@ const register = async (req, res) => {
       { new: true, upsert: true }
     );
 
-
-
     const newNotification = new Notification({
       id: Notifcounter.seq, // Auto-generated notification ID:
       from: participant.id, // Participant's ID
@@ -252,9 +250,38 @@ const cancelRegistration = async (req, res) => {
   }
 };
 
+const getCancelationData = async (req, res) => {
+  try {
+    const { participantId, eventId } = req.body;
+
+    const participant = await Participant.findOne({ _id: participantId });
+
+    if (!participant) {
+      return res.status(404).json({ message: "Participant not found" });
+    }
+
+    const allParticipations = await Participant.find({
+      email: participant.email,
+      eventId,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Cancellation data retrieved",
+      participants: allParticipations,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
+
 module.exports = {
   addParticipant,
   deleteParticipant,
+  getCancelationData,
   editParticipant,
   getEventParticipants,
   register,
