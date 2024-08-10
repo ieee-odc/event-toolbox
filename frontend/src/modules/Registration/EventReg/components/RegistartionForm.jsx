@@ -41,6 +41,8 @@ const RegistrationForm = () => {
   const [tokenData, setTokenData] = useState();
   const [fileError, setFileError] = useState("");
 
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
   const [validated, setValidated] = useState(false);
   useEffect(() => {
     try {

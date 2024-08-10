@@ -39,6 +39,7 @@ const ParticipantsCard = () => {
     participantsPerPage,
     searchQuery,
     isEdit,
+    isLoading,
   } = useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(1);

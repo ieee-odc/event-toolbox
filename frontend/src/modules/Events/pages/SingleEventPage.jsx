@@ -149,7 +149,7 @@ function SingleEventPage() {
             <li className="nav-item" role="presentation">
               <button
                 className={`nav-link ${
-                  activeTab === "Workshops" ? "active" : ""
+                  activeTab === "Sessions" ? "active" : ""
                 }`}
                 id="pills-workshop-tab"
                 data-bs-toggle="pill"
@@ -157,7 +157,7 @@ function SingleEventPage() {
                 type="button"
                 role="tab"
                 aria-controls="pills-workshop"
-                aria-selected={activeTab === "Workshops"}
+                aria-selected={activeTab === "Sessions"}
                 onClick={() => {
                   setActiveTab("Sessions");
                 }}
@@ -208,7 +208,7 @@ function SingleEventPage() {
           </div>
           <div
             className={`tab-pane fade ${
-              activeTab === "Workshops" ? "show active" : ""
+              activeTab === "Sessions" ? "show active" : ""
             }`}
             id="pills-workshop"
             role="tabpanel"
