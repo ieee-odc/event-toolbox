@@ -170,7 +170,7 @@ function FormContainer() {
                   <tr>
                     <th scope="col">Name</th>
                     <th>Deadline</th>
-                    <th>Workshop</th>
+                    <th>Session</th>
                     <th style={{ textAlign: "right" }}></th>
                   </tr>
                 </thead>

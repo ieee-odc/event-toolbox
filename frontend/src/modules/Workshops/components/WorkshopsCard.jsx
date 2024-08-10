@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import WorkshopTableHeader from "./WorkshopTableHeader";
 import WorkshopModal from "./WorkshopModal";
+import { useNavigate } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { UserData } from "./../../../utils/UserData";
 import Pagination from "../../../core/components/Pagination/Pagination";
 import Card from "../../../core/components/Card/Card";
 import { Spinner } from "react-bootstrap";
@@ -52,7 +54,11 @@ const WorkshopsCard = () => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <WorkshopTableHeader />
             <div className="d-flex align-items-center gap-2">
-              <select id="participantStatusFilter" className="form-select">
+              <select
+                id="participantStatusFilter"
+                className="form-select"
+                // onChange={handleStatusChange}
+              >
                 <option value="">All Sessions</option>
                 <option value="Paid">Done</option>
                 <option value="Pending">Starting Soon</option>

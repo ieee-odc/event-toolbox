@@ -285,9 +285,16 @@ const ParticipantsCard = () => {
                 aria-describedby="DataTables_Table_0_info"
                 style={{ width: "100%" }}
               >
-                <thead>
+                <thead id="table-head">
                   <tr>
-                    <th>#ID</th>
+                    <th>
+                      <input
+                        type="checkbox"
+                        className="mt-1 "
+                        onChange={handleSelectAll}
+                        checked={areAllSelected}
+                      />
+                    </th>
                     <th>Client</th>
                     <th>Email</th>
                     <th>Issued Date</th>
@@ -302,25 +309,22 @@ const ParticipantsCard = () => {
                       className={`${index % 2 === 0 ? "even" : "odd"}`}
                     >
                       <td>
-                        <span
-                          className="fw-medium"
-                          style={{
-                            fontWeight: "500",
-                            color: "#646cff",
-                            textDecoration: "inherit",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => handleOpenDetails(participant)}
-                        >
-                          #{participant.id}
-                        </span>
+                        <input
+                          type="checkbox"
+                          checked={selectedParticipants.includes(
+                            participant.id
+                          )}
+                          onChange={() =>
+                            handleSelectParticipant(participant.id)
+                          }
+                        />
                       </td>
                       <td>
                         <div className="d-flex justify-content-start align-items-center">
                           <div className="avatar-wrapper">
                             <div className="avatar avatar-sm me-2">
                               <span className="avatar-initial rounded-circle bg-label-dark">
-                                <i className="bx bx-user"></i>
+                                <i className="bx bx-user m-0"></i>
                               </span>
                             </div>
                           </div>
