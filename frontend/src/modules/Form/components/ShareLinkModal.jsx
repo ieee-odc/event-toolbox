@@ -1,18 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
-
-const base64UrlEncode = (str) => {
-  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-};
-
-const base64UrlDecode = (str) => {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) {
-    base64 += "=";
-  }
-  return atob(base64);
-};
+import { base64UrlEncode } from "../../../utils/helpers/base64Helper";
 
 const ShareLinkModal = ({ formId, onClose }) => {
   const userData = UserData();

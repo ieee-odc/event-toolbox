@@ -19,14 +19,7 @@ import "./RegistrationForm.css";
 import socketIOClient from "socket.io-client";
 import HeadComponent from "../../../../core/components/Head/CustomHead";
 import toast from "react-hot-toast";
-
-const base64UrlDecode = (str) => {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) {
-    base64 += "=";
-  }
-  return atob(base64);
-};
+import { base64UrlDecode } from "../../../../utils/helpers/base64Helper";
 
 const RegistrationForm = () => {
   const dispatch = useDispatch();
@@ -41,7 +34,6 @@ const RegistrationForm = () => {
     hasMultiSelectForm,
     isEventForm,
   } = useSelector((state) => state.registrationStore);
-  const decodedToken = base64UrlDecode(token);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -50,6 +42,7 @@ const RegistrationForm = () => {
   const [checkboxValidation, setCheckboxValidation] = useState({});
   const [fileError, setFileError] = useState("");
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+  const decodedToken = base64UrlDecode(token);
   let tokenData;
 
   try {
@@ -343,8 +336,9 @@ const RegistrationForm = () => {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className={`needs-validation ${validated ? "was-validated" : ""
-                    }`}
+                  className={`needs-validation ${
+                    validated ? "was-validated" : ""
+                  }`}
                   noValidate
                 >
                   <div className="mb-3">
@@ -440,7 +434,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                    !checkboxValidation[field.question]
+                                  !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
@@ -487,7 +481,8 @@ const RegistrationForm = () => {
                             />
                             {fileError && (
                               <div className="invalid-feedback d-block">
-                                {fileError}</div>
+                                {fileError}
+                              </div>
                             )}
                           </div>
                         )}
@@ -587,7 +582,7 @@ const RegistrationForm = () => {
                               style={{
                                 display:
                                   validated &&
-                                    !checkboxValidation[field.question]
+                                  !checkboxValidation[field.question]
                                     ? "block"
                                     : "none",
                               }}
@@ -601,7 +596,11 @@ const RegistrationForm = () => {
                   ) : (
                     <div>No fields to display</div>
                   )}
-                  <button type="submit" className="btn btn-primary" disabled={isSubmitDisabled}>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isSubmitDisabled}
+                  >
                     Submit
                   </button>
                 </form>
