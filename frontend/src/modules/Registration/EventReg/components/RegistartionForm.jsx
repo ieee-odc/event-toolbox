@@ -19,14 +19,7 @@ import "./RegistrationForm.css";
 import socketIOClient from "socket.io-client";
 import HeadComponent from "../../../../core/components/Head/CustomHead";
 import toast from "react-hot-toast";
-
-const base64UrlDecode = (str) => {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) {
-    base64 += "=";
-  }
-  return atob(base64);
-};
+import { base64UrlDecode } from "../../../../utils/helpers/base64Helper";
 
 const RegistrationForm = () => {
   const dispatch = useDispatch();
@@ -41,12 +34,12 @@ const RegistrationForm = () => {
     hasMultiSelectForm,
     isEventForm,
   } = useSelector((state) => state.registrationStore);
-  const decodedToken = base64UrlDecode(token);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [tokenData, setTokenData] = useState();
+  const [fileError, setFileError] = useState("");
 
   const [validated, setValidated] = useState(false);
   useEffect(() => {
@@ -88,6 +81,15 @@ const RegistrationForm = () => {
     const file = files[0];
 
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setFileError("File size must not exceed 10MB.");
+        setIsSubmitDisabled(true);
+        return;
+      } else {
+        setFileError("");
+        setIsSubmitDisabled(false);
+      }
+
       const storageRef = ref(storage, `files/${file.name}`);
       try {
         await uploadBytes(storageRef, file);
@@ -141,6 +143,21 @@ const RegistrationForm = () => {
             "/participant/add",
             baseSubmissionData
           );
+
+          axiosRequest
+            .post("/notification/add", {
+              from: response.data.participant.id,
+              to: formData.event.organizerId,
+              type: "EventRegistration",
+              message: `A new participant has registered for your event: ${formData.event.name}`,
+              read: false,
+            })
+            .then((res) => {
+              socket.emit("create-notification", {
+                organizerId: formData.event.organizerId,
+                notification: res.data.notification,
+              });
+            });
 
           if (socket) {
             socket.emit("addEventParticipant", {
@@ -320,8 +337,8 @@ const RegistrationForm = () => {
                 >
                   <span style={{ textAlign: "center" }}>
                     {hasMultiSelectForm
-                      ? "All workshops are full"
-                      : "Workshop is full"}
+                      ? "All sessions are full"
+                      : "Session is full"}
                   </span>
                 </div>
               ) : (
@@ -454,13 +471,20 @@ const RegistrationForm = () => {
                           </div>
                         )}
                         {field.type === "file" && (
-                          <input
-                            type="file"
-                            className="form-control"
-                            id={field.question}
-                            onChange={handleFileChange}
-                            required
-                          />
+                          <div>
+                            <input
+                              type="file"
+                              className="form-control"
+                              id={field.question}
+                              onChange={handleFileChange}
+                              required={field.required}
+                            />
+                            {fileError && (
+                              <div className="invalid-feedback d-block">
+                                {fileError}
+                              </div>
+                            )}
+                          </div>
                         )}
                         {field.type === "dropdown" && (
                           <select
@@ -564,7 +588,11 @@ const RegistrationForm = () => {
                   ) : (
                     <div>No fields to display</div>
                   )}
-                  <button type="submit" className="btn btn-primary">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isSubmitDisabled}
+                  >
                     Submit
                   </button>
                 </form>

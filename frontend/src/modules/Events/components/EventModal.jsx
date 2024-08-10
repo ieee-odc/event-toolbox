@@ -46,16 +46,7 @@ function EventModal() {
       });
       dispatch(addEvent(response.data));
       dispatch(toggleEventModal());
-      dispatch(
-        updateSelectedEventField({
-          organizerId: userData.id,
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        })
-      );
+      dispatch(resetEventModal());
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -72,16 +63,7 @@ function EventModal() {
       });
       dispatch(editEvent(response.data.event));
       dispatch(toggleEventModal());
-      dispatch(
-        updateSelectedEventField({
-          organizerId: userData.id,
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        })
-      );
+      dispatch(resetEventModal());
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -114,9 +96,9 @@ function EventModal() {
       flatpickrNodeEnd &&
       !flatpickrNodeEnd.contains(event.target)
     ) {
-      dispatch(toggleFormModal());
+      dispatch(toggleEventModal());
       if (isEdit) {
-        dispatch(resetFormModal());
+        dispatch(toggleEventModal());
       }
     }
   };
@@ -131,6 +113,24 @@ function EventModal() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    const today = new Date().toISOString();
+    if (!isEdit) {
+      dispatch(
+        updateSelectedEventField({
+          id: "startDate",
+          value: today,
+        })
+      );
+      dispatch(
+        updateSelectedEventField({
+          id: "endDate",
+          value: today,
+        })
+      );
+    }
   }, [isModalOpen]);
 
   return (
@@ -210,7 +210,7 @@ function EventModal() {
                   </label>
 
                   <Flatpickr
-                    id={"date"}
+                    id={"startDate"}
                     ref={flatpickrRefStart}
                     value={selectedEvent.startDate || new Date()}
                     onChange={(date) => {
@@ -232,7 +232,7 @@ function EventModal() {
                     End Date
                   </label>
                   <Flatpickr
-                    id={"date"}
+                    id={"endDate"}
                     ref={flatpickrRefEnd}
                     value={selectedEvent.endDate || new Date()}
                     onChange={(date) => {

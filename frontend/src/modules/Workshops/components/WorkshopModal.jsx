@@ -190,7 +190,7 @@ function WorkshopModal() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
-                  {isEdit ? "Edit" : "Add"} Workshop
+                  {isEdit ? "Edit" : "Add"} Session
                 </h5>
                 <button
                   type="button"
@@ -292,12 +292,11 @@ function WorkshopModal() {
                     />
                     {capacityMessage && (
                       <p
-                        className={`mt-2 ${
-                          selectedWorkshop.numberOfAttendees >
+                        className={`mt-2 ${selectedWorkshop.numberOfAttendees >
                           selectedSpace?.capacity
-                            ? "text-danger"
-                            : "text-success"
-                        }`}
+                          ? "text-danger"
+                          : "text-success"
+                          }`}
                       >
                         {capacityMessage}
                       </p>
@@ -401,7 +400,7 @@ function WorkshopModal() {
                   onClick={handleWorkshop}
                   disabled={!isFormComplete}
                 >
-                  {isEdit ? "Save Changes" : "Create Workshop"}
+                  {isEdit ? "Save Changes" : "Create Session"}
                 </button>
               </div>
             </div>

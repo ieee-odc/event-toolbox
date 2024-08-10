@@ -53,7 +53,7 @@ const WorkshopsCard = () => {
             <WorkshopTableHeader />
             <div className="d-flex align-items-center gap-2">
               <select id="participantStatusFilter" className="form-select">
-                <option value="">All Workshops</option>
+                <option value="">All Sessions</option>
                 <option value="Paid">Done</option>
                 <option value="Pending">Starting Soon</option>
               </select>

@@ -7,6 +7,7 @@ const {
   getEventParticipants,
   getWorkshopParticipants,
   register,
+  cancelRegistration,
 } = require("../controllers/ParticipantController");
 
 router.post("/add", addParticipant);
@@ -14,6 +15,7 @@ router.post("/edit/:participantId", editParticipant);
 router.post("/delete/:participantId", deleteParticipant);
 router.get("/get-event/:eventId", getEventParticipants);
 router.get("/get-workshop/:workshopId", getWorkshopParticipants);
-router.post("/submit",  register);
+router.post("/submit", register);
+router.post("/cancel/:participantId", cancelRegistration);
 
 module.exports = router;

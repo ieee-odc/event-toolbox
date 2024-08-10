@@ -1,4 +1,3 @@
-// File: ParticipantsCard.jsx
 import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import ParticipantTableHeader from "./ParticipantTableHeader";
@@ -22,6 +21,8 @@ import CustomDropdown from "../../../core/components/Dropdown/CustomDropdown";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import CustomButton from "../../../core/components/Button/Button";
+import "../Participants.css";
+import * as XLSX from "xlsx";
 import { Spinner } from "react-bootstrap";
 
 const ParticipationStatus = Object.freeze({
@@ -32,19 +33,44 @@ const ParticipationStatus = Object.freeze({
 
 const ParticipantsCard = () => {
   const { eventId, workshopId } = useParams();
-  const { participants, filteredParticipants, participantsPerPage, isLoading } =
-    useSelector((store) => store.participantsStore);
-
+  const {
+    participants,
+    filteredParticipants,
+    participantsPerPage,
+    searchQuery,
+    isEdit,
+  } = useSelector((store) => store.participantsStore);
   const dispatch = useDispatch();
-
   const [currentPage, setCurrentPage] = useState(1);
-
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
   const currentParticipants = filteredParticipants.slice(
     indexOfFirstParticipant,
     indexOfLastParticipant
   );
+  const [selectedParticipants, setSelectedParticipants] = useState([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const handleSelectParticipant = (id) => {
+    const updatedSelectedParticipants = selectedParticipants.includes(id)
+      ? selectedParticipants.filter((participantId) => participantId !== id)
+      : [...selectedParticipants, id];
+    setSelectedParticipants(updatedSelectedParticipants);
+    setIsSelecting(updatedSelectedParticipants.length > 0);
+  };
+
+  const handleSelectAll = () => {
+    if (areAllSelected) {
+      setSelectedParticipants([]);
+      setIsSelecting(false);
+    } else {
+      const allParticipantIds = filteredParticipants.map((p) => p.id);
+      setSelectedParticipants(allParticipantIds);
+      setIsSelecting(true);
+    }
+  };
+
+  const areAllSelected =
+    selectedParticipants.length === filteredParticipants.length;
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -127,8 +153,8 @@ const ParticipantsCard = () => {
       .join("; ");
   };
 
-  const generateCSV = () => {
-    const csvHeader = [
+  const generateExcel = () => {
+    const excelHeader = [
       "ID",
       "Full Name",
       "Email",
@@ -136,15 +162,16 @@ const ParticipantsCard = () => {
       "Status",
       "Event Name",
       "Event Questions & Responses",
-      "Workshop Details",
+      "Session Details",
     ];
 
-    const csvRows = participants.map((participant) => {
+    const excelRows = participants.map((participant) => {
       const eventResponses = formatResponses(participant.eventResponses);
       const workshopDetails = participant.workshops
         .map((workshop) => {
           const workshopResponses = formatResponses(workshop.responses);
-          return `Workshop: ${workshop.workshopName} (${workshopResponses})`;
+
+          return `Session: ${workshop.workshopName} (${workshopResponses})`;
         })
         .join("; ");
 
@@ -157,20 +184,31 @@ const ParticipantsCard = () => {
         participant.eventName,
         eventResponses,
         workshopDetails,
-      ].join(",");
+      ];
     });
 
-    const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.setAttribute("download", "participants.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const worksheet = XLSX.utils.aoa_to_sheet([excelHeader, ...excelRows]);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Participants");
+    XLSX.writeFile(workbook, "participants.xlsx");
   };
+  const sendEmailsToSelectedParticipants = () => {
+    const emailList = selectedParticipants
+      .map((participantId) => {
+        const participant = filteredParticipants.find(
+          (p) => p.id === participantId
+        );
+        return participant.email;
+      })
+      .join(",");
 
+    const subject = encodeURIComponent("Your Subject Here");
+    const body = encodeURIComponent("Your Email Body Here");
+
+    const mailtoLink = `mailto:${emailList}?subject=${subject}&body=${body}`;
+
+    window.location.href = mailtoLink;
+  };
   return (
     <div className="card" style={{ padding: "20px" }}>
       <div className="card-datatable table-responsive">
@@ -181,7 +219,27 @@ const ParticipantsCard = () => {
         >
           <div className="d-flex justify-content-between align-items-center mb-4">
             <ParticipantTableHeader onSearchChange={handleSearchChange} />
+
             <div className="d-flex align-items-center gap-2">
+              {isSelecting ? (
+                <>
+                  <div></div>
+                  <div className="d-flex align-items-center gap-2">
+                    <CustomButton
+                      text="Send Email"
+                      iconClass="bx bx-envelope me-md-1 mrt-1"
+                      style={{ padding: "5px" }}
+                      backgroundColor="var(--primary-color)"
+                      textColor="white"
+                      hoverBackgroundColor="#0F205D"
+                      hoverTextColor="white"
+                      onClick={() => {
+                        sendEmailsToSelectedParticipants();
+                      }}
+                    />
+                  </div>{" "}
+                </>
+              ) : null}
               <select
                 id="participantStatusFilter"
                 className="form-select"
@@ -202,7 +260,7 @@ const ParticipantsCard = () => {
                   hoverBackgroundColor="#0F205D"
                   hoverTextColor="white"
                   onClick={() => {
-                    generateCSV();
+                    generateExcel();
                   }}
                 />
               </div>
