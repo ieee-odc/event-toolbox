@@ -40,16 +40,18 @@ const addParticipant = async (req, res) => {
 
     await participant.save();
     
-
-     // Send email notification
-    //  const subject = `Registration Confirmation for ${event.name}`;
-    //  const text = `Hello, You have successfully registered for the event: ${event.name}.`;
-    //  const html = `<p>Hello,</p><p>You have successfully registered for the event: <strong>${event.name}</strong>.</p>`;
-    //  await Email.sendEmail(email, subject, text, html);
-     // Send email notification
+    // Send email notification
      const subject = `Registration Confirmation for ${event.name}`;
-     await Email.sendEmail(email, subject, participantData.fullName || 'Participant', event.name);
-
+     await Email.sendEmail(
+      email,
+      subject,
+      participantData.fullName || 'Participant',
+      event.name,
+      event.description,
+      event.location,
+      event.startDate,
+      event.endDate
+    );
     res.status(201).json({
       status: "success",
       message: "Added Participant",
@@ -193,6 +195,19 @@ const register = async (req, res) => {
     await participant.save();
     console.log(participant);
 
+    // Send email notification to the participant
+    const subject = `Registration Confirmation for ${workshop.name} session`;
+    await Email.sendEmail1(
+      email,
+      subject,
+      participantData.fullName || 'Participant',
+      workshop.name,
+      workshop.description,
+      workshop.startTime,
+      workshop.endTime,
+      Event.name
+    );  
+
     // Create a notification for the workshop organizer
     const organizerId = workshop.organizerId; // Assuming organizerId is stored in the workshop document
     const Notifcounter = await Counter.findOneAndUpdate(
@@ -214,12 +229,6 @@ const register = async (req, res) => {
     await newNotification.save();
     workshop.currentParticipants += 1;
     await workshop.save();
-
-    // // Send email notification
-    // const subject = `Registration Confirmation for ${workshop.name}`;
-    // const text = `Hello, You have successfully registered for the workshop: ${workshop.name}.`;
-    // const html = `<p>Hello,</p><p>You have successfully registered for the workshop: <strong>${workshop.name}</strong>.</p>`;
-    // await Email.sendEmail(email, subject, text, html);
 
     res.status(201).json({
       status: "success",

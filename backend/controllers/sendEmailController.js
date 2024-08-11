@@ -1,7 +1,8 @@
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path'); // Update path module import
-const filePath = path.join(__dirname, 'templates', 'email-template.html'); // Adjusted file path
+const filePath = path.join(__dirname, 'templates', 'email-template.html');  
+const filePath1 = path.join(__dirname, 'templates', 'workshopEmail-template.html'); 
 
 const transporter = nodemailer.createTransport({
   host: "smtp.office365.com",
@@ -16,8 +17,8 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Send email function
-const sendEmail = async (recipientEmail, subject, participantName, eventName) => {
+// Send email function for event registration
+const sendEmail = async (recipientEmail, subject, participantName, eventName, eventDescription, eventLocation, eventStartDate, eventEndDate) => {
   try {
     // Read the HTML template file
     let htmlTemplate = fs.readFileSync(filePath, 'utf-8');
@@ -25,6 +26,9 @@ const sendEmail = async (recipientEmail, subject, participantName, eventName) =>
     // Replace placeholders with actual values
     htmlTemplate = htmlTemplate.replace('[ParticipantName]', participantName);
     htmlTemplate = htmlTemplate.replace('[EventName]', eventName);
+    htmlTemplate = htmlTemplate.replace('[eventLocation]', eventLocation)
+    htmlTemplate = htmlTemplate.replace('[eventStartDate]', eventStartDate.toDateString())
+    htmlTemplate = htmlTemplate.replace('[eventEndDate]', eventEndDate.toDateString());
     
     // Send email
     const info = await transporter.sendMail({
@@ -41,30 +45,27 @@ const sendEmail = async (recipientEmail, subject, participantName, eventName) =>
   }
 };
 
-// const sendEmail = async (recipientEmail, subject, text, html) => {
-//     try {
-//       const info = await transporter.sendMail({
-//         from: '"Event Management" <event.toolbox@outlook.com>', // sender address
-//         to: recipientEmail, // list of receivers
-//         subject: subject, // Subject line
-//         text: text, // plain text body
-//         html: html, // html body
-//       });
-  
-//       console.log('Message sent: %s', info.messageId);
-//     } catch (error) {
-//       console.error('Error sending email:', error);
-//     }
-//   };
-
-  const sendEmail1 = async (recipientEmail, participantName, eventName) => {
-    const html = generateEmailTemplate(participantName, eventName);
+  // Send email function for workshop registrations
+  const sendEmail1 = async (recipientEmail, subject, participantName, workshopName, description, startTime, endTime, eventName) => {
     try {
+      // Read the HTML template file
+      let htmlTemplate = fs.readFileSync(filePath1, 'utf-8');
+      
+      // Replace placeholders with actual values
+      htmlTemplate = htmlTemplate.replace('[ParticipantName]', participantName);
+      htmlTemplate = htmlTemplate.replace('[WorkshopName]', workshopName);
+      htmlTemplate = htmlTemplate.replace('[Description]', description);
+      htmlTemplate = htmlTemplate.replace('[StartTime]', new Date(startTime).toLocaleString());
+      htmlTemplate = htmlTemplate.replace('[EndTime]', new Date(endTime).toLocaleString());
+      htmlTemplate = htmlTemplate.replace('[EventName]', eventName);
+      
+      // Send email
       const info = await transporter.sendMail({
-        from: '"Event Management" <your-email@gmail.com>',
-        to: recipientEmail,
-        subject: `Registration Confirmation for ${eventName}`,
-        html: html,
+        from: '"Event Management" <event.toolbox@outlook.com>', // sender address
+        to: recipientEmail, // list of receivers
+        subject: subject, // Subject line
+        text: `Hello ${participantName}, You have successfully registered for the workshop: ${workshopName}. Description: ${description}. Start Time: ${new Date(startTime).toLocaleString()}. End Time: ${new Date(endTime).toLocaleString()}. Event: ${eventName}.`, // plain text body
+        html: htmlTemplate, // HTML body
       });
   
       console.log('Message sent: %s', info.messageId);
@@ -72,6 +73,8 @@ const sendEmail = async (recipientEmail, subject, participantName, eventName) =>
       console.error('Error sending email:', error);
     }
   };
+  
+
   module.exports={
     sendEmail,
     sendEmail1
