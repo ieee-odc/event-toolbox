@@ -28,7 +28,7 @@ const sendEmail = async (recipientEmail, subject, participantName, eventName) =>
     
     // Send email
     const info = await transporter.sendMail({
-      from: '"Event Management" <**************>', // sender address
+      from: '"Event Management" <event.toolbox@outlook.com>', // sender address
       to: recipientEmail, // list of receivers
       subject: subject, // Subject line
       text: `Hello ${participantName}, You have successfully registered for the event: ${eventName}.`, // plain text body
@@ -44,7 +44,7 @@ const sendEmail = async (recipientEmail, subject, participantName, eventName) =>
 // const sendEmail = async (recipientEmail, subject, text, html) => {
 //     try {
 //       const info = await transporter.sendMail({
-//         from: '"Event Management" <**********************>', // sender address
+//         from: '"Event Management" <event.toolbox@outlook.com>', // sender address
 //         to: recipientEmail, // list of receivers
 //         subject: subject, // Subject line
 //         text: text, // plain text body

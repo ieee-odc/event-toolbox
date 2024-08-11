@@ -39,6 +39,7 @@ const addParticipant = async (req, res) => {
     });
 
     await participant.save();
+    
 
      // Send email notification
     //  const subject = `Registration Confirmation for ${event.name}`;
@@ -47,7 +48,7 @@ const addParticipant = async (req, res) => {
     //  await Email.sendEmail(email, subject, text, html);
      // Send email notification
      const subject = `Registration Confirmation for ${event.name}`;
-     await Email.sendEmail(email, subject, participantData.name || 'Participant', event.name);
+     await Email.sendEmail(email, subject, participantData.fullName || 'Participant', event.name);
 
     res.status(201).json({
       status: "success",
