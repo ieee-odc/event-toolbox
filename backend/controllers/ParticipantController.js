@@ -3,6 +3,7 @@ const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
 const Notification = require("../models/NotificationModel");
+const Email= require("../controllers/sendEmailController");
 
 const addParticipant = async (req, res) => {
   try {
@@ -38,6 +39,15 @@ const addParticipant = async (req, res) => {
     });
 
     await participant.save();
+
+     // Send email notification
+    //  const subject = `Registration Confirmation for ${event.name}`;
+    //  const text = `Hello, You have successfully registered for the event: ${event.name}.`;
+    //  const html = `<p>Hello,</p><p>You have successfully registered for the event: <strong>${event.name}</strong>.</p>`;
+    //  await Email.sendEmail(email, subject, text, html);
+     // Send email notification
+     const subject = `Registration Confirmation for ${event.name}`;
+     await Email.sendEmail(email, subject, participantData.name || 'Participant', event.name);
 
     res.status(201).json({
       status: "success",
@@ -203,6 +213,13 @@ const register = async (req, res) => {
     await newNotification.save();
     workshop.currentParticipants += 1;
     await workshop.save();
+
+    // // Send email notification
+    // const subject = `Registration Confirmation for ${workshop.name}`;
+    // const text = `Hello, You have successfully registered for the workshop: ${workshop.name}.`;
+    // const html = `<p>Hello,</p><p>You have successfully registered for the workshop: <strong>${workshop.name}</strong>.</p>`;
+    // await Email.sendEmail(email, subject, text, html);
+
     res.status(201).json({
       status: "success",
       message: "Added Participant and created notification",
