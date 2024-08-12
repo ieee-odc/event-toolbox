@@ -45,6 +45,15 @@ const WorkshopSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
+    price: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+    },
+    
   },
   { timestamps: true }
 );

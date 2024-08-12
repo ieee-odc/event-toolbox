@@ -73,6 +73,8 @@ const WorkshopsSlice = createSlice({
         date: null,
         organizerId: "",
         numberOfAttendees: null,
+        price: "",
+        status: "free",
       };
       state.selectedWorkshop = newSelectedSpace;
     },
