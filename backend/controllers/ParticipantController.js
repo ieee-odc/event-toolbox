@@ -193,7 +193,6 @@ const register = async (req, res) => {
     });
 
     await participant.save();
-    console.log(participant);
 
     // Send email notification to the participant
     const subject = `Registration Confirmation for ${workshop.name} session`;
@@ -215,8 +214,6 @@ const register = async (req, res) => {
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
-
-
 
     const newNotification = new Notification({
       id: Notifcounter.seq, // Auto-generated notification ID:

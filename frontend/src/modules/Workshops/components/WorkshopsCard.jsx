@@ -1,32 +1,19 @@
-import React, { useEffect, useState } from "react";
-import axiosRequest from "../../../utils/AxiosConfig";
-import { toast } from "react-hot-toast";
+import React, { useState } from "react";
 import WorkshopTableHeader from "./WorkshopTableHeader";
 import WorkshopModal from "./WorkshopModal";
 import { useNavigate } from "react-router-dom";
 import { formatTime } from "../../../utils/helpers/FormatDateWithTime";
 import { formatDateWithNumbers } from "../../../utils/helpers/FormatDate";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteWorkshop,
-  filterWorkshops,
-  initializeWorkshops,
-  setSelectedWorkshop,
-  toggleWorkshopModal,
-  updateSelectedWorkshopField,
-} from "../../../core/Features/Workshops";
 import { UserData } from "./../../../utils/UserData";
 import Pagination from "../../../core/components/Pagination/Pagination";
 import Card from "../../../core/components/Card/Card";
+import { Spinner } from "react-bootstrap";
 
 const WorkshopsCard = () => {
   const { filteredWorkshops, workshopsPerPage, isLoading } = useSelector(
     (state) => state.workshopsStore
   );
-  const userData = UserData();
-  const dispatch = useDispatch();
-  const [dropdownStates, setDropdownStates] = useState({});
-  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
 
   const indexOfLastWorkshop = currentPage * workshopsPerPage;
@@ -70,7 +57,7 @@ const WorkshopsCard = () => {
               <select
                 id="participantStatusFilter"
                 className="form-select"
-              // onChange={handleStatusChange}
+                // onChange={handleStatusChange}
               >
                 <option value="">All Sessions</option>
                 <option value="Paid">Done</option>
@@ -80,7 +67,15 @@ const WorkshopsCard = () => {
           </div>
           <div className="row g-4" style={{ justifyContent: "center" }}>
             {isLoading ? (
-              <p>Loading sessions...</p>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Spinner />
+              </div>
             ) : (
               currentWorkshops &&
               currentWorkshops.map((workshop) => {
