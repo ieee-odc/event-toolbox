@@ -23,31 +23,31 @@ export const fetchWorkshopData = createAsyncThunk(
 export const initializeParticipants = createAsyncThunk(
   "Participants/initializeParticipants",
   async (participants, { dispatch }) => {
-    const emailToParticipant = {};
-    for (const participant of participants) {
-      const eventId = participant.eventId;
-      const workshopId = participant.workshopId;
+    // const emailToParticipant = {};
+    // for (const participant of participants) {
+    //   const eventId = participant.eventId;
+    //   const workshopId = participant.workshopId;
 
-      if (!emailToParticipant[participant.email]) {
-        const eventResponse = await dispatch(fetchEventData(eventId));
-        emailToParticipant[participant.email] = {
-          ...participant,
-          eventName: eventResponse.payload.event.name,
-          eventResponses: participant.responses || [],
-          workshops: [],
-        };
-      }
+    //   if (!emailToParticipant[participant.email]) {
+    //     const eventResponse = await dispatch(fetchEventData(eventId));
+    //     emailToParticipant[participant.email] = {
+    //       ...participant,
+    //       eventName: eventResponse.payload.event.name,
+    //       eventResponses: participant.responses || [],
+    //       workshops: [],
+    //     };
+    //   }
 
-      if (workshopId) {
-        const workshopResponse = await dispatch(fetchWorkshopData(workshopId));
-        emailToParticipant[participant.email].workshops.push({
-          workshopId,
-          workshopName: workshopResponse.payload.workshop.name,
-          responses: participant.responses || [],
-        });
-      }
-    }
-    return Object.values(emailToParticipant);
+    //   if (workshopId) {
+    //     const workshopResponse = await dispatch(fetchWorkshopData(workshopId));
+    //     emailToParticipant[participant.email].workshops.push({
+    //       workshopId,
+    //       workshopName: workshopResponse.payload.workshop.name,
+    //       responses: participant.responses || [],
+    //     });
+    //   }
+    // }
+    return participants;
   }
 );
 const ParticipantsSlice = createSlice({
@@ -165,40 +165,24 @@ const ParticipantsSlice = createSlice({
           participant.email.toLowerCase().includes(query)
       );
     },
+    setIsParticipantLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(initializeParticipants.pending, (state) => {
-        state.isLoading = true;
-      })
+      .addCase(initializeParticipants.pending, (state) => {})
       .addCase(initializeParticipants.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.participants = action.payload;
         state.filteredParticipants = action.payload;
       })
-      .addCase(initializeParticipants.rejected, (state) => {
-        state.isLoading = false;
-      })
-      .addCase(fetchEventData.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchEventData.fulfilled, (state, action) => {
-        state.isLoading = false;
-        // Process event data if needed
-      })
-      .addCase(fetchEventData.rejected, (state) => {
-        state.isLoading = false;
-      })
-      .addCase(fetchWorkshopData.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(fetchWorkshopData.fulfilled, (state, action) => {
-        state.isLoading = false;
-        // Process workshop data if needed
-      })
-      .addCase(fetchWorkshopData.rejected, (state) => {
-        state.isLoading = false;
-      });
+      .addCase(initializeParticipants.rejected, (state) => {})
+      .addCase(fetchEventData.pending, (state) => {})
+      .addCase(fetchEventData.fulfilled, (state, action) => {})
+      .addCase(fetchEventData.rejected, (state) => {})
+      .addCase(fetchWorkshopData.pending, (state) => {})
+      .addCase(fetchWorkshopData.fulfilled, (state, action) => {})
+      .addCase(fetchWorkshopData.rejected, (state) => {});
   },
 });
 
@@ -209,7 +193,6 @@ export const {
   editParticipant,
   toggleParticipantModal,
   toggleParticipantDetails,
-  toggleParticipantsIsLoading,
   selectParticipant,
   setSelectedParticipant,
   updateSelectedParticipantField,
@@ -221,6 +204,7 @@ export const {
   setParticipantsPerPage,
   filterParticipants,
   setSearchQuery,
+  setIsParticipantLoading,
 } = ParticipantsSlice.actions;
 
 export default ParticipantsSlice.reducer;
