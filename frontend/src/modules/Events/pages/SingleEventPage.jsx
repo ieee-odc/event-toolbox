@@ -34,16 +34,9 @@ function SingleEventPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    axiosRequest
-      .get(`/events/${eventId}`, { signal })
-      .then((res) => {
-        setEvent(res.data.event);
-      })
-      .catch((error) => {
-        if (error.name !== "AbortError") {
-          console.error(error);
-        }
-      });
+    axiosRequest.get(`/events/${eventId}`).then((res) => {
+      setEvent(res.data.event);
+    });
   }, [eventId]);
 
   useEffect(() => {
