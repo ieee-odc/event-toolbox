@@ -1,19 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axiosRequest from "../../../utils/AxiosConfig";
-import { UserData } from "../../../utils/UserData";
-import {
-  initializeSpaces,
-  selectSpace,
-  setSelectedSpace,
-  toggleSpaceModal,
-} from "../../../core/Features/Spaces";
+import { selectSpace, toggleSpaceModal } from "../../../core/Features/Spaces";
 import SpaceModal from "./SpaceModal";
 import CustomButton from "../../../core/components/Button/Button";
+import { Spinner } from "react-bootstrap";
 
 function SpaceContainer() {
   const dispatch = useDispatch();
-  const { spaces } = useSelector((store) => store.spacesStore);
+  const { spaces, isLoading } = useSelector((store) => store.spacesStore);
 
   return (
     <div className="flex-grow-1">
@@ -113,49 +107,61 @@ function SpaceContainer() {
                 />
               </div>
 
-              <div className="card-body p-0 logistics-fleet-sidebar-body ps">
+              {isLoading ? (
                 <div
-                  className="accordion p-2"
-                  id="fleet"
-                  data-bs-toggle="sidebar"
-                  data-overlay=""
-                  data-target="#app-logistics-fleet-sidebar"
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(4, 1fr)",
-                    gap: "10px",
+                    width: "100%",
+                    justifyContent: "center",
+                    display: "flex",
                   }}
                 >
-                  {spaces.map((space) => (
-                    <div
-                      key={space.id}
-                      role="button"
-                      className="accordion-button shadow-none collapsed"
-                      data-bs-toggle="collapse"
-                      aria-expanded="false"
-                      onClick={() => {
-                        dispatch(selectSpace(space));
-                        dispatch(toggleSpaceModal());
-                      }}
-                    >
-                      <div className="d-flex align-items-center">
-                        <div className="avatar-wrapper">
-                          <div className="avatar me-3">
-                            <span className="avatar-initial rounded-circle bg-label-secondary">
-                              <i className="bx bxs-buildings"></i>
-                            </span>
-                          </div>
-                        </div>
-                        <span className="d-flex flex-column">
-                          <span className="h6 mb-0">{space.name}</span>
-                          <span className="text-muted">{space.capacity}</span>
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  {spaces.length === 0 && <div>No spaces at the moment</div>}
+                  <Spinner />
                 </div>
-              </div>
+              ) : (
+                <div className="card-body p-0 logistics-fleet-sidebar-body ps">
+                  <div
+                    className="accordion p-2"
+                    id="fleet"
+                    data-bs-toggle="sidebar"
+                    data-overlay=""
+                    data-target="#app-logistics-fleet-sidebar"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(4, 1fr)",
+                      gap: "10px",
+                    }}
+                  >
+                    {spaces.map((space) => (
+                      <div
+                        key={space.id}
+                        role="button"
+                        className="accordion-button shadow-none collapsed"
+                        data-bs-toggle="collapse"
+                        aria-expanded="false"
+                        onClick={() => {
+                          dispatch(selectSpace(space));
+                          dispatch(toggleSpaceModal());
+                        }}
+                      >
+                        <div className="d-flex align-items-center">
+                          <div className="avatar-wrapper">
+                            <div className="avatar me-3">
+                              <span className="avatar-initial rounded-circle bg-label-secondary">
+                                <i className="bx bxs-buildings"></i>
+                              </span>
+                            </div>
+                          </div>
+                          <span className="d-flex flex-column">
+                            <span className="h6 mb-0">{space.name}</span>
+                            <span className="text-muted">{space.capacity}</span>
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                    {spaces.length === 0 && <div>No spaces at the moment</div>}
+                  </div>
+                </div>
+              )}
               <div
                 className="ps__rail-x"
                 style={{ left: "0px", bottom: "0px" }}

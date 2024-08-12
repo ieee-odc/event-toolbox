@@ -135,7 +135,9 @@ function WorkshopModal() {
     axiosRequest
       .post(url, reqBody)
       .then((res) => {
-        toast.success(`Successfully ${isEdit ? "edited" : "created"}!`);
+        toast.success(
+          `Workshop Successfully ${isEdit ? "edited" : "created"}!`
+        );
         dispatch(toggleWorkshopModal());
         if (isEdit) {
           dispatch(editWorkshop(res.data.workshop));
