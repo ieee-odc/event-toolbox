@@ -34,9 +34,16 @@ function SingleEventPage() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    axiosRequest.get(`/events/${eventId}`).then((res) => {
-      setEvent(res.data.event);
-    });
+    axiosRequest
+      .get(`/events/${eventId}`, { signal })
+      .then((res) => {
+        setEvent(res.data.event);
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          console.error(error);
+        }
+      });
   }, [eventId]);
 
   useEffect(() => {
@@ -64,6 +71,7 @@ function SingleEventPage() {
   }, [eventId]);
 
   useEffect(() => {
+    dispatch(setIsParticipantLoading(true));
     axiosRequest.get(`/participant/get-event/${eventId}`).then((res) => {
       dispatch(initializeParticipants(res.data.participants));
       dispatch(setIsParticipantLoading(false));
