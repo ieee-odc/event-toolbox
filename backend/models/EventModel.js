@@ -37,6 +37,9 @@ const EventSchema = mongoose.Schema(
       type: Array(String),
       default: [],
     },
+    coverPhoto: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
