@@ -287,7 +287,7 @@ function FormModal() {
                             e.target.value === "workshop-selection" &&
                             workshops.length < 2
                           ) {
-                            toast.error("You should have at least 2 workshops");
+                            toast.error("You should have at least 2 sessions");
                             return;
                           }
 
@@ -310,7 +310,7 @@ function FormModal() {
                         <option value="date">Date</option>
                         <option value="time">Time</option>
                         <option value="workshop-selection">
-                          Workshop selection
+                          Session selection
                         </option>
                       </select>
                       <button
@@ -460,7 +460,7 @@ function FormModal() {
                           value={element.type}
                           aria-hidden="true"
                         >
-                          <option value={-1}>Select workshop</option>
+                          <option value={-1}>Select Session</option>
                           {workshops &&
                             workshops.map((workshop) => {
                               if (
