@@ -51,6 +51,7 @@ const RegistrationForm = () => {
       console.error("Invalid token format", error);
     }
   }, [token]);
+  const decodedToken = base64UrlDecode(token);
 
   useEffect(() => {
     if (!tokenData) {
