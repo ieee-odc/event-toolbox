@@ -108,7 +108,7 @@ function EventsList() {
           `/events/get-organizer/${userData.id}`
         );
         dispatch(initializeEvents(response.data.events));
-        console.log()
+
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -262,6 +262,18 @@ function EventsList() {
                               navigate(`/event/${event.id}`);
                             }}
                           >
+                            <img
+                              onClick={() => {
+                                navigate(`/event/${event.id}`);
+                              }}
+                              className="img-fluid cursor-pointer"
+                              style={{ height: 200, marginBottom: 10 }}
+                              src={
+                                event.coverPhoto ||
+                                "https://via.placeholder.com/300"
+                              }
+                              alt="event cover"
+                            />
                             <div className="d-flex justify-content-between align-items-center mb-3">
                               <span
                                 className={
