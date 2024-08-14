@@ -8,6 +8,7 @@ const {
   getOrganizerEvents,
   duplicateEvent,
   getOneEvent,
+  selectFormForEvent
 } = require("../controllers/EventController");
 
 router.get("/", getEvents);
@@ -18,5 +19,6 @@ router.get("/get-organizer/:organizerId", getOrganizerEvents);
 router.delete("/delete/:eventId", deleteEvent);
 router.post("/edit/:eventId", updateEvent);
 router.post("/duplicate/:eventId", duplicateEvent);
+router.post("/select-form", selectFormForEvent);
 
 module.exports = router;

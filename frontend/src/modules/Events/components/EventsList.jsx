@@ -6,6 +6,7 @@ import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "./../../../utils/UserData";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import {
   filterEvents,
   initializeEvents,
@@ -107,7 +108,7 @@ function EventsList() {
           `/events/get-organizer/${userData.id}`
         );
         dispatch(initializeEvents(response.data.events));
-        console.log(response.data.events)
+        console.log()
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -228,6 +229,24 @@ function EventsList() {
                               style={{ margin: 0, color: "white" }}
                             ></i>
                           </div>
+                          <Link to={`/events/details/${event.id}`}>
+                            <div
+                              style={{
+                                cursor: "pointer",
+                                background: "var(--secondary-color)",
+                                padding: 5,
+                                borderRadius: "50%",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                position: "absolute",
+                                top: 15,
+                                right: 50,
+                              }}
+                            >
+                              <i className="bx bx-info-circle" style={{ margin: 0, color: "white" }}></i>
+                            </div>
+                          </Link>
                           <img
                             onClick={() => {
                               navigate(`/event/${event.id}`);
