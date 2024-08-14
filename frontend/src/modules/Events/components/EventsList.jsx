@@ -1,3 +1,5 @@
+// EventsList.js
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../Events.css";
@@ -225,16 +227,7 @@ function EventsList() {
                               style={{ margin: 0, color: "white" }}
                             ></i>
                           </div>
-                          <img
-                            onClick={() => {
-                              navigate(`/event/${event.id}`);
-                            }}
-                            className="img-fluid cursor-pointer"
-                            src={
-                              "https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"
-                            }
-                            alt="tutor image 1"
-                          />
+
                           <div
                             className="card-body p-3 pt-3 cursor-pointer"
                             id="eventCardBody"
@@ -242,6 +235,18 @@ function EventsList() {
                               navigate(`/event/${event.id}`);
                             }}
                           >
+                            <img
+                              onClick={() => {
+                                navigate(`/event/${event.id}`);
+                              }}
+                              className="img-fluid cursor-pointer"
+                              style={{ height: 200, marginBottom: 10 }}
+                              src={
+                                event.coverPhoto ||
+                                "https://via.placeholder.com/300"
+                              }
+                              alt="event cover"
+                            />
                             <div className="d-flex justify-content-between align-items-center mb-3">
                               <span
                                 className={
@@ -254,10 +259,6 @@ function EventsList() {
                                     .status
                                 }
                               </span>
-                              {/* Number of participants  */}
-                              {/* <h6 className="d-flex align-items-center justify-content-center gap-1 mb-0">
-                              <span className="text-muted"> (34)</span>
-                            </h6> */}
                             </div>
                             <div className="d-flex align-items-center ms-1 mb-3">
                               <p className="h4">{event.name}</p>
@@ -266,7 +267,6 @@ function EventsList() {
                               <i className="bx bx-location-plus me-2"></i>
 
                               <b>
-                                {" "}
                                 <p className="d-flex align-items-center text mb-0">
                                   Location :
                                 </p>
@@ -334,14 +334,6 @@ function EventsList() {
                               <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>
                             </div>
                           </button>
-
-                          {/* <a
-                            className="app-academy-md-50 btn btn-label-primary d-flex align-items-center"
-                            href="app-academy-course-details.html"
-                          >
-                            <span className="me-0">Continue</span>
-                            <i className="bx bx-chevron-right lh-1 scaleX-n1-rtl"></i>
-                          </a> */}
                         </div>
                       </div>
                     </div>
