@@ -180,7 +180,6 @@ const register = async (req, res) => {
     });
 
     await participant.save();
-    console.log(participant);
 
     // Create a notification for the workshop organizer
     const organizerId = workshop.organizerId; // Assuming organizerId is stored in the workshop document

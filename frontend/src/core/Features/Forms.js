@@ -44,9 +44,6 @@ const FormsSlice = createSlice({
     toggleFormModal: (state) => {
       state.isFormModalOpen = !state.isFormModalOpen;
     },
-    toggleFormsIsLoading: (state) => {
-      state.isLoading = !state.isLoading;
-    },
     setSelectedForm: (state, action) => {
       state.isEdit = true;
       state.selectedForm = action.payload;
@@ -97,10 +94,14 @@ const FormsSlice = createSlice({
       if (index >= 0 && index < state.selectedForm.data.length) {
         state.selectedForm.data[index].type = newType;
         if (state.optionsArray.includes(newType)) {
-          state.selectedForm.data[index].options = [
-            "First Option",
-            "Second Option",
-          ];
+          if (newType !== "workshop-selection") {
+            state.selectedForm.data[index].options = [
+              "First Option",
+              "Second Option",
+            ];
+          } else {
+            state.selectedForm.data[index].options = [];
+          }
         } else {
           state.selectedForm.data[index].options = [];
         }
@@ -138,12 +139,14 @@ const FormsSlice = createSlice({
         (item) => item.toString() !== action.payload
       );
     },
-
     selectAWorkshop: (state, action) => {
       state.selectedWorkshops = [...state.selectedWorkshops, action.payload];
     },
     changeFormState: (state, action) => {
       state.isEdit = action.payload;
+    },
+    setIsLoadingForm: (state, action) => {
+      state.isLoading = action.payload;
     },
   },
 });
@@ -154,7 +157,6 @@ export const {
   deleteForm,
   editForm,
   toggleFormModal,
-  toggleFormsIsLoading,
   setSelectedForm,
   updateSelectedFormField,
   addField,
@@ -169,5 +171,6 @@ export const {
   resetSelectedWorkshops,
   removeOneSelectedWorkshop,
   selectAWorkshop,
+  setIsLoadingForm,
 } = FormsSlice.actions;
 export default FormsSlice.reducer;
