@@ -213,7 +213,7 @@ const register = async (req, res) => {
   }
 };
 
-const cancelRegistration = async (req, res) => {
+const cancelWorkshopRegistration = async (req, res) => {
   try {
     const participantId = req.params.participantId;
 
@@ -249,6 +249,47 @@ const cancelRegistration = async (req, res) => {
   }
 };
 
+const cancelEventRegistration = async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+
+    const { participantEmail } = req.body;
+
+    // Find all participants for the event
+    const participants = await Participant.find({
+      eventId: eventId,
+      email: participantEmail,
+    });
+
+    if (participants.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No participants found for this event" });
+    }
+
+    // Iterate over each participant to cancel their workshop registration
+    for (const participant of participants) {
+      // Find and update the workshop by decrementing the currentParticipants
+      await Workshop.findOneAndUpdate(
+        { id: participant.workshopId },
+        { $inc: { currentParticipants: -1 } }
+      );
+
+      // Delete the participant
+      await Participant.findOneAndDelete({ _id: participant._id });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Event registration cancelled, and all participants removed",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Server Error!",
+    });
+  }
+};
 const getCancelationData = async (req, res) => {
   try {
     const { participantId, eventId } = req.body;
@@ -264,16 +305,26 @@ const getCancelationData = async (req, res) => {
       eventId,
     });
 
+    const participationWithWorkshops = await Promise.all(
+      allParticipations.map(async (participation) => {
+        const participationObj = participation.toObject();
+        const workshop = await Workshop.findOne({
+          id: participation.workshopId,
+        });
+        return {
+          ...participationObj,
+          workshop,
+        };
+      })
+    );
     res.status(200).json({
       status: "success",
       message: "Cancellation data retrieved",
-      participants: allParticipations,
+      participants: participationWithWorkshops,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
-      message: "Server Error!",
-    });
+    res.status(500).json({ message: "Server Error!", error });
   }
 };
 
@@ -285,5 +336,6 @@ module.exports = {
   getEventParticipants,
   register,
   getWorkshopParticipants,
-  cancelRegistration,
+  cancelEventRegistration,
+  cancelWorkshopRegistration,
 };
