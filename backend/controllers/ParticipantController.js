@@ -3,7 +3,8 @@ const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
 const Notification = require("../models/NotificationModel");
-const Email= require("../controllers/sendEmailController");
+const Email = require("../controllers/sendEmailController");
+const { base64UrlEncode } = require("../utils/helpers");
 
 const addParticipant = async (req, res) => {
   try {
@@ -39,18 +40,25 @@ const addParticipant = async (req, res) => {
     });
 
     await participant.save();
-    
+
     // Send email notification
-     const subject = `Registration Confirmation for ${event.name}`;
-     await Email.sendEmail(
+    const object = {
+      participantId: participant._id,
+      eventId,
+    };
+
+    const cancelationToken = base64UrlEncode(JSON.stringify(object));
+    const subject = `Registration Confirmation for ${event.name}`;
+    await Email.sendEventEmail(
       email,
       subject,
-      participantData.fullName || 'Participant',
+      participantData.fullName || "Participant",
       event.name,
       event.description,
       event.location,
       event.startDate,
-      event.endDate
+      event.endDate,
+      cancelationToken
     );
     res.status(201).json({
       status: "success",
@@ -194,18 +202,23 @@ const register = async (req, res) => {
 
     await participant.save();
 
-    // Send email notification to the participant
+    const object = {
+      participantId: participant._id,
+      eventId,
+    };
+
+    const cancelationToken = base64UrlEncode(JSON.stringify(object));
     const subject = `Registration Confirmation for ${workshop.name} session`;
-    await Email.sendEmail1(
+    await Email.sendWorkshopEmail(
       email,
       subject,
-      participantData.fullName || 'Participant',
+      participantData.fullName || "Participant",
       workshop.name,
       workshop.description,
       workshop.startTime,
       workshop.endTime,
-      Event.name
-    );  
+      cancelationToken
+    );
 
     // Create a notification for the workshop organizer
     const organizerId = workshop.organizerId; // Assuming organizerId is stored in the workshop document
