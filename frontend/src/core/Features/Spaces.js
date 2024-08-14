@@ -20,6 +20,9 @@ const SpacesSlice = createSlice({
       state.spaces = action.payload;
       state.filteredSpaces = action.payload;
     },
+    toggleSpaceModal: (state) => {
+      state.isModalOpen = !state.isModalOpen;
+    },
     addSpace: (state, action) => {
       state.spaces = [...state.spaces, action.payload];
       state.filteredSpaces = [...state.filteredSpaces, action.payload];
@@ -51,9 +54,7 @@ const SpacesSlice = createSlice({
         space.status.toLowerCase().includes(action.payload.toLowerCase())
       );
     },
-    toggleSpacesIsLoading: (state) => {
-      state.isLoading = !state.isLoading;
-    },
+    
     selectSpace: (state, action) => {
       state.isEdit = true;
       state.selectedSpace = action.payload;

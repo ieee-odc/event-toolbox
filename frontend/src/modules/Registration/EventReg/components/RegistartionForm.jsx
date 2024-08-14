@@ -103,18 +103,78 @@ const RegistrationForm = () => {
       }
     }
   };
+  // CHECK WORKSHOP STATUS
+  const checkWorkshopAndFetchFormData = async () => {
+    dispatch(fetchFormData(tokenData.formId));
+    try {
+      console.log("Form Details:", formData);
+      if (formData.workshopId) {
+        const workshopResponse = await axiosRequest.get(`/workshop/${formData.workshopId}`);
+        const workshopDetails = workshopResponse.data.workshop;
+        console.log("Workshop Details:", workshopDetails);
 
+        if (workshopDetails.status === 'free') {
+          return true; // Proceed if the workshop is open
+        } else {
+          console.log("eventid", formData.eventId)
+          const eventResponse = await axiosRequest.get(`/events/${formData.eventId}`);
+          const eventDetails = eventResponse.data.event;
+          console.log("Event Details:", eventDetails);
+
+          if (eventDetails.status === 'paid') {
+            const hasPaid = await checkPaymentStatus(email);
+            console.log("Has Paid:", hasPaid);
+            if (!hasPaid) {
+              return false;
+            }
+          }
+
+          const emailIsAllowed = eventDetails.allowedList.some((e) => e === email);
+          console.log("Email is Allowed:", emailIsAllowed);
+          console.log("allowed list", eventDetails.allowedList)
+          if (!emailIsAllowed) {
+            toast.error("Email is not allowed for this event.");
+            return false;
+          }
+        }
+      }
+      return true; // Proceed if all checks pass
+    } catch (error) {
+      console.error("Error fetching form or workshop data:", error);
+      toast.error("Error fetching form or workshop data.");
+      return false; // Stop further processing on error
+    }
+  };
+  const checkPaymentStatus = async (email) => {
+    try {
+      const response = await axiosRequest.get(`/participant/get-event/ ${eventId}`);
+      const data = response.data.participants;
+      console.log("data", data)
+      const participant = data.find((p) => p.email === email);
+      console.log(email)
+      if (participant) {
+        console.log("Participantttttttttt", participant)
+        if (participant.status !== "Paid") {
+          toast.error("You must complete the payment to register for this session.");
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        console.error("Participant not found")
+      }
+    } catch (error) {
+      console.error("Error fetching participants: ", error);
+      return false;
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    if (!isEventForm) {
-      const emailIsAllowed = formData.event.allowedList.some(
-        (e) => e === email
-      );
-      if (!emailIsAllowed) {
-        toast.error("Email is not allowed.");
-        return;
-      }
+    const verif = await checkWorkshopAndFetchFormData()
+    if (!verif) {
+      e.stopPropagation();
+      return
     }
 
     if (!form.checkValidity()) {
@@ -362,9 +422,8 @@ const RegistrationForm = () => {
                 <form
                   onSubmit={handleSubmit}
                   noValidate
-                  className={`needs-validation ${
-                    validated ? "was-validated" : ""
-                  }`}
+                  className={`needs-validation ${validated ? "was-validated" : ""
+                    }`}
                 >
                   <div className="mb-3">
                     <label className="form-label" htmlFor="fullName">
@@ -583,7 +642,7 @@ const RegistrationForm = () => {
                                       onChange={(e) =>
                                         handleCheckboxChange(e, field)
                                       }
-                                      // required
+                                    // required
                                     />
                                     <label
                                       className="form-check-label"

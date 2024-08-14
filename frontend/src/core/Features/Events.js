@@ -91,6 +91,8 @@ const EventsSlice = createSlice({
         location: "",
         startDate: "",
         endDate: "",
+        price: "",
+        status: "free",
       };
     },
     changeFormState: (state, action) => {

@@ -28,7 +28,6 @@ function WorkshopModal() {
   const [selectedSpace, setSelectedSpace] = useState();
   const dispatch = useDispatch();
   const userData = UserData();
-  const [priceEnabled, setPriceEnabled] = useState(false);
   const [capacityMessage, setCapacityMessage] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const modalRef = useRef(null);
@@ -74,8 +73,7 @@ function WorkshopModal() {
       selectedWorkshop.startTime &&
       selectedWorkshop.endTime &&
       selectedWorkshop.numberOfAttendees > 0 &&
-      selectedWorkshop.spaceId &&
-      (priceEnabled ? selectedWorkshop.price && selectedWorkshop.price > 0 : true);
+      selectedWorkshop.spaceId
     setIsFormComplete(allFieldsFilled);
   }, [
     selectedWorkshop.name,
@@ -86,8 +84,6 @@ function WorkshopModal() {
     selectedWorkshop.endTime,
     selectedWorkshop.numberOfAttendees,
     selectedWorkshop.space,
-    selectedWorkshop.price,
-    priceEnabled
   ]);
 
   const handleWorkshop = () => {
@@ -124,8 +120,7 @@ function WorkshopModal() {
       spaceId: selectedWorkshop.spaceId,
       eventId,
       numberOfAttendees: selectedWorkshop.numberOfAttendees,
-      price: priceEnabled ? parseFloat(selectedWorkshop.price) : 0,
-      status: priceEnabled ? "paid" : "free",
+      status: selectedWorkshop.status,
     };
 
     const url = isEdit
@@ -157,11 +152,7 @@ function WorkshopModal() {
 
   const handleStatusChange = (e) => {
     const value = e.target.value;
-    setPriceEnabled(value === "paid");
     dispatch(updateSelectedWorkshopField({ id: "status", value }));
-    if (value === "free") {
-      dispatch(updateSelectedWorkshopField({ id: "price", value: "Free" }));
-    }
   };
   const handleClickOutside = (event) => {
     const flatpickrNodeStart =
@@ -312,7 +303,7 @@ function WorkshopModal() {
                     />
                   </div>
                 </div>
-                <div className="row">
+                <div className="grid-container-2">
                   <div className="col mb-2">
                     <label htmlFor="numberOfAttendees" className="form-label">
                       Number of Attendees
@@ -337,8 +328,6 @@ function WorkshopModal() {
                       </p>
                     )}
                   </div>
-                </div>
-                <div className="grid-container-2">
                   <div className="col mb-3">
                     <label htmlFor="emailWithTitle" className="form-label">
                       Status
@@ -352,27 +341,16 @@ function WorkshopModal() {
                       aria-hidden="true"
                       value={selectedWorkshop.status}
                       onChange={handleStatusChange}
-
                     >
-                      <option value="free">Free</option>
-                      <option value="paid">Paid</option>
+                      <option value="open">Open for All</option>
+                      <option value="exclusive">Exclusive</option>
 
                     </select>
                   </div>
-                  <div className="col mb-3">
-                    <label htmlFor="spaceCapacity" className="form-label">
-                      Price (TND)
-                    </label>
-                    <input
-                      value={priceEnabled ? selectedWorkshop.price : "free"}
-                      onChange={handleInputChange}
-                      type="number"
-                      id="price"
-                      className="form-control"
-                      disabled={!priceEnabled}
-                      placeholder="Enter Price"
-                    />
-                  </div>
+                </div>
+                <div className="row">
+
+
                 </div>
                 <div className="grid-container-2 mb-3">
                   <div className="col mb-0">

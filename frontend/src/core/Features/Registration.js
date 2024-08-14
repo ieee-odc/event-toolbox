@@ -56,7 +56,6 @@ const registrationSlice = createSlice({
       .addCase(fetchFormData.fulfilled, (state, action) => {
         state.loading = false;
         state.formFields = action.payload.form.data;
-
         const workshopIdsSet = new Set(); // Create an empty Set to store unique workshop IDs
 
         for (let i = 0; i < action.payload.form.data.length; i++) {
@@ -77,7 +76,6 @@ const registrationSlice = createSlice({
         state.workshopsIds = Array.from(workshopIdsSet).filter(
           (id) => id !== undefined
         );
-
         state.eventId = action.payload.form.eventId;
         state.hasMultiSelectForm = action.payload.form.data.some(
           (question) => question.type === "workshop-selection"
