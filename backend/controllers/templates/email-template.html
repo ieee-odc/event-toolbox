@@ -1,83 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 5px;
-      overflow: hidden;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background-color: #002b5b;
-      color: #ffffff;
-      padding: 20px;
-      text-align: center;
-    }
-    .header svg {
-      width: 150px;
-      height: auto;
-    }
-    .content {
-      padding: 20px;
-    }
-    .content p {
-      margin: 0 0 15px;
-    }
-    .footer {
-      background-color: #f4f4f4;
-      padding: 20px;
-      text-align: center;
-      font-size: 14px;
-      color: #888888;
-    }
-    .button {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 10px 0;
-      font-size: 16px;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 5px;
-      text-align: center;
-    }
-    .button-view {
-      background-color: #002b5b;
-    }
-    .button-manage {
-      background-color: #e74c3c;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-
-      <span class="app-brand-text demo menu-text fw-bold ms-2" style="text-transform: none; color: #ffffff;">Event Box</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #002b5b;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .header svg {
+        width: 150px;
+        height: auto;
+      }
+      .content {
+        padding: 20px;
+      }
+      .content p {
+        margin: 0 0 15px;
+      }
+      .footer {
+        background-color: #f4f4f4;
+        padding: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: #888888;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 0;
+        font-size: 16px;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .button-view {
+        background-color: #002b5b;
+      }
+      .button-manage {
+        background-color: #e74c3c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <span
+          class="app-brand-text demo menu-text fw-bold ms-2"
+          style="text-transform: none; color: #ffffff"
+          >Event Box</span
+        >
+      </div>
+      <div class="content">
+        <p>Hello [ParticipantName],</p>
+        <p>
+          You have successfully registered for the event:
+          <strong>[EventName]</strong>.
+        </p>
+        <p>Location: [eventLocation]</p>
+        <p>Start Date: [eventStartDate]</p>
+        <p>End Date: [eventEndDate]</p>
+        <a href="http://localhost:5173/events" class="button button-view"
+          >View Event</a
+        >
+        <a
+          href="http://localhost:5173/cancel-registration/[cancelationToken]"
+          class="button button-manage"
+          >Cancel Registration</a
+        >
+      </div>
+      <div class="footer">© 2024 Event Management. All Rights Reserved.</div>
     </div>
-    <div class="content">
-      <p>Hello [ParticipantName],</p>
-      <p>You have successfully registered for the event: <strong>[EventName]</strong>.</p>
-      <p>Location: [eventLocation]</p>
-      <p>Start Date: [eventStartDate]</p>
-      <p>End Date: [eventEndDate]</p>
-      <a href="http://localhost:5173/events" class="button button-view">View Event</a>
-      <a href="http://localhost:5173/events" class="button button-manage">Cancel Registration</a>
-    </div>
-    <div class="footer">
-      © 2024 Event Management. All Rights Reserved.
-    </div>
-  </div>
-</body>
+  </body>
 </html>
