@@ -182,31 +182,45 @@ const RegistrationForm = () => {
             selectedWorkshops.push(...formData[question]);
           }
         });
-        console.log(workshopQuestions);
-        console.log(formData);
-        console.log(formWorkshops);
-        console.log(selectedWorkshops);
-        if (selectedWorkshops.length === 0) {
+        if (hasMultiSelectForm && selectedWorkshops.length === 0) {
           toast.error("Please select at least one workshop");
           return;
         }
-        for (const workshopId of selectedWorkshops) {
-          console.log(workshopId);
-          const submissionData = {
-            ...baseSubmissionData,
-            workshopId: workshopId,
-          };
+        if (hasMultiSelectForm) {
+          for (const workshopId of selectedWorkshops) {
+            const submissionData = {
+              ...baseSubmissionData,
+              workshopId: workshopId,
+            };
+            const response = await axiosRequest.post(
+              "/participant/submit",
+              submissionData
+            );
 
-          const response = await axiosRequest.post(
-            "/participant/submit",
-            submissionData
-          );
+            if (socket) {
+              socket.emit("addEventParticipant", {
+                participant: response.data.participant,
+                roomId: `${eventId}/${workshopId}`,
+              });
+            }
+          }
+        } else {
+          for (const workshopId of workshopsIds) {
+            const submissionData = {
+              ...baseSubmissionData,
+              workshopId: workshopId,
+            };
+            const response = await axiosRequest.post(
+              "/participant/submit",
+              submissionData
+            );
 
-          if (socket) {
-            socket.emit("addEventParticipant", {
-              participant: response.data.participant,
-              roomId: `${eventId}/${workshopId}`,
-            });
+            if (socket) {
+              socket.emit("addEventParticipant", {
+                participant: response.data.participant,
+                roomId: `${eventId}/${workshopId}`,
+              });
+            }
           }
         }
       }
