@@ -293,7 +293,7 @@ function EventsList() {
                               </p>
                             </div>
                             <div className="d-flex align-items-center mb-1 date-container">
-                              <i className="bx bx-calendar me-2 date-icon"></i>
+                              <i className="bx bx-calendar me-2 date-icon" style={{ fontSize: "13px" }}></i>
                               <b>
                                 <span className="text mb-0">Dates:</span>
                               </b>
