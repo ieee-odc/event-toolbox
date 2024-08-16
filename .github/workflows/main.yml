@@ -146,7 +146,7 @@ jobs:
 
   sonar-checks:
     name: quality gate
-    needs: depchecktest
+    needs: depchecktest-front
     runs-on: ubuntu-latest
     
     steps:
