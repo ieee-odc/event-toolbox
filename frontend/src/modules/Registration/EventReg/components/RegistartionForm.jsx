@@ -103,18 +103,66 @@ const RegistrationForm = () => {
       }
     }
   };
+  // CHECK WORKSHOP STATUS
+  const checkWorkshopAndFetchFormData = async () => {
+    dispatch(fetchFormData(tokenData.formId));
+    try {
+      if (formData.workshopId) {
+        const workshopResponse = await axiosRequest.get(`/workshop/${formData.workshopId}`);
+        const workshopDetails = workshopResponse.data.workshop;
+        if (workshopDetails.status === 'free') {
+          return true;
+        }
 
+        const eventResponse = await axiosRequest.get(`/events/${formData.eventId}`);
+        const eventDetails = eventResponse.data.event;
+        if (eventDetails.status === 'paid') {
+          const hasPaid = await checkPaymentStatus(email);
+          if (!hasPaid) {
+            return false;
+          }
+        }
+        const emailIsAllowed = eventDetails.allowedList.some((e) => e === email);
+        if (!emailIsAllowed) {
+          toast.error("Email is not allowed for this event.");
+          return false;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error("Error fetching form or workshop data:", error);
+      toast.error("Error fetching form or workshop data.");
+      return false; // Stop further processing on error
+    }
+  };
+  const checkPaymentStatus = async (email) => {
+    try {
+      const response = await axiosRequest.get(`/participant/get-event/ ${eventId}`);
+      const data = response.data.participants;
+      const participant = data.find((p) => p.email === email);
+      if (!participant) {
+        console.error("Participant not found")
+        return false;
+      }
+
+      if (participant.status !== "Paid") {
+        toast.error("You must complete the payment to register for this session.");
+        return false;
+      }
+      return true;
+
+    } catch (error) {
+      console.error("Error fetching participants: ", error);
+      return false;
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    if (!isEventForm) {
-      const emailIsAllowed = formData.event.allowedList.some(
-        (e) => e === email
-      );
-      if (!emailIsAllowed) {
-        toast.error("Email is not allowed.");
-        return;
-      }
+    const verif = await checkWorkshopAndFetchFormData()
+    if (!verif) {
+      e.stopPropagation();
+      return
     }
 
     if (!form.checkValidity()) {
@@ -318,32 +366,32 @@ const RegistrationForm = () => {
   };
   return (
     <div className="container-fluid ">
-     
-  
+
+
       <HeadComponent
         title={formData.event ? formData.event.name : "Event Registration"}
         description={formData.event ? formData.event.description : "Register for the event"}
         image="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"
       />
-  
+
       <div className="form-container d-flex justify-content-center align-items-center">
         <div className="card border-0" style={{ width: '100%', maxWidth: '900px' }}>
           <div className="card-body">
-          {formData.event && (
+            {formData.event && (
               <>
-             <div className="form-section">
-            <h4 className="form-title mb-2">{formData.event.name}</h4>
-            </div>
-            </>
+                <div className="form-section">
+                  <h4 className="form-title mb-2">{formData.event.name}</h4>
+                </div>
+              </>
             )}
-             {/* Image Banner */}
+            {/* Image Banner */}
             <div className="image-banner">
               <img
                 src="/assets/tsyp.jpg"
                 alt="Event Banner"
                 className="img-fluid"
               />
-      </div>
+            </div>
             {formData.event && (
               <>
                 <div className="form-section">
@@ -380,9 +428,8 @@ const RegistrationForm = () => {
               <form
                 onSubmit={handleSubmit}
                 noValidate
-                className={`needs-validation ${
-                  validated ? "was-validated" : ""
-                }`}
+                className={`needs-validation ${validated ? "was-validated" : ""
+                  }`}
               >
                 <div className="mb-3">
                   <label className="form-label" htmlFor="fullName">
@@ -652,7 +699,7 @@ const RegistrationForm = () => {
       </div>
     </div>
   );
-  
-  };
+
+};
 
 export default RegistrationForm;
