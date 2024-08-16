@@ -306,6 +306,17 @@ function EventsList() {
                                   {formatDate(event.endDate)}
                                 </p>
                               </span>
+                            </div> <div className="d-flex align-items-center mb-1 date-container">
+                              <i className="bx bx-check me-2 date-icon"></i>
+                              <b>
+                                <span className="text mb-0">Status:</span>
+                              </b>
+                              <span className="dates-span d-flex align-items-center ms-2 mt-1">
+                                <p className="mb-0 date">
+                                  {event.status === "paid" ? "Paid" : "Free"}
+                                </p>
+
+                              </span>
                             </div>
                           </div>
                         </div>

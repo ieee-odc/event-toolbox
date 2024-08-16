@@ -57,7 +57,7 @@ const WorkshopsCard = () => {
               <select
                 id="participantStatusFilter"
                 className="form-select"
-                // onChange={handleStatusChange}
+              // onChange={handleStatusChange}
               >
                 <option value="">All Sessions</option>
                 <option value="Paid">Done</option>
@@ -89,6 +89,7 @@ const WorkshopsCard = () => {
                       title={workshop.name}
                       formText={workshop.formId}
                       workshop={workshop}
+                      status={workshop.status}
                       date={formatDateWithNumbers(workshop.endTime)}
                       endTime={formatTime(workshop.endTime)}
                       startTime={formatTime(workshop.startTime)}

@@ -413,7 +413,6 @@ const ParticipantsCard = () => {
                             >
                               Mark as Canceled
                             </a>
-                            <hr className="dropdown-divider" />
                             <a
                               onClick={() =>
                                 handleDeleteParticipant(participant.id)
