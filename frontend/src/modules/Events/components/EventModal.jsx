@@ -1,4 +1,3 @@
-// EventModal.js
 
 import React, { useEffect, useRef, useState } from "react";
 import "../Events.css";
@@ -21,9 +20,11 @@ function EventModal() {
   const dispatch = useDispatch();
   const userData = UserData();
   const modalRef = useRef(null);
-
   const flatpickrRefStart = useRef(null);
   const flatpickrRefEnd = useRef(null);
+  const [priceEnabled, setPriceEnabled] = useState(false);
+  const [isFormComplete, setIsFormComplete] = useState(false);
+
   const { isModalOpen, selectedEvent, isEdit } = useSelector(
     (state) => state.eventsStore
   );
@@ -33,14 +34,18 @@ function EventModal() {
   const modalClassName = isModalOpen ? "modal fade show" : "modal fade";
 
   const validateFields = () => {
-    const { name, description, location, startDate, endDate } = selectedEvent;
+    const { name, description, location, startDate, endDate, status, price } = selectedEvent;
     if (!name || !description || !location || !startDate || !endDate) {
       toast.error("Please fill in all fields.");
       return false;
     }
+    if (status === "paid" && (!price || parseFloat(price) <= 0)) {
+      toast.error("Please provide a valid price for paid events.");
+      return false;
+    }
+
     return true;
   };
-
   const handleAddEvent = async (photoURL = null) => {
     try {
       if (!validateFields()) {
@@ -49,13 +54,13 @@ function EventModal() {
 
       const response = await axiosRequest.post("/events/add", {
         ...selectedEvent,
-        coverPhoto: photoURL, // Save photo URL in the event data
+        coverPhoto: photoURL,
         organizerId: userData.id,
+        status: selectedEvent.status || "free",
+        price: selectedEvent.status === "free" ? 0 : selectedEvent.price || 0,
       });
 
       dispatch(addEvent(response.data));
-      dispatch(toggleEventModal());
-      dispatch(resetEventModal());
     } catch (error) {
       console.error("Error creating event:", error);
     }
@@ -71,26 +76,50 @@ function EventModal() {
         organizerId: userData.id,
         coverPhoto: photoURL, // Save photo URL in the event data
         ...selectedEvent,
+        status: selectedEvent.status || "free",
+        price: selectedEvent.status === "free" ? 0 : selectedEvent.price || 0,
       });
 
       dispatch(editEvent(response.data.event));
-      dispatch(toggleEventModal());
-      dispatch(resetEventModal());
+
     } catch (error) {
       console.error("Error editing event:", error);
     }
   };
 
   const handleSubmit = () => {
-    if (coverPhoto) {
-      handleImageUpload();
-    } else if (isEdit) {
-      handleEditEvent(selectedEvent.id);
-    } else {
-      handleAddEvent();
+
+    if (isFormComplete) {
+      if (coverPhoto) {
+        handleImageUpload();
+      } else if (isEdit) {
+        handleEditEvent(selectedEvent.id);
+      } else {
+        handleAddEvent();
+      }
+      dispatch(toggleEventModal());
+      dispatch(resetEventModal());
+      setCoverPhoto(null)
+      setPhotoPreview(null);
+      setPriceEnabled(false);
     }
   };
+  const handleStatusChange = (e) => {
+    const value = e.target.value;
+    setPriceEnabled(value === "paid");
+    dispatch(updateSelectedEventField({ id: "status", value }));
 
+    if (value === "free") {
+      dispatch(updateSelectedEventField({ id: "price", value: null }));
+    }
+  };
+  useEffect(() => {
+    if (isEdit && selectedEvent.status === "paid") {
+      setPriceEnabled(true);
+    } else {
+      setPriceEnabled(false);
+    }
+  }, [isEdit, selectedEvent.status]);
   const handleInputChange = (e) => {
     const payload = e.target;
     dispatch(
@@ -100,6 +129,7 @@ function EventModal() {
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
+    // if (!file) return;
     setCoverPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
   };
@@ -155,6 +185,7 @@ function EventModal() {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
+      setPriceEnabled(false);
     }
 
     return () => {
@@ -180,6 +211,24 @@ function EventModal() {
     }
   }, [isModalOpen]);
 
+  useEffect(() => {
+    const allFieldsFilled =
+      selectedEvent.name &&
+      selectedEvent.description &&
+      selectedEvent.location &&
+      selectedEvent.startDate &&
+      selectedEvent.endDate &&
+      (priceEnabled ? selectedEvent.price && selectedEvent.price > 0 : true);
+    setIsFormComplete(allFieldsFilled);
+  }, [
+    selectedEvent.name,
+    selectedEvent.description,
+    selectedEvent.location,
+    selectedEvent.startDate,
+    selectedEvent.endDate,
+    selectedEvent.price,
+    priceEnabled
+  ]);
   return (
     <>
       {isModalOpen && <div className="modal-backdrop fade show"></div>}
@@ -262,17 +311,55 @@ function EventModal() {
                   onChange={handlePhotoChange}
                 />
               </div>
-              {photoPreview && (
-                <div className="mb-3 text-center">
-                  <img
-                    src={photoPreview}
-                    alt="Cover Preview"
-                    className="img-thumbnail"
-                    style={{ maxHeight: "200px" }}
+              {
+                photoPreview && (
+                  <div className="mb-3 text-center">
+                    <img
+                      src={photoPreview}
+                      alt="Cover Preview"
+                      className="img-thumbnail"
+                      style={{ maxHeight: "200px" }}
+                    />
+                  </div>
+                )
+              }
+              <div className="grid-container">
+                <div className="col mb-3">
+                  <label htmlFor="emailWithTitle" className="form-label">
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    className="select2 form-select form-select-md select2-hidden-accessible"
+                    data-allow-clear="true"
+                    data-select2-id="select2Basic"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    value={selectedEvent.status}
+                    onChange={handleStatusChange}
+
+                  >
+                    <option value="free">Free</option>
+                    <option value="paid">Paid</option>
+
+                  </select>
+                </div>
+                <div className="col mb-3">
+                  <label htmlFor="spaceCapacity" className="form-label">
+                    Price (TND)
+                  </label>
+                  <input
+                    value={priceEnabled || isEdit ? selectedEvent.price : null}
+                    onChange={handleInputChange}
+                    type="number"
+                    id="price"
+                    className="form-control"
+                    disabled={selectedEvent.status === "free"}
+                    placeholder="Enter Price"
                   />
                 </div>
-              )}
-              <div className="row g-2">
+              </div>
+              <div className="grid-container">
                 <div className="col">
                   <label htmlFor="startDate" className="form-label">
                     Start Date
@@ -326,17 +413,18 @@ function EventModal() {
                 onClick={() => {
                   dispatch(resetEventModal());
                   dispatch(toggleEventModal());
+                  setPriceEnabled(false);
                 }}
               >
                 Close
               </button>
-              <button className="btn btn-primary" onClick={handleSubmit}>
+              <button className="btn btn-primary" onClick={handleSubmit} disabled={!isFormComplete} >
                 {isEdit ? "Save" : "Create"}
               </button>
             </div>
-          </div>
-        </div>
-      </div>
+          </div >
+        </div >
+      </div >
     </>
   );
 }

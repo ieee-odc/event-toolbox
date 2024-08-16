@@ -1,12 +1,77 @@
-@media (max-width: 800px) {
-  .dt-action-buttons {
-    margin-top: 0 !important;
-  }
-  .form-select {
-    min-width: 70px !important;
-  }
-  #create-workshop-container,
-  .form-control {
-    margin-bottom: 10px !important;
-  }
+ .grid-container-1 {
+   display: grid;
+   grid-template-columns: 2fr 1fr;
+   gap: 10px;
+   align-items: start;
+ }
+
+ .grid-container-2 {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: 10px;
+   align-items: start;
+ }
+
+ /* .wrapper {
+   position: relative;
+   height: 40px;
+   width: 300px;
+   overflow: hidden;
+   display: flex;
+   flex-direction: row;
+   border-radius: 4px;
+ }
+
+ .sufix {
+   position: relative;
+   height: auto;
+   width: auto;
+   display: flex;
+   justify-content: center;
+   align-content: center;
+   flex-direction: column;
+   background: rgb(243, 242, 241);
+   color: rgb(96, 94, 92);
+   display: flex;
+   align-items: center;
+   white-space: nowrap;
+   flex-shrink: 0;
+   padding: 0px 10px;
+   box-sizing: border-box;
+   border-radius: 40px !important;
+
+ } */
+
+ /*
+.grid-sub-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
 }
+
+.space-select,
+.space-capacity,
+.other-space-select {
+  width: 100%;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+} */
+
+
+ @media (max-width: 800px) {
+   .dt-action-buttons {
+     margin-top: 0 !important;
+   }
+
+   .form-select {
+     min-width: 70px !important;
+   }
+
+   #create-workshop-container,
+   .form-control {
+     margin-bottom: 10px !important;
+   }
+ }

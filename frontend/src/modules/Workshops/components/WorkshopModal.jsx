@@ -22,12 +22,12 @@ function WorkshopModal() {
     (state) => state.workshopsStore
   );
   const { spaces } = useSelector((state) => state.spacesStore);
-  const flatpickrRef = useRef();
+  const flatpickrRefStart = useRef(null);
+  const flatpickrRefEnd = useRef(null);
+  const flatpickrRefDate = useRef(null);
   const [selectedSpace, setSelectedSpace] = useState();
-
   const dispatch = useDispatch();
   const userData = UserData();
-
   const [capacityMessage, setCapacityMessage] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const modalRef = useRef(null);
@@ -48,16 +48,21 @@ function WorkshopModal() {
       );
     }
   }, [selectedWorkshop.spaceId]);
-
+  const prevAttendeesRef = useRef(selectedWorkshop.numberOfAttendees);
   useEffect(() => {
-    if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
-      setCapacityMessage(
-        "The selected space does not have enough capacity for the attendees."
-      );
+    if (prevAttendeesRef.current !== selectedWorkshop.numberOfAttendees && selectedWorkshop.numberOfAttendees !== "") {
+      if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
+        setCapacityMessage(
+          "The selected space does not have enough capacity for the attendees."
+        );
+      } else {
+        setCapacityMessage("The selected space has enough capacity.");
+      }
     } else {
-      setCapacityMessage("The selected space has enough capacity.");
+      setCapacityMessage("");
     }
-  }, [selectedWorkshop.space, selectedWorkshop.numberOfAttendees]);
+    prevAttendeesRef.current = selectedWorkshop.numberOfAttendees;
+  }, [selectedWorkshop.numberOfAttendees, selectedSpace]);
 
   useEffect(() => {
     const allFieldsFilled =
@@ -68,7 +73,7 @@ function WorkshopModal() {
       selectedWorkshop.startTime &&
       selectedWorkshop.endTime &&
       selectedWorkshop.numberOfAttendees > 0 &&
-      selectedWorkshop.spaceId;
+      selectedWorkshop.spaceId
     setIsFormComplete(allFieldsFilled);
   }, [
     selectedWorkshop.name,
@@ -115,6 +120,7 @@ function WorkshopModal() {
       spaceId: selectedWorkshop.spaceId,
       eventId,
       numberOfAttendees: selectedWorkshop.numberOfAttendees,
+      status: selectedWorkshop.status,
     };
 
     const url = isEdit
@@ -144,18 +150,34 @@ function WorkshopModal() {
     dispatch(updateSelectedWorkshopField({ id, value }));
   };
 
+  const handleStatusChange = (e) => {
+    const value = e.target.value;
+    dispatch(updateSelectedWorkshopField({ id: "status", value }));
+  };
   const handleClickOutside = (event) => {
-    const flatpickrNode = flatpickrRef.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeStart =
+      flatpickrRefStart.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeEnd =
+      flatpickrRefEnd.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeDate =
+      flatpickrRefDate.current?.flatpickr?.calendarContainer;
     if (
       modalRef.current &&
       !modalRef.current.contains(event.target) &&
-      flatpickrNode &&
-      !flatpickrNode.contains(event.target)
+      flatpickrNodeStart &&
+      !flatpickrNodeStart.contains(event.target) &&
+      flatpickrNodeEnd &&
+      !flatpickrNodeEnd.contains(event.target) &&
+      flatpickrNodeDate &&
+      !flatpickrNodeDate.contains(event.target)
     ) {
       dispatch(toggleWorkshopModal());
-      dispatch(resetWorkshopModal());
+      if (isEdit) {
+        dispatch(toggleWorkshopModal());
+      }
     }
   };
+
 
   useEffect(() => {
     if (isModalOpen) {
@@ -242,7 +264,7 @@ function WorkshopModal() {
                     </div>
                   </div>
                 </div>
-                <div className="row">
+                <div className="grid-container-1">
                   <div className="col mb-3">
                     <label htmlFor="emailWithTitle" className="form-label">
                       Space
@@ -273,12 +295,16 @@ function WorkshopModal() {
                       id="spaceCapacity"
                       className="form-control"
                       value={selectedSpace?.capacity}
+
+                      style={{
+                        cursor: 'not-allowed',
+                      }}
                       readOnly
                     />
                   </div>
                 </div>
-                <div className="row">
-                  <div className="col mb-3">
+                <div className="grid-container-2">
+                  <div className="col mb-2">
                     <label htmlFor="numberOfAttendees" className="form-label">
                       Number of Attendees
                     </label>
@@ -302,8 +328,31 @@ function WorkshopModal() {
                       </p>
                     )}
                   </div>
+                  <div className="col mb-3">
+                    <label htmlFor="emailWithTitle" className="form-label">
+                      Status
+                    </label>
+                    <select
+                      id="price"
+                      className="select2 form-select form-select-md select2-hidden-accessible"
+                      data-allow-clear="true"
+                      data-select2-id="select2Basic"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      value={selectedWorkshop.status}
+                      onChange={handleStatusChange}
+                    >
+                      <option value="open">Open for All</option>
+                      <option value="exclusive">Exclusive</option>
+
+                    </select>
+                  </div>
                 </div>
-                <div className="row mb-3 g-2">
+                <div className="row">
+
+
+                </div>
+                <div className="grid-container-2 mb-3">
                   <div className="col mb-0">
                     <label htmlFor="start-time" className="form-label">
                       Start Time
@@ -311,6 +360,7 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"startTime"}
                       value={selectedWorkshop.startTime}
+                      ref={flatpickrRefStart}
                       onChange={(time) => {
                         const myType = time[0].toISOString();
                         dispatch(
@@ -336,6 +386,7 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"endTime"}
                       value={selectedWorkshop.endTime}
+                      ref={flatpickrRefEnd}
                       onChange={(time) => {
                         const myType = time[0].toISOString();
 
@@ -366,6 +417,7 @@ function WorkshopModal() {
                     </label>
                     <Flatpickr
                       id={"date"}
+                      ref={flatpickrRefDate}
                       value={selectedWorkshop.date || new Date()}
                       onChange={(date) => {
                         const myDate = date[0].toISOString();

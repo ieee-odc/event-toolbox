@@ -4,8 +4,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
-  backdrop-filter: blur(0px); /* Apply backdrop blur effect */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Adjust opacity as needed */
+  backdrop-filter: blur(0px);
+  /* Apply backdrop blur effect */
   z-index: 2;
 }
 
@@ -16,6 +18,7 @@
   transform: translate(-50%, -50%);
   z-index: 3;
 }
+
 .modal.show .modal-dialog {
   transform: translateY(0) scale(1);
 }
@@ -28,6 +31,12 @@
 a {
   color: #566a7f;
 }
+
 .transform {
   transform: scale(1.3);
 }
+
+/* 
+.pre-set-q-container div input {
+  margin: 0;
+} */

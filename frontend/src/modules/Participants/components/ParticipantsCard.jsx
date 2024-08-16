@@ -70,8 +70,10 @@ const ParticipantsCard = () => {
     }
   };
 
-  const areAllSelected =
-    selectedParticipants.length === filteredParticipants.length;
+
+
+  const areAllSelected = selectedParticipants.length > 0 && selectedParticipants.length === filteredParticipants.length;
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -222,7 +224,7 @@ const ParticipantsCard = () => {
             <ParticipantTableHeader onSearchChange={handleSearchChange} />
 
             <div className="d-flex align-items-center gap-2">
-              {isSelecting ? (
+              {isSelecting && filteredParticipants.length > 0 ? (
                 <>
                   <div></div>
                   <div className="d-flex align-items-center gap-2">
@@ -411,7 +413,6 @@ const ParticipantsCard = () => {
                             >
                               Mark as Canceled
                             </a>
-                            <hr className="dropdown-divider" />
                             <a
                               onClick={() =>
                                 handleDeleteParticipant(participant.id)
