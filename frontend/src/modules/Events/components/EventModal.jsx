@@ -99,6 +99,8 @@ function EventModal() {
       }
       dispatch(toggleEventModal());
       dispatch(resetEventModal());
+      setCoverPhoto(null)
+      setPhotoPreview(null);
       setPriceEnabled(false);
     }
   };
@@ -106,8 +108,7 @@ function EventModal() {
     const value = e.target.value;
     setPriceEnabled(value === "paid");
     dispatch(updateSelectedEventField({ id: "status", value }));
-    console.log("daz")
-    console.log(value)
+
     if (value === "free") {
       dispatch(updateSelectedEventField({ id: "price", value: null }));
     }
@@ -128,6 +129,7 @@ function EventModal() {
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
+    // if (!file) return;
     setCoverPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
   };
@@ -352,7 +354,7 @@ function EventModal() {
                     type="number"
                     id="price"
                     className="form-control"
-                    disabled={!priceEnabled || selectedEvent.status === "free"}
+                    disabled={selectedEvent.status === "free"}
                     placeholder="Enter Price"
                   />
                 </div>

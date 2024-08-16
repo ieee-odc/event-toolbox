@@ -16,6 +16,7 @@ import {
   addEvent,
   setEventsPerPage,
   turnIsLoadingOff,
+  resetEventModal,
 } from "../../../core/Features/Events";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -84,6 +85,7 @@ function EventsList() {
   };
 
   const onAddEventClick = () => {
+    dispatch(resetEventModal());
     dispatch(toggleEventModal());
   };
 
