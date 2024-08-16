@@ -30,7 +30,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
-        <Route path="/events/details/:eventId" element={<EventDetail />} />
+        <Route path="/events/details/:token" element={<EventDetail />} />
 
         <Route
           path="/participants"
