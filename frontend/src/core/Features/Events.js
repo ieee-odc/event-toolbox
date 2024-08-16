@@ -17,6 +17,7 @@ const EventsSlice = createSlice({
       location: "",
       startDate: "",
       endDate: "",
+      formId: null,
     },
   },
   reducers: {

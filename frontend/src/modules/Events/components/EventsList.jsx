@@ -1,12 +1,11 @@
-// EventsList.js
-
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { QRCode } from "react-qrcode-logo";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "./../../../utils/UserData";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import {
   filterEvents,
   initializeEvents,
@@ -22,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import CustomButton from "../../../core/components/Button/Button";
 import Pagination from "../../../core/components/Pagination/Pagination";
+import { base64UrlEncode } from "../../../utils/helpers/base64Helper";
 
 function EventsList() {
   const dispatch = useDispatch();
@@ -36,7 +36,13 @@ function EventsList() {
     indexOfFirstEvent,
     indexOfLastEvent
   );
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const handleQRCodeClick = (event) => {
+    setSelectedEvent(event);
+    setShowQRModal(true);
+  };
   const handleDeleteEvent = async (eventId) => {
     try {
       await axiosRequest.delete(`/events/delete/${eventId}`);
@@ -122,6 +128,18 @@ function EventsList() {
   const handleEventsPerPageChange = (e) => {
     dispatch(setEventsPerPage(Number(e.target.value)));
     setCurrentPage(1); // Reset to the first page
+  };
+  const downloadQRCode = () => {
+    const canvas = document.querySelector("#qr-gen canvas");
+    const pngUrl = canvas
+      .toDataURL("image/png")
+      .replace("image/png", "image/octet-stream");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = `${selectedEvent.name}-qr-code.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   };
 
   return (
@@ -229,36 +247,34 @@ function EventsList() {
                               style={{ margin: 0, color: "white" }}
                             ></i>
                           </div>
-                          <Link to={`/events/details/${event.id}`}>
-                            <div
-                              style={{
-                                cursor: "pointer",
-                                background: "var(--secondary-color)",
-                                padding: 5,
-                                borderRadius: "50%",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                position: "absolute",
-                                top: 15,
-                                right: 50,
-                              }}
-                            >
-                              <i className="bx bx-info-circle" style={{ margin: 0, color: "white" }}></i>
-                            </div>
-                          </Link>
-                          <img
+                          <div
                             onClick={() => {
-                              navigate(`/event/${event.id}`);
+                              handleQRCodeClick(event);
                             }}
-                            className="img-fluid cursor-pointer"
-                            src={event.coverPhoto || "https://via.placeholder.com/300"}
-                            alt="event cover"
-                          />
+                            style={{
+                              cursor: "pointer",
+                              background: "var(--primary-color)",
+                              padding: 5,
+                              borderRadius: "50%",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              position: "absolute",
+                              top: 15,
+                              right: 85,
+                            }}
+                          >
+                            <i
+                              className="bx bx-qr"
+                              style={{ margin: 0, color: "white" }}
+                            ></i>
+                          </div>
+
                           <div
                             className="card-body p-3 pt-3 cursor-pointer"
                             id="eventCardBody"
                             onClick={() => {
+                              dispatch(selectEvent(event));
                               navigate(`/event/${event.id}`);
                             }}
                           >
@@ -342,7 +358,16 @@ function EventsList() {
                         >
                           <button
                             id="deleteButton"
-                            onClick={() => handleDeleteEvent(event.id)}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "Are you sure you want to delete this event?"
+                                )
+                              ) {
+                                handleDeleteEvent(event._id);
+                              }
+
+                            }}
                           >
                             <p className="mx-1">Delete</p>
                             <div className="centered">
@@ -391,6 +416,30 @@ function EventsList() {
             </div>
           </div>
         </div>
+        <Modal show={showQRModal} onHide={() => setShowQRModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>QR Code for {selectedEvent?.name}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div id="qr-gen" style={{ textAlign: "center" }}>
+              <QRCode
+                value={`${window.location.origin}/events/details/${base64UrlEncode(
+                  JSON.stringify({ eventId: selectedEvent?.id, formId: selectedEvent?.formId })
+                )}`}
+              />
+
+              <p>This QR code is for event: {selectedEvent?.name}</p>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowQRModal(false)}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={downloadQRCode}>
+              Download QR Code
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );

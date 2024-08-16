@@ -2,17 +2,28 @@ import React, { useEffect, useState } from "react";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux"; // Import useSelector to access Redux state
-
+import { UserData } from "../../../utils/UserData";
+import { base64UrlDecode, base64UrlEncode } from "../../../utils/helpers/base64Helper";
 const EventDetail = () => {
-    const { eventId } = useParams();
+    const { token } = useParams()
     const navigate = useNavigate(); // Initialize useNavigate for navigation
     const [event, setEvent] = useState(null);
-    const selectedFormId = useSelector((state) => state.eventsStore.selectedEvent.formId); // Access selected form ID
+    // const selectedFormId = useSelector((state) => state.eventsStore.selectedEvent.formId); // Access selected form ID
+    const userData = UserData();
 
+    const decodedToken = base64UrlDecode(token);
+    const [tokenData, setTokenData] = useState();
+    useEffect(() => {
+        try {
+            setTokenData(JSON.parse(decodedToken));
+        } catch (error) {
+            console.error("Invalid token format", error);
+        }
+    }, [token]);
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const response = await axiosRequest.get(`/events/${eventId}`);
+                const response = await axiosRequest.get(`/events/${tokenData.eventId}`);
                 setEvent(response.data.event);
             } catch (error) {
                 console.error("Error fetching event details:", error);
@@ -20,7 +31,7 @@ const EventDetail = () => {
         };
 
         fetchEvent();
-    }, [eventId]);
+    }, [tokenData]);
 
     const calculateDurationInDays = (startDate, endDate) => {
         const start = new Date(startDate);
@@ -52,8 +63,13 @@ const EventDetail = () => {
     };
 
     const handleRegisterClick = () => {
-        if (selectedFormId) {
-            navigate(`/form/${selectedFormId}`);
+
+        if (event) {
+            const object = {
+                userId: event.organizerId,
+                formId: event.formId
+            }
+            navigate(`/form/${base64UrlEncode(JSON.stringify(object))}`);
         } else {
             console.error("No form selected for this event.");
         }
