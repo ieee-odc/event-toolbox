@@ -18,6 +18,7 @@ import SingleEventPage from "./modules/Events/pages/SingleEventPage";
 import SingleWorkshopPage from "./modules/Workshops/pages/SingleWorkshopPage";
 import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
+import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
 
 function App() {
   return (
@@ -81,7 +82,7 @@ function App() {
         <Route path="/form/:token" element={<RegistartionForm />} />
         <Route
           path="/cancel-registration/:token"
-          element={<RegistartionForm />}
+          element={<CancelRegistration />}
         />
 
         <Route
