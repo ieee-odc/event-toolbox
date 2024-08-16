@@ -46,7 +46,6 @@ function EventModal() {
 
     return true;
   };
-
   const handleAddEvent = async (photoURL = null) => {
     try {
       if (!validateFields()) {
@@ -55,9 +54,10 @@ function EventModal() {
 
       const response = await axiosRequest.post("/events/add", {
         ...selectedEvent,
-        coverPhoto: photoURL, // Save photo URL in the event data
+        coverPhoto: photoURL,
         organizerId: userData.id,
-        price: selectedEvent.status === "free" ? 0 : selectedEvent.price,
+        status: selectedEvent.status || "free",
+        price: selectedEvent.status === "free" ? 0 : selectedEvent.price || 0,
       });
 
       dispatch(addEvent(response.data));
@@ -76,7 +76,8 @@ function EventModal() {
         organizerId: userData.id,
         coverPhoto: photoURL, // Save photo URL in the event data
         ...selectedEvent,
-        price: selectedEvent.status === "free" ? 0 : selectedEvent.price,
+        status: selectedEvent.status || "free",
+        price: selectedEvent.status === "free" ? 0 : selectedEvent.price || 0,
       });
 
       dispatch(editEvent(response.data.event));
@@ -87,6 +88,7 @@ function EventModal() {
   };
 
   const handleSubmit = () => {
+
     if (isFormComplete) {
       if (coverPhoto) {
         handleImageUpload();
@@ -104,10 +106,19 @@ function EventModal() {
     const value = e.target.value;
     setPriceEnabled(value === "paid");
     dispatch(updateSelectedEventField({ id: "status", value }));
+    console.log("daz")
+    console.log(value)
     if (value === "free") {
-      dispatch(updateSelectedEventField({ id: "price", value: "Free" }));
+      dispatch(updateSelectedEventField({ id: "price", value: null }));
     }
   };
+  useEffect(() => {
+    if (isEdit && selectedEvent.status === "paid") {
+      setPriceEnabled(true);
+    } else {
+      setPriceEnabled(false);
+    }
+  }, [isEdit, selectedEvent.status]);
   const handleInputChange = (e) => {
     const payload = e.target;
     dispatch(
@@ -316,7 +327,7 @@ function EventModal() {
                     Status
                   </label>
                   <select
-                    id="price"
+                    id="status"
                     className="select2 form-select form-select-md select2-hidden-accessible"
                     data-allow-clear="true"
                     data-select2-id="select2Basic"
@@ -336,12 +347,12 @@ function EventModal() {
                     Price (TND)
                   </label>
                   <input
-                    value={priceEnabled ? selectedEvent.price : "free"}
+                    value={priceEnabled || isEdit ? selectedEvent.price : null}
                     onChange={handleInputChange}
                     type="number"
                     id="price"
                     className="form-control"
-                    disabled={!priceEnabled}
+                    disabled={!priceEnabled || selectedEvent.status === "free"}
                     placeholder="Enter Price"
                   />
                 </div>

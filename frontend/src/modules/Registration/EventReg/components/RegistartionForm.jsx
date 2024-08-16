@@ -107,38 +107,28 @@ const RegistrationForm = () => {
   const checkWorkshopAndFetchFormData = async () => {
     dispatch(fetchFormData(tokenData.formId));
     try {
-      console.log("Form Details:", formData);
       if (formData.workshopId) {
         const workshopResponse = await axiosRequest.get(`/workshop/${formData.workshopId}`);
         const workshopDetails = workshopResponse.data.workshop;
-        console.log("Workshop Details:", workshopDetails);
-
         if (workshopDetails.status === 'free') {
-          return true; // Proceed if the workshop is open
-        } else {
-          console.log("eventid", formData.eventId)
-          const eventResponse = await axiosRequest.get(`/events/${formData.eventId}`);
-          const eventDetails = eventResponse.data.event;
-          console.log("Event Details:", eventDetails);
+          return true;
+        }
 
-          if (eventDetails.status === 'paid') {
-            const hasPaid = await checkPaymentStatus(email);
-            console.log("Has Paid:", hasPaid);
-            if (!hasPaid) {
-              return false;
-            }
-          }
-
-          const emailIsAllowed = eventDetails.allowedList.some((e) => e === email);
-          console.log("Email is Allowed:", emailIsAllowed);
-          console.log("allowed list", eventDetails.allowedList)
-          if (!emailIsAllowed) {
-            toast.error("Email is not allowed for this event.");
+        const eventResponse = await axiosRequest.get(`/events/${formData.eventId}`);
+        const eventDetails = eventResponse.data.event;
+        if (eventDetails.status === 'paid') {
+          const hasPaid = await checkPaymentStatus(email);
+          if (!hasPaid) {
             return false;
           }
         }
+        const emailIsAllowed = eventDetails.allowedList.some((e) => e === email);
+        if (!emailIsAllowed) {
+          toast.error("Email is not allowed for this event.");
+          return false;
+        }
       }
-      return true; // Proceed if all checks pass
+      return true;
     } catch (error) {
       console.error("Error fetching form or workshop data:", error);
       toast.error("Error fetching form or workshop data.");
@@ -149,20 +139,18 @@ const RegistrationForm = () => {
     try {
       const response = await axiosRequest.get(`/participant/get-event/ ${eventId}`);
       const data = response.data.participants;
-      console.log("data", data)
       const participant = data.find((p) => p.email === email);
-      console.log(email)
-      if (participant) {
-        console.log("Participantttttttttt", participant)
-        if (participant.status !== "Paid") {
-          toast.error("You must complete the payment to register for this session.");
-          return false;
-        } else {
-          return true;
-        }
-      } else {
+      if (!participant) {
         console.error("Participant not found")
+        return false;
       }
+
+      if (participant.status !== "Paid") {
+        toast.error("You must complete the payment to register for this session.");
+        return false;
+      }
+      return true;
+
     } catch (error) {
       console.error("Error fetching participants: ", error);
       return false;
