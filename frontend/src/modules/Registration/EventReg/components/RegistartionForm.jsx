@@ -38,12 +38,13 @@ const RegistrationForm = () => {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [tokenData, setTokenData] = useState();
   const [fileError, setFileError] = useState("");
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   const [validated, setValidated] = useState(false);
+  const decodedToken = base64UrlDecode(token);
+  const [tokenData, setTokenData] = useState();
   useEffect(() => {
     try {
       setTokenData(JSON.parse(decodedToken));
@@ -51,7 +52,6 @@ const RegistrationForm = () => {
       console.error("Invalid token format", error);
     }
   }, [token]);
-  const decodedToken = base64UrlDecode(token);
 
   useEffect(() => {
     if (!tokenData) {
@@ -701,5 +701,7 @@ const RegistrationForm = () => {
   );
 
 };
+
+
 
 export default RegistrationForm;

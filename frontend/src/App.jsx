@@ -18,6 +18,7 @@ import SingleEventPage from "./modules/Events/pages/SingleEventPage";
 import SingleWorkshopPage from "./modules/Workshops/pages/SingleWorkshopPage";
 import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
+import EventDetail from "./modules/Events/components/EventDetailsQR"
 import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
+        <Route path="/events/details/:token" element={<EventDetail />} />
 
         <Route
           path="/participants"
