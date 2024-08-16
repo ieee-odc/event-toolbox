@@ -40,6 +40,10 @@ function EventsList() {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const handleQRCodeClick = (event) => {
+    if (!event.formId) {
+      toast.error("Event does not have a form ID. Please create a form first.");
+      return;
+    }
     setSelectedEvent(event);
     setShowQRModal(true);
   };
@@ -261,7 +265,7 @@ function EventsList() {
                               alignItems: "center",
                               position: "absolute",
                               top: 15,
-                              right: 85,
+                              right: 40,
                             }}
                           >
                             <i
@@ -431,7 +435,7 @@ function EventsList() {
               <p>This QR code is for event: {selectedEvent?.name}</p>
             </div>
           </Modal.Body>
-          <Modal.Footer>
+          <Modal.Footer style={{ display: "flex", gap: 10 }}>
             <Button variant="secondary" onClick={() => setShowQRModal(false)}>
               Close
             </Button>
