@@ -72,9 +72,34 @@ jobs:
   #         name: dependency-check-report
   #         path: ./frontend/dependency-check-report.json
 
+  depchecktest:
+    runs-on: ubuntu-latest
+    name: depecheck_test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build project with node
+        run: cd ./frontend && npm install && npm run build
+      - name: Depcheck
+        uses: dependency-check/Dependency-Check_Action@main
+        id: Depcheck
+        with:
+          project: 'test'
+          path: './frontend'
+          format: 'HTML'
+          out: 'reports' # this is the default, no need to specify unless you wish to override it
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+      - name: Upload Test results
+        uses: actions/upload-artifact@master
+        with:
+           name: Depcheck report
+           path: ${{github.workspace}}/reports
 
   sonar-checks:
     name: quality gate
+    needs: test
     runs-on: ubuntu-latest
     
     steps:
