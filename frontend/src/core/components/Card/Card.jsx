@@ -24,6 +24,7 @@ const Card = ({
   personCapacity,
   progress,
   workshop,
+  status
 }) => {
   const { eventId } = useParams();
   const dropdownRef = useRef(null);
@@ -120,7 +121,6 @@ const Card = ({
                     Edit
                   </a>
                   <a className="dropdown-item">Duplicate</a>
-                  <div className="dropdown-divider" />
                   <a
                     onClick={() => {
                       handleDeleteWorkshop(workshop.id);
@@ -171,8 +171,15 @@ const Card = ({
               Ends: &nbsp;
               <span className="text-body fw-normal">
                 {" "}
-                {formatTime(workshop.startTime)}{" "}
-                {formatDateWithNumbers(workshop.startTime)}{" "}
+                {formatTime(workshop.endTime)}{" "}
+                {formatDateWithNumbers(workshop.endTime)}{" "}
+              </span>
+            </h6>
+            <h6 className="mb-1">
+              Status: &nbsp;
+              <span className="text-body fw-normal">
+                {" "}
+                {workshop.status === "exclusive" ? "Exclusive" : "Open for all"}
               </span>
             </h6>
           </div>

@@ -22,11 +22,12 @@ function WorkshopModal() {
     (state) => state.workshopsStore
   );
   const { spaces } = useSelector((state) => state.spacesStore);
-  const flatpickrRef = useRef();
-
+  const flatpickrRefStart = useRef(null);
+  const flatpickrRefEnd = useRef(null);
+  const flatpickrRefDate = useRef(null);
+  const [selectedSpace, setSelectedSpace] = useState();
   const dispatch = useDispatch();
   const userData = UserData();
-
   const [capacityMessage, setCapacityMessage] = useState("");
   const [isFormComplete, setIsFormComplete] = useState(false);
   const modalRef = useRef(null);
@@ -41,17 +42,27 @@ function WorkshopModal() {
   }, [spaces]);
 
   useEffect(() => {
-    if (
-      selectedWorkshop.numberOfAttendees >
-      spaces.find((space) => space.id == selectedWorkshop.spaceId)?.capacity
-    ) {
-      setCapacityMessage(
-        "The selected space does not have enough capacity for the numberOfAttendees."
+    if (selectedWorkshop.spaceId) {
+      setSelectedSpace(
+        spaces.find((space) => space.id == selectedWorkshop.spaceId)
       );
-    } else {
-      setCapacityMessage("The selected space has enough capacity.");
     }
-  }, [selectedWorkshop.space, selectedWorkshop.numberOfAttendees]);
+  }, [selectedWorkshop.spaceId]);
+  const prevAttendeesRef = useRef(selectedWorkshop.numberOfAttendees);
+  useEffect(() => {
+    if (prevAttendeesRef.current !== selectedWorkshop.numberOfAttendees && selectedWorkshop.numberOfAttendees !== "") {
+      if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
+        setCapacityMessage(
+          "The selected space does not have enough capacity for the attendees."
+        );
+      } else {
+        setCapacityMessage("The selected space has enough capacity.");
+      }
+    } else {
+      setCapacityMessage("");
+    }
+    prevAttendeesRef.current = selectedWorkshop.numberOfAttendees;
+  }, [selectedWorkshop.numberOfAttendees, selectedSpace]);
 
   useEffect(() => {
     const allFieldsFilled =
@@ -62,9 +73,7 @@ function WorkshopModal() {
       selectedWorkshop.startTime &&
       selectedWorkshop.endTime &&
       selectedWorkshop.numberOfAttendees > 0 &&
-      selectedWorkshop.spaceId &&
-      selectedWorkshop.numberOfAttendees <= selectedWorkshop.space.capacity;
-
+      selectedWorkshop.spaceId
     setIsFormComplete(allFieldsFilled);
   }, [
     selectedWorkshop.name,
@@ -77,20 +86,30 @@ function WorkshopModal() {
     selectedWorkshop.space,
   ]);
 
-  const handleAddWorkshop = () => {
-    if (selectedWorkshop.numberOfAttendees > selectedWorkshop.space.capacity) {
-      toast.error("Number of numberOfAttendees exceeds the space capacity.");
+  const handleWorkshop = () => {
+    if (selectedWorkshop.numberOfAttendees > selectedSpace?.capacity) {
+      toast.error("Number of attendees exceeds the space capacity.");
       return;
     }
+
     const startDate = new Date(selectedWorkshop.date);
-    const [startHours, startMinutes] = selectedWorkshop.startTime.split(":");
+    const [startHours, startMinutes] = selectedWorkshop.startTime
+      .split("T")[1]
+      .split(":");
     startDate.setHours(parseInt(startHours, 10));
     startDate.setMinutes(parseInt(startMinutes, 10));
 
     const endDate = new Date(selectedWorkshop.date);
-    const [endHours, endMinutes] = selectedWorkshop.endTime.split(":");
+    const [endHours, endMinutes] = selectedWorkshop.endTime
+      .split("T")[1]
+      .split(":");
     endDate.setHours(parseInt(endHours, 10));
     endDate.setMinutes(parseInt(endMinutes, 10));
+
+    if (startDate >= endDate) {
+      toast.error("Start time must be before end time.");
+      return;
+    }
 
     const reqBody = {
       organizerId: userData.id,
@@ -101,55 +120,28 @@ function WorkshopModal() {
       spaceId: selectedWorkshop.spaceId,
       eventId,
       numberOfAttendees: selectedWorkshop.numberOfAttendees,
-    };
-    axiosRequest
-      .post("/workshop/add", reqBody)
-      .then((res) => {
-        toast.success("Successfully created!");
-        dispatch(toggleWorkshopModal());
-        dispatch(addWorkshop(res.data.workshop));
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Failed to add workshop");
-      });
-  };
-
-  const handleEditWorkshop = () => {
-    if (selectedWorkshop.numberOfAttendees > selectedWorkshop.space.capacity) {
-      toast.error("Number of numberOfAttendees exceeds the space capacity.");
-      return;
-    }
-    const startDate = new Date(selectedWorkshop.date);
-    const [startHours, startMinutes] = selectedWorkshop.startTime.split(":");
-    startDate.setHours(parseInt(startHours, 10));
-    startDate.setMinutes(parseInt(startMinutes, 10));
-
-    const endDate = new Date(selectedWorkshop.date);
-    const [endHours, endMinutes] = selectedWorkshop.endTime.split(":");
-    endDate.setHours(parseInt(endHours, 10));
-    endDate.setMinutes(parseInt(endMinutes, 10));
-
-    const reqBody = {
-      organizerId: userData.id,
-      name: selectedWorkshop.name,
-      description: selectedWorkshop.description,
-      startTime: startDate.toISOString(),
-      endTime: endDate.toISOString(),
-      spaceId: selectedWorkshop.spaceId,
-      eventId,
-      numberOfAttendees: selectedWorkshop.numberOfAttendees,
+      status: selectedWorkshop.status,
     };
 
+    const url = isEdit
+      ? `/workshop/edit/${selectedWorkshop.id}`
+      : "/workshop/add";
+
     axiosRequest
-      .post(`/workshop/edit/${selectedWorkshop.id}`, reqBody)
+      .post(url, reqBody)
       .then((res) => {
-        toast.success("Successfully Edited!");
+        toast.success(
+          `Workshop Successfully ${isEdit ? "edited" : "created"}!`
+        );
         dispatch(toggleWorkshopModal());
-        dispatch(editWorkshop(res.data.workshop));
+        if (isEdit) {
+          dispatch(editWorkshop(res.data.workshop));
+        } else {
+          dispatch(addWorkshop(res.data.workshop));
+        }
       })
       .catch((err) => {
-        toast.error("Failed to edit workshop");
+        toast.error(`Failed to ${isEdit ? "edit" : "add"} workshop`);
       });
   };
 
@@ -158,20 +150,34 @@ function WorkshopModal() {
     dispatch(updateSelectedWorkshopField({ id, value }));
   };
 
+  const handleStatusChange = (e) => {
+    const value = e.target.value;
+    dispatch(updateSelectedWorkshopField({ id: "status", value }));
+  };
   const handleClickOutside = (event) => {
-    const flatpickrNode = flatpickrRef.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeStart =
+      flatpickrRefStart.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeEnd =
+      flatpickrRefEnd.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeDate =
+      flatpickrRefDate.current?.flatpickr?.calendarContainer;
     if (
       modalRef.current &&
       !modalRef.current.contains(event.target) &&
-      flatpickrNode &&
-      !flatpickrNode.contains(event.target)
+      flatpickrNodeStart &&
+      !flatpickrNodeStart.contains(event.target) &&
+      flatpickrNodeEnd &&
+      !flatpickrNodeEnd.contains(event.target) &&
+      flatpickrNodeDate &&
+      !flatpickrNodeDate.contains(event.target)
     ) {
-      dispatch(toggleFormModal());
+      dispatch(toggleWorkshopModal());
       if (isEdit) {
-        dispatch(resetFormModal());
+        dispatch(toggleWorkshopModal());
       }
     }
   };
+
 
   useEffect(() => {
     if (isModalOpen) {
@@ -206,7 +212,7 @@ function WorkshopModal() {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="modalCenterTitle">
-                  {isEdit ? "Edit" : "Add"} Workshop
+                  {isEdit ? "Edit" : "Add"} Session
                 </h5>
                 <button
                   type="button"
@@ -215,9 +221,7 @@ function WorkshopModal() {
                   aria-label="Close"
                   onClick={() => {
                     dispatch(toggleWorkshopModal());
-                    if (isEdit) {
-                      dispatch(resetWorkshopModal());
-                    }
+                    dispatch(resetWorkshopModal());
                   }}
                 />
               </div>
@@ -260,7 +264,7 @@ function WorkshopModal() {
                     </div>
                   </div>
                 </div>
-                <div className="row">
+                <div className="grid-container-1">
                   <div className="col mb-3">
                     <label htmlFor="emailWithTitle" className="form-label">
                       Space
@@ -290,17 +294,17 @@ function WorkshopModal() {
                       type="text"
                       id="spaceCapacity"
                       className="form-control"
-                      value={
-                        spaces.find(
-                          (space) => space.id == selectedWorkshop.spaceId
-                        )?.capacity
-                      }
+                      value={selectedSpace?.capacity}
+
+                      style={{
+                        cursor: 'not-allowed',
+                      }}
                       readOnly
                     />
                   </div>
                 </div>
-                <div className="row">
-                  <div className="col mb-3">
+                <div className="grid-container-2">
+                  <div className="col mb-2">
                     <label htmlFor="numberOfAttendees" className="form-label">
                       Number of Attendees
                     </label>
@@ -314,19 +318,41 @@ function WorkshopModal() {
                     />
                     {capacityMessage && (
                       <p
-                        className={`mt-2 ${
-                          selectedWorkshop.numberOfAttendees >
-                          selectedWorkshop.space?.capacity
-                            ? "text-danger"
-                            : "text-success"
-                        }`}
+                        className={`mt-2 ${selectedWorkshop.numberOfAttendees >
+                          selectedSpace?.capacity
+                          ? "text-danger"
+                          : "text-success"
+                          }`}
                       >
                         {capacityMessage}
                       </p>
                     )}
                   </div>
+                  <div className="col mb-3">
+                    <label htmlFor="emailWithTitle" className="form-label">
+                      Status
+                    </label>
+                    <select
+                      id="price"
+                      className="select2 form-select form-select-md select2-hidden-accessible"
+                      data-allow-clear="true"
+                      data-select2-id="select2Basic"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      value={selectedWorkshop.status}
+                      onChange={handleStatusChange}
+                    >
+                      <option value="open">Open for All</option>
+                      <option value="exclusive">Exclusive</option>
+
+                    </select>
+                  </div>
                 </div>
-                <div className="row mb-3 g-2">
+                <div className="row">
+
+
+                </div>
+                <div className="grid-container-2 mb-3">
                   <div className="col mb-0">
                     <label htmlFor="start-time" className="form-label">
                       Start Time
@@ -334,6 +360,7 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"startTime"}
                       value={selectedWorkshop.startTime}
+                      ref={flatpickrRefStart}
                       onChange={(time) => {
                         const myType = time[0].toISOString();
                         dispatch(
@@ -359,6 +386,7 @@ function WorkshopModal() {
                     <Flatpickr
                       id={"endTime"}
                       value={selectedWorkshop.endTime}
+                      ref={flatpickrRefEnd}
                       onChange={(time) => {
                         const myType = time[0].toISOString();
 
@@ -389,7 +417,8 @@ function WorkshopModal() {
                     </label>
                     <Flatpickr
                       id={"date"}
-                      value={selectedWorkshop.date}
+                      ref={flatpickrRefDate}
+                      value={selectedWorkshop.date || new Date()}
                       onChange={(date) => {
                         const myDate = date[0].toISOString();
                         dispatch(
@@ -420,10 +449,10 @@ function WorkshopModal() {
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={isEdit ? handleEditWorkshop : handleAddWorkshop}
+                  onClick={handleWorkshop}
                   disabled={!isFormComplete}
                 >
-                  {isEdit ? "Save Changes" : "Create Workshop"}
+                  {isEdit ? "Save Changes" : "Create Session"}
                 </button>
               </div>
             </div>

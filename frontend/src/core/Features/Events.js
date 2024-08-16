@@ -17,6 +17,8 @@ const EventsSlice = createSlice({
       location: "",
       startDate: "",
       endDate: "",
+      formId: null,
+      status: "free",
     },
   },
   reducers: {
@@ -91,6 +93,9 @@ const EventsSlice = createSlice({
         location: "",
         startDate: "",
         endDate: "",
+        price: "",
+        status: "free",
+        coverPhoto: ""
       };
     },
     changeFormState: (state, action) => {

@@ -16,7 +16,10 @@ import Spaces from "./modules/Space/page/Spaces";
 import Forms from "./modules/Form/pages/Forms";
 import SingleEventPage from "./modules/Events/pages/SingleEventPage";
 import SingleWorkshopPage from "./modules/Workshops/pages/SingleWorkshopPage";
+import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
+import EventDetail from "./modules/Events/components/EventDetailsQR"
+import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
 
 function App() {
   return (
@@ -28,20 +31,75 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
+        <Route path="/events/details/:token" element={<EventDetail />} />
 
-        <Route path="/participants" element={<PrivateRoute><Participants /></PrivateRoute>} />
-        <Route path="/workshops" element={<PrivateRoute><Workshops /></PrivateRoute>} />
-        <Route path="/events" element={<PrivateRoute><EventsPage /></PrivateRoute>} />
-        <Route path="/event/:eventId" element={<PrivateRoute><SingleEventPage /></PrivateRoute>} />
-        <Route path="/spaces" element={<PrivateRoute><Spaces /></PrivateRoute>} />
-        <Route path="/forms" element={<PrivateRoute><Forms /></PrivateRoute>} />
+        <Route
+          path="/participants"
+          element={
+            <PrivateRoute>
+              <Participants />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workshops"
+          element={
+            <PrivateRoute>
+              <Workshops />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <PrivateRoute>
+              <EventsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/event/:eventId"
+          element={
+            <PrivateRoute>
+              <SingleEventPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/spaces"
+          element={
+            <PrivateRoute>
+              <Spaces />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms"
+          element={
+            <PrivateRoute>
+              <Forms />
+            </PrivateRoute>
+          }
+        />
         <Route path="/form/:token" element={<RegistartionForm />} />
+        <Route
+          path="/cancel-registration/:token"
+          element={<CancelRegistration />}
+        />
 
         <Route
           path="/event/:eventId/workshop/:workshopId"
           element={
             <PrivateRoute>
               <SingleWorkshopPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
             </PrivateRoute>
           }
         />

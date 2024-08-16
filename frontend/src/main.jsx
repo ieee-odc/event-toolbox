@@ -10,6 +10,8 @@ import spacesStore from "./core/Features/Spaces.js";
 import formsStore from "./core/Features/Forms.js";
 import participantsStore from "./core/Features/Participants.js";
 import registrationStore from "./core/Features/Registration.js";
+import statsStore from "./core/Features/Stats.js";
+import notificationStore from "./core/Features/Notifications.js";
 
 import { Provider } from "react-redux";
 const store = configureStore({
@@ -20,6 +22,8 @@ const store = configureStore({
     formsStore: formsStore,
     participantsStore: participantsStore,
     registrationStore: registrationStore,
+    statsStore: statsStore,
+    notificationStore: notificationStore
   },
 });
 

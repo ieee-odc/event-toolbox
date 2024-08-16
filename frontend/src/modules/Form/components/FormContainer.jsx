@@ -14,12 +14,15 @@ import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
 import { initializeWorkshops } from "../../../core/Features/Workshops";
 import CustomButton from "../../../core/components/Button/Button";
+import { Spinner } from "react-bootstrap";
+import { initializeEvents, updateSelectedEventField } from "../../../core/Features/Events";
 
 function FormContainer() {
   const dispatch = useDispatch();
   const userData = UserData();
-  const { filteredForms } = useSelector((store) => store.formsStore);
+  const { filteredForms, isLoading } = useSelector((store) => store.formsStore);
   const { workshops } = useSelector((store) => store.workshopsStore);
+  const { selectedEvent, events } = useSelector((store) => store.eventsStore);
   function formatDate(originalDate) {
     const date = new Date(originalDate);
 
@@ -57,6 +60,20 @@ function FormContainer() {
       dispatch(deleteForm(formId));
       toast.success("Form deleted successfully");
     });
+  };
+  const handleRadioChange = (form) => {
+    axiosRequest
+      .post(`/events/select-form`, {
+        eventId: form.eventId,
+        formId: form.id,
+      })
+      .then(() => {
+        dispatch(updateSelectedEventField({ id: "formId", value: form.id }));
+        toast.success(`Selected ${form.name} form`);
+      })
+      .catch((error) => {
+        console.error("Error updating form or event:", error);
+      });
   };
 
   const handleEditClick = (form) => {
@@ -134,14 +151,14 @@ function FormContainer() {
         </div>
       </div>
       <div className="card">
-        <div className="container-fluid mt-4">
+        <div className="container-fluid">
           <div
-            className="mb-4"
-            style={{ display: "flex", justifyContent: "end" }}
+            className="card-header border-0 d-flex justify-content-end"
+            style={{ alignItems: "center" }}
           >
             <CustomButton
               text="Create Form"
-              iconClass="bx bx-plus me-md-1 mb-2"
+              iconClass="bx bx-plus me-md-1 mrt-1 mrt-1"
               backgroundColor="var(--primary-color)"
               textColor="white"
               hoverBackgroundColor="#0F205D"
@@ -152,95 +169,116 @@ function FormContainer() {
               }}
             />
           </div>
-          <div className="table-responsive">
-            <table className="table table-striped">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th>Deadline</th>
-                  <th>Workshop</th>
-                  <th style={{ textAlign: "right" }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredForms &&
-                  filteredForms.map((form) => {
-                    const relatedWorkshop = form.workshopId
-                      ? workshops.find(
+          {isLoading ? (
+            <div
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                display: "flex",
+              }}
+            >
+              <Spinner />
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th>Deadline</th>
+                    <th>Session</th>
+                    <th style={{ textAlign: "right" }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredForms &&
+                    filteredForms.map((form) => {
+                      const relatedWorkshop = form.workshopId
+                        ? workshops.find(
                           (workshop) => workshop.id === form.workshopId
                         )
-                      : null;
-                    return (
-                      <tr key={form.id}>
-                        <td>
-                          <a href="">{form.name}</a>
-                        </td>
-                        <td>
-                          <a href="">{formatDate(form.deadline)}</a>
-                        </td>
-                        <td>{relatedWorkshop ? relatedWorkshop.name : ""}</td>
-                        <td style={{ textAlign: "right" }}>
-                          <button
-                            className="btn btn-link p-0"
-                            onClick={() => handleEditClick(form)}
+                        : null;
+                      return (
+                        <tr key={form.id}>
+                          <td style={{ cursor: "pointer" }}>
+                            <input
+                              type="radio"
+                              name="selectedForm"
+                              value={form.id}
+                              checked={selectedEvent.formId === form.id}
+                              onChange={() => handleRadioChange(form)}
+                            />
+                          </td>
+                          <td
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleRadioChange(form)}
                           >
-                            <i
-                              className={`bx bx-edit-alt bx-sm ${
-                                hoveredIcon === `edit_${form._id}`
+                            <a href="#">{form.name}</a>
+                          </td>
+                          <td>
+                            <a href="">{formatDate(form.deadline)}</a>
+                          </td>
+                          <td>{relatedWorkshop ? relatedWorkshop.name : ""}</td>
+                          <td style={{ textAlign: "right" }}>
+                            <button
+                              className="btn btn-link p-0"
+                              onClick={() => handleEditClick(form)}
+                            >
+                              <i
+                                className={`bx bx-edit-alt bx-sm ${hoveredIcon === `edit_${form._id}`
                                   ? "transform"
                                   : ""
-                              }`}
-                              onMouseEnter={() =>
-                                handleMouseEnter(`edit_${form._id}`)
-                              }
-                              onMouseLeave={handleMouseLeave}
-                            ></i>
-                          </button>
-                          <button
-                            className="btn btn-link p-0"
-                            onClick={() => handleDeleteForm(form.id)}
-                          >
-                            <i
-                              className={`bx bx-trash bx-sm ${
-                                hoveredIcon === `delete_${form._id}`
+                                  }`}
+                                onMouseEnter={() =>
+                                  handleMouseEnter(`edit_${form._id}`)
+                                }
+                                onMouseLeave={handleMouseLeave}
+                              ></i>
+                            </button>
+                            <button
+                              className="btn btn-link p-0"
+                              onClick={() => handleDeleteForm(form.id)}
+                            >
+                              <i
+                                className={`bx bx-trash bx-sm ${hoveredIcon === `delete_${form._id}`
                                   ? "transform"
                                   : ""
-                              }`}
-                              onMouseEnter={() =>
-                                handleMouseEnter(`delete_${form._id}`)
-                              }
-                              onMouseLeave={handleMouseLeave}
-                            ></i>
-                          </button>
-                          <button className="btn btn-link p-0">
-                            <i
-                              className={`bx bx-share bx-sm ${
-                                hoveredIcon === `share_${form._id}`
+                                  }`}
+                                onMouseEnter={() =>
+                                  handleMouseEnter(`delete_${form._id}`)
+                                }
+                                onMouseLeave={handleMouseLeave}
+                              ></i>
+                            </button>
+                            <button className="btn btn-link p-0">
+                              <i
+                                className={`bx bx-share bx-sm ${hoveredIcon === `share_${form._id}`
                                   ? "transform"
                                   : ""
-                              }`}
-                              onMouseEnter={() =>
-                                handleMouseEnter(`share_${form._id}`)
-                              }
-                              onMouseLeave={handleMouseLeave}
-                              onClick={() => handleShareClick(form.id)}
-                            ></i>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                                  }`}
+                                onMouseEnter={() =>
+                                  handleMouseEnter(`share_${form._id}`)
+                                }
+                                onMouseLeave={handleMouseLeave}
+                                onClick={() => handleShareClick(form.id)}
+                              ></i>
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
 
-                {filteredForms && filteredForms.length === 0 && (
-                  <tr>
-                    <td colSpan="4" style={{ textAlign: "center" }}>
-                      <span>There is no data currently</span>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  {filteredForms && filteredForms.length === 0 && (
+                    <tr>
+                      <td colSpan="4" style={{ textAlign: "center" }}>
+                        <span>There is no data currently</span>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
           <FormModal />
           {isShareModalOpen && (
             <ShareLinkModal

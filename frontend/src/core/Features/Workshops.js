@@ -62,6 +62,7 @@ const WorkshopsSlice = createSlice({
       const { id, value } = action.payload;
       state.selectedWorkshop[id] = value;
     },
+
     resetWorkshopModal: (state) => {
       state.isEdit = false;
       const newSelectedSpace = {
@@ -70,8 +71,11 @@ const WorkshopsSlice = createSlice({
         description: "",
         startTime: "",
         endTime: "",
+        date: null,
         organizerId: "",
         numberOfAttendees: null,
+        price: "",
+        status: "free",
       };
       state.selectedWorkshop = newSelectedSpace;
     },
@@ -80,6 +84,9 @@ const WorkshopsSlice = createSlice({
     },
     toggleWorkshopsIsLoading: (state) => {
       state.isLoading = !state.isLoading;
+    },
+    setIsWorkshopLoading: (state, action) => {
+      state.isLoading = action.payload;
     },
   },
 });
@@ -97,5 +104,6 @@ export const {
   setWorkshopsPerPage,
   toggleWorkshopsIsLoading,
   isLoading,
+  setIsWorkshopLoading,
 } = WorkshopsSlice.actions;
 export default WorkshopsSlice.reducer;
