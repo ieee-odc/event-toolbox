@@ -381,7 +381,7 @@ function EventsList() {
                                   "Are you sure you want to delete this event?"
                                 )
                               ) {
-                                handleDeleteEvent(event._id);
+                                handleDeleteEvent(event.id);
                               }
 
                             }}
