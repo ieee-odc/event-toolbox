@@ -27,6 +27,31 @@ function SpaceModal() {
   const modalClassName = isModalOpen ? "modal fade show" : "modal fade";
   const userData = UserData();
   const modalRef = useRef(null);
+  const [roomSelections, setRoomSelections] = useState([]);
+
+  const availableRoomTypes = (currentType) => {
+    return ["Double", "Triple", "Quadruple", "Other"].filter(
+      (type) => !roomSelections.some((selection) => selection.type === type) || type === currentType
+    );
+  };
+  const handleRoomTypeChange = (index, field, value) => {
+    const updatedSelections = roomSelections.map((selection, i) =>
+      i === index ? { ...selection, [field]: value } : selection
+    );
+
+    setRoomSelections(updatedSelections);
+
+    dispatch(
+      updateSelectedSpaceField({ id: 'roomSelections', value: updatedSelections })
+    );
+  };
+  const addRoomSelection = () => {
+    setRoomSelections([...roomSelections, { type: "", capacity: "" }]);
+  };
+  const removeRoomSelection = (index) => {
+    const updatedSelections = roomSelections.filter((_, i) => i !== index);
+    setRoomSelections(updatedSelections);
+  };
 
   const handleDelete = async () => {
     try {
@@ -43,7 +68,7 @@ function SpaceModal() {
         dispatch(toggleSpaceModal());
         toast.success("Space deleted successfully");
       });
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const handleInputChange = (e) => {
@@ -173,10 +198,51 @@ function SpaceModal() {
                   id="capacity"
                   className="form-control"
                   placeholder="Enter Capacity"
-                  value={selectedSpace.capacity}
-                  onChange={handleInputChange}
-                  required
+                  value={roomSelections.reduce((sum, selection) => sum + Number(selection.capacity || 0), 0)}
+                  disabled
+                  readOnly onChange={handleInputChange}
                 />
+              </div>
+              <div className="mb-3">
+                {roomSelections.map((selection, index) => (
+                  <div key={index} className="d-flex align-items-center mb-3">
+                    <select
+                      className="form-control me-2"
+                      value={selection.type}
+                      onChange={(e) => handleRoomTypeChange(index, "type", e.target.value)}
+                      required
+                    >
+                      <option value="">Select Room Type</option>
+                      {availableRoomTypes(selection.type).map((type) => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="number"
+                      className="form-control me-2"
+                      placeholder="Number Of Rooms"
+                      value={selection.capacity || ""}
+                      onChange={(e) => handleRoomTypeChange(index, "capacity", e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-danger"
+                      onClick={() => removeRoomSelection(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                {availableRoomTypes("").length > 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={addRoomSelection}
+                  >
+                    Add Another Room Type
+                  </button>
+                )}
               </div>
             </div>
             <div className="modal-footer">
