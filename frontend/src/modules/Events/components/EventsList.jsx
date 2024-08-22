@@ -120,7 +120,6 @@ function EventsList() {
           `/events/get-organizer/${userData.id}`
         );
         dispatch(initializeEvents(response.data.events));
-
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -324,7 +323,6 @@ function EventsList() {
                                 {event.location}
                               </p>
                             </div>
-
                             <div className="d-flex align-items-center mb-1">
                               <i className="bx bx-time-five me-2"></i>
                               <b>
@@ -342,7 +340,10 @@ function EventsList() {
                               </p>
                             </div>
                             <div className="d-flex align-items-center mb-1 date-container">
-                              <i className="bx bx-calendar me-2 date-icon" style={{ fontSize: "13px" }}></i>
+                              <i
+                                className="bx bx-calendar me-2 date-icon"
+                                style={{ fontSize: "13px" }}
+                              ></i>
                               <b>
                                 <span className="text mb-0">Dates:</span>
                               </b>
@@ -355,7 +356,8 @@ function EventsList() {
                                   {formatDate(event.endDate)}
                                 </p>
                               </span>
-                            </div> <div className="d-flex align-items-center mb-1 date-container">
+                            </div>{" "}
+                            <div className="d-flex align-items-center mb-1 date-container">
                               <i className="bx bx-check me-2 date-icon"></i>
                               <b>
                                 <span className="text mb-0">Status:</span>
@@ -364,7 +366,6 @@ function EventsList() {
                                 <p className="mb-0 date">
                                   {event.status === "paid" ? "Paid" : "Free"}
                                 </p>
-
                               </span>
                             </div>
                           </div>
@@ -383,7 +384,6 @@ function EventsList() {
                               ) {
                                 handleDeleteEvent(event.id);
                               }
-
                             }}
                           >
                             <p className="mx-1">Delete</p>
@@ -440,8 +440,13 @@ function EventsList() {
           <Modal.Body>
             <div id="qr-gen" style={{ textAlign: "center" }}>
               <QRCode
-                value={`${window.location.origin}/events/details/${base64UrlEncode(
-                  JSON.stringify({ eventId: selectedEvent?.id, formId: selectedEvent?.formId })
+                value={`${
+                  window.location.origin
+                }/events/details/${base64UrlEncode(
+                  JSON.stringify({
+                    eventId: selectedEvent?.id,
+                    formId: selectedEvent?.formId,
+                  })
                 )}`}
               />
 

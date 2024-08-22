@@ -94,9 +94,7 @@ const NotificationIcon = () => {
   };
 
   const handleIconClick = () => {
-    console.log('Before toggle:', showNotifications);
     dispatch(toggleShowNotifications());
-    console.log('After toggle:', showNotifications);
   };
 
   const handleMarkAllAsRead = async () => {
@@ -146,12 +144,14 @@ const NotificationIcon = () => {
               <div className="dropdown-item">No notifications available</div>
             ) : (
               notifications &&
-              [...notifications].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+              [...notifications]
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((notification) => (
                   <div
                     key={notification._id}
-                    className={`dropdown-item ${!notification.read ? "unread" : ""
-                      }`}
+                    className={`dropdown-item ${
+                      !notification.read ? "unread" : ""
+                    }`}
                   >
                     <div className="item-icon">
                       {notification.type === "EventRegistration" && (
