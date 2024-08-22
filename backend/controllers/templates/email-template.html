@@ -58,6 +58,12 @@
       .button-manage {
         background-color: #e74c3c;
       }
+      a {
+        color: white;
+      }
+      .ii a[href] {
+        color: white;
+      }
     </style>
   </head>
   <body>
@@ -78,12 +84,12 @@
         <p>Location: [eventLocation]</p>
         <p>Start Date: [eventStartDate]</p>
         <p>End Date: [eventEndDate]</p>
+        <p>Check-in QR Code:</p>
+        <div>[QRCode]</div>
         <a href="http://localhost:5173/events" class="button button-view"
           >View Event</a
         >
-        <a
-          href="http://localhost:5173/cancel-registration/[cancelationToken]"
-          class="button button-manage"
+        <a href="[cancelationLink]" class="button button-manage"
           >Cancel Registration</a
         >
       </div>
