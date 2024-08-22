@@ -1,7 +1,10 @@
-import React, { useEffect, useRef } from "react";
+// EventModal.js
+
+import React, { useEffect, useRef, useState } from "react";
 import "../Events.css";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import Flatpickr from "react-flatpickr";
 import {
   addEvent,
   changeFormState,
@@ -12,16 +15,23 @@ import {
 } from "../../../core/Features/Events";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "./../../../utils/UserData";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"; // Import Firebase storage
 
 function EventModal() {
   const dispatch = useDispatch();
   const userData = UserData();
   const modalRef = useRef(null);
 
+  const flatpickrRefStart = useRef(null);
+  const flatpickrRefEnd = useRef(null);
   const { isModalOpen, selectedEvent, isEdit } = useSelector(
     (state) => state.eventsStore
   );
+  const [coverPhoto, setCoverPhoto] = useState(null); // State for cover photo
+  const [photoPreview, setPhotoPreview] = useState(null); // State for photo preview
+
   const modalClassName = isModalOpen ? "modal fade show" : "modal fade";
+
   const validateFields = () => {
     const { name, description, location, startDate, endDate } = selectedEvent;
     if (!name || !description || !location || !startDate || !endDate) {
@@ -31,60 +41,50 @@ function EventModal() {
     return true;
   };
 
-  const handleAddEvent = async () => {
+  const handleAddEvent = async (photoURL = null) => {
     try {
       if (!validateFields()) {
         return;
       }
+
       const response = await axiosRequest.post("/events/add", {
         ...selectedEvent,
+        coverPhoto: photoURL, // Save photo URL in the event data
         organizerId: userData.id,
       });
+
       dispatch(addEvent(response.data));
       dispatch(toggleEventModal());
-      dispatch(
-        updateSelectedEventField({
-          organizerId: userData.id,
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        })
-      );
+      dispatch(resetEventModal());
     } catch (error) {
       console.error("Error creating event:", error);
     }
   };
 
-  const handleEditEvent = async (eventId) => {
+  const handleEditEvent = async (eventId, photoURL = null) => {
     try {
       if (!validateFields()) {
         return;
       }
+
       const response = await axiosRequest.post(`/events/edit/${eventId}`, {
         organizerId: userData.id,
+        coverPhoto: photoURL, // Save photo URL in the event data
         ...selectedEvent,
       });
+
       dispatch(editEvent(response.data.event));
       dispatch(toggleEventModal());
-      dispatch(
-        updateSelectedEventField({
-          organizerId: userData.id,
-          name: "",
-          description: "",
-          location: "",
-          startDate: "",
-          endDate: "",
-        })
-      );
+      dispatch(resetEventModal());
     } catch (error) {
-      console.error("Error creating event:", error);
+      console.error("Error editing event:", error);
     }
   };
 
   const handleSubmit = () => {
-    if (isEdit) {
+    if (coverPhoto) {
+      handleImageUpload();
+    } else if (isEdit) {
       handleEditEvent(selectedEvent.id);
     } else {
       handleAddEvent();
@@ -97,11 +97,55 @@ function EventModal() {
       updateSelectedEventField({ id: payload.id, value: payload.value })
     );
   };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    setCoverPhoto(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handleImageUpload = () => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `events/${coverPhoto.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, coverPhoto);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        // Handle progress if needed
+      },
+      (error) => {
+        console.error("Error uploading image:", error);
+        toast.error("Failed to upload image.");
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          if (isEdit) {
+            handleEditEvent(selectedEvent.id, downloadURL);
+          } else {
+            handleAddEvent(downloadURL);
+          }
+        });
+      }
+    );
+  };
+
   const handleClickOutside = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
+    const flatpickrNodeStart =
+      flatpickrRefStart.current?.flatpickr?.calendarContainer;
+    const flatpickrNodeEnd =
+      flatpickrRefEnd.current?.flatpickr?.calendarContainer;
+    if (
+      modalRef.current &&
+      !modalRef.current.contains(event.target) &&
+      flatpickrNodeStart &&
+      !flatpickrNodeStart.contains(event.target) &&
+      flatpickrNodeEnd &&
+      !flatpickrNodeEnd.contains(event.target)
+    ) {
       dispatch(toggleEventModal());
       if (isEdit) {
-        dispatch(resetEventModal());
+        dispatch(toggleEventModal());
       }
     }
   };
@@ -116,6 +160,24 @@ function EventModal() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    const today = new Date().toISOString();
+    if (!isEdit) {
+      dispatch(
+        updateSelectedEventField({
+          id: "startDate",
+          value: today,
+        })
+      );
+      dispatch(
+        updateSelectedEventField({
+          id: "endDate",
+          value: today,
+        })
+      );
+    }
   }, [isModalOpen]);
 
   return (
@@ -188,31 +250,71 @@ function EventModal() {
                   onChange={handleInputChange}
                 ></textarea>
               </div>
+              <div className="mb-3">
+                <label htmlFor="coverPhoto" className="form-label">
+                  Cover Photo
+                </label>
+                <input
+                  type="file"
+                  id="coverPhoto"
+                  className="form-control"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                />
+              </div>
+              {photoPreview && (
+                <div className="mb-3 text-center">
+                  <img
+                    src={photoPreview}
+                    alt="Cover Preview"
+                    className="img-thumbnail"
+                    style={{ maxHeight: "200px" }}
+                  />
+                </div>
+              )}
               <div className="row g-2">
                 <div className="col">
                   <label htmlFor="startDate" className="form-label">
                     Start Date
                   </label>
-                  {typeof selectedEvent.startDate}
-                  <input
-                    type="date"
-                    id="startDate"
+                  <Flatpickr
+                    id={"startDate"}
+                    ref={flatpickrRefStart}
+                    value={selectedEvent.startDate || new Date()}
+                    onChange={(date) => {
+                      const myDate = date[0].toISOString();
+                      dispatch(
+                        updateSelectedEventField({
+                          id: "startDate",
+                          value: myDate,
+                        })
+                      );
+                    }}
+                    options={{ dateFormat: "Y-m-d" }}
                     className="form-control"
-                    value={selectedEvent.startDate}
-                    onChange={handleInputChange}
+                    required
                   />
                 </div>
                 <div className="col">
                   <label htmlFor="endDate" className="form-label">
                     End Date
                   </label>
-                  <input
-                    type="date"
-                    id="endDate"
+                  <Flatpickr
+                    id={"endDate"}
+                    ref={flatpickrRefEnd}
+                    value={selectedEvent.endDate || new Date()}
+                    onChange={(date) => {
+                      const myDate = date[0].toISOString();
+                      dispatch(
+                        updateSelectedEventField({
+                          id: "endDate",
+                          value: myDate,
+                        })
+                      );
+                    }}
+                    options={{ dateFormat: "Y-m-d" }}
                     className="form-control"
-                    value={selectedEvent.endDate}
-                    onChange={handleInputChange}
-                    min={selectedEvent.startDate}
+                    required
                   />
                 </div>
               </div>

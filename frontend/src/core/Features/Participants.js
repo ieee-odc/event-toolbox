@@ -1,38 +1,55 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosRequest from "../../utils/AxiosConfig";
 
+// Function to fetch event data
+export const fetchEventData = createAsyncThunk(
+  "Participant/fetchEventData",
+  async (eventId) => {
+    const response = await axiosRequest.get(`/events/${eventId}`);
+    return response.data;
+  }
+);
 
-const groupParticipantsByEmail = (participants) => {
-  const emailToParticipant = {};
-  participants.forEach((participant) => {
-    if (!emailToParticipant[participant.email]) {
-      emailToParticipant[participant.email] = { ...participant };
-    } else {
-      // Aggregate statuses
-      if (!emailToParticipant[participant.email].statuses) {
-        emailToParticipant[participant.email].statuses = [emailToParticipant[participant.email].status];
-      }
-      emailToParticipant[participant.email].statuses.push(participant.status);
+// Function to fetch workshop data
+export const fetchWorkshopData = createAsyncThunk(
+  "Participant/fetchWorkshopData",
+  async (workshopId) => {
+    const response = await axiosRequest.get(`/workshop/${workshopId}`);
+    return response.data;
+  }
+);
 
-      // Aggregate phone numbers
-      if (!emailToParticipant[participant.email].phoneNumbers) {
-        emailToParticipant[participant.email].phoneNumbers = [emailToParticipant[participant.email].phoneNumber];
-      }
-      if (participant.phoneNumber && !emailToParticipant[participant.email].phoneNumbers.includes(participant.phoneNumber)) {
-        emailToParticipant[participant.email].phoneNumbers.push(participant.phoneNumber);
-      }
+// Function to initialize participants
+export const initializeParticipants = createAsyncThunk(
+  "Participants/initializeParticipants",
+  async (participants, { dispatch }) => {
+    // const emailToParticipant = {};
+    // for (const participant of participants) {
+    //   const eventId = participant.eventId;
+    //   const workshopId = participant.workshopId;
 
-      // Aggregate responses
-      if (!emailToParticipant[participant.email].responses) {
-        emailToParticipant[participant.email].responses = [];
-      }
-      if (participant.responses) {
-        emailToParticipant[participant.email].responses = emailToParticipant[participant.email].responses.concat(participant.responses);
-      }
-    }
-  });
-  return Object.values(emailToParticipant);
-};
+    //   if (!emailToParticipant[participant.email]) {
+    //     const eventResponse = await dispatch(fetchEventData(eventId));
+    //     emailToParticipant[participant.email] = {
+    //       ...participant,
+    //       eventName: eventResponse.payload.event.name,
+    //       eventResponses: participant.responses || [],
+    //       workshops: [],
+    //     };
+    //   }
 
+    //   if (workshopId) {
+    //     const workshopResponse = await dispatch(fetchWorkshopData(workshopId));
+    //     emailToParticipant[participant.email].workshops.push({
+    //       workshopId,
+    //       workshopName: workshopResponse.payload.workshop.name,
+    //       responses: participant.responses || [],
+    //     });
+    //   }
+    // }
+    return participants;
+  }
+);
 const ParticipantsSlice = createSlice({
   name: "Participants",
   initialState: {
@@ -44,18 +61,17 @@ const ParticipantsSlice = createSlice({
     filterStatus: "",
     filteredParticipants: [],
     selectedParticipant: {
-      email: '',
-      fullName: '',
-      phoneNumber: '',
+      email: "",
+      fullName: "",
+      phoneNumber: "",
     },
     participantsPerPage: 10,
     searchQuery: "",
   },
   reducers: {
-    initializeParticipants: (state, action) => {
-      const groupedParticipants = groupParticipantsByEmail(action.payload);
-      state.participants = groupedParticipants;
-      state.filteredParticipants = groupedParticipants;
+    setParticipants: (state, action) => {
+      state.participants = action.payload;
+      state.filteredParticipants = action.payload;
     },
     addParticipant: (state, action) => {
       state.participants = [...state.participants, action.payload];
@@ -87,7 +103,7 @@ const ParticipantsSlice = createSlice({
       state.isParticipantModalOpen = !state.isParticipantModalOpen;
     },
     resetParticipantModal: (state) => {
-      state.selectedParticipant = { email: '', fullName: '', phoneNumber: '' };
+      state.selectedParticipant = { email: "", fullName: "", phoneNumber: "" };
       state.isEdit = false;
     },
     toggleParticipantsIsLoading: (state) => {
@@ -111,7 +127,6 @@ const ParticipantsSlice = createSlice({
     updateData: (state, action) => {
       state.selectedParticipant.data = action.payload;
     },
-
     removeField: (state, action) => {
       const fieldName = action.payload;
       const { [fieldName]: _, ...newData } = state.selectedParticipant.data;
@@ -127,7 +142,7 @@ const ParticipantsSlice = createSlice({
       ];
     },
     removeField: (state, action) => {
-      state.selectedParticipant.data.splice(action.payload, 1); // Just splice, don't reassign
+      state.selectedParticipant.data.splice(action.payload, 1);
     },
     setParticipantsPerPage: (state, action) => {
       state.participantsPerPage = action.payload;
@@ -143,25 +158,41 @@ const ParticipantsSlice = createSlice({
     setSearchQuery: (state, action) => {
       const query = action.payload.toLowerCase();
       state.searchQuery = query;
-      
-      state.filteredParticipants = state.participants.filter((participant) =>
-        participant.fullName.toLowerCase().includes(query) ||
-        participant.email.toLowerCase().includes(query)
+
+      state.filteredParticipants = state.participants.filter(
+        (participant) =>
+          participant.fullName.toLowerCase().includes(query) ||
+          participant.email.toLowerCase().includes(query)
       );
-    }
-    
+    },
+    setIsParticipantLoading: (state, action) => {
+      state.isLoading = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(initializeParticipants.pending, (state) => {})
+      .addCase(initializeParticipants.fulfilled, (state, action) => {
+        state.participants = action.payload;
+        state.filteredParticipants = action.payload;
+      })
+      .addCase(initializeParticipants.rejected, (state) => {})
+      .addCase(fetchEventData.pending, (state) => {})
+      .addCase(fetchEventData.fulfilled, (state, action) => {})
+      .addCase(fetchEventData.rejected, (state) => {})
+      .addCase(fetchWorkshopData.pending, (state) => {})
+      .addCase(fetchWorkshopData.fulfilled, (state, action) => {})
+      .addCase(fetchWorkshopData.rejected, (state) => {});
   },
 });
 
-
 export const {
-  initializeParticipants,
+  setParticipants,
   addParticipant,
   deleteParticipant,
   editParticipant,
   toggleParticipantModal,
   toggleParticipantDetails,
-  toggleParticipantsIsLoading,
   selectParticipant,
   setSelectedParticipant,
   updateSelectedParticipantField,
@@ -173,5 +204,7 @@ export const {
   setParticipantsPerPage,
   filterParticipants,
   setSearchQuery,
+  setIsParticipantLoading,
 } = ParticipantsSlice.actions;
+
 export default ParticipantsSlice.reducer;

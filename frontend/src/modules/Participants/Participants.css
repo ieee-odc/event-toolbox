@@ -2,7 +2,17 @@
   width: auto;
   display: inline-block;
 }
+
 .extend-select option {
   width: auto;
   padding-right: 10px;
+}
+
+#table-head tr th input {
+  max-height: 12px !important;
+}
+
+
+#table-head tr th {
+  vertical-align: middle !important;
 }

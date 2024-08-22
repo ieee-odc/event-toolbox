@@ -12,21 +12,14 @@ import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
 import { useParams } from "react-router-dom";
 import { Modal } from "react-bootstrap";
-import { storage } from "../../../../utils/firebaseConfig"; // Adjust the path as needed
+import { storage } from "../../../../utils/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./RegistrationForm.css";
 
 import socketIOClient from "socket.io-client";
 import HeadComponent from "../../../../core/components/Head/CustomHead";
 import toast from "react-hot-toast";
-
-const base64UrlDecode = (str) => {
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) {
-    base64 += "=";
-  }
-  return atob(base64);
-};
+import { base64UrlDecode } from "../../../../utils/helpers/base64Helper";
 
 const RegistrationForm = () => {
   const dispatch = useDispatch();
@@ -41,27 +34,31 @@ const RegistrationForm = () => {
     hasMultiSelectForm,
     isEventForm,
   } = useSelector((state) => state.registrationStore);
-  const decodedToken = base64UrlDecode(token);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [validated, setValidated] = useState(false);
-  const [checkboxValidation, setCheckboxValidation] = useState({});
-  let tokenData;
+  const [tokenData, setTokenData] = useState();
+  const [fileError, setFileError] = useState("");
 
-  try {
-    tokenData = JSON.parse(decodedToken);
-  } catch (error) {
-    console.error("Invalid token format", error);
-  }
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
+  const [validated, setValidated] = useState(false);
+  useEffect(() => {
+    try {
+      setTokenData(JSON.parse(decodedToken));
+    } catch (error) {
+      console.error("Invalid token format", error);
+    }
+  }, [token]);
+  const decodedToken = base64UrlDecode(token);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const action = dispatch(fetchFormData(tokenData.formId));
-    };
-    fetchData();
-  }, [tokenData.formId]);
+    if (!tokenData) {
+      return;
+    }
+    dispatch(fetchFormData(tokenData.formId));
+  }, [tokenData]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
@@ -75,11 +72,6 @@ const RegistrationForm = () => {
       ? [...currentValues, value]
       : currentValues.filter((val) => val !== value);
     dispatch(updateFormData({ field: field.question, value: newValues }));
-
-    setCheckboxValidation((prevState) => ({
-      ...prevState,
-      [field.question]: newValues.length > 0,
-    }));
   };
 
   const handleRadioChange = (e, field) => {
@@ -92,6 +84,15 @@ const RegistrationForm = () => {
     const file = files[0];
 
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setFileError("File size must not exceed 10MB.");
+        setIsSubmitDisabled(true);
+        return;
+      } else {
+        setFileError("");
+        setIsSubmitDisabled(false);
+      }
+
       const storageRef = ref(storage, `files/${file.name}`);
       try {
         await uploadBytes(storageRef, file);
@@ -106,35 +107,23 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-
-    let valid = true;
-    const newCheckboxValidation = {};
-    formFields.forEach((field) => {
-      if (field.type === "checkbox") {
-        const isValid =
-          formData[field.question] && formData[field.question].length > 0;
-        newCheckboxValidation[field.question] = isValid;
-        if (!isValid) valid = false;
-      }
-    });
     if (!isEventForm) {
       const emailIsAllowed = formData.event.allowedList.some(
         (e) => e === email
       );
       if (!emailIsAllowed) {
-        setValidated(false); // Ensure form is marked as invalid
-        valid = false;
         toast.error("Email is not allowed.");
+        return;
       }
     }
 
-    setCheckboxValidation(newCheckboxValidation);
-
-    if (form.checkValidity() === false || !valid) {
+    if (!form.checkValidity()) {
       e.stopPropagation();
       setValidated(true);
       return;
     }
+
+    setValidated(false);
 
     const responses = formFields.map((field) => ({
       question: field.question,
@@ -151,13 +140,27 @@ const RegistrationForm = () => {
     };
 
     try {
-
       if (isEventForm) {
         try {
           const response = await axiosRequest.post(
             "/participant/add",
             baseSubmissionData
           );
+
+          axiosRequest
+            .post("/notification/add", {
+              from: response.data.participant.id,
+              to: formData.event.organizerId,
+              type: "EventRegistration",
+              message: `A new participant has registered for your event: ${formData.event.name}`,
+              read: false,
+            })
+            .then((res) => {
+              socket.emit("create-notification", {
+                organizerId: formData.event.organizerId,
+                notification: res.data.notification,
+              });
+            });
 
           if (socket) {
             socket.emit("addEventParticipant", {
@@ -170,40 +173,85 @@ const RegistrationForm = () => {
           return;
         }
       } else {
-        for (const workshop of formWorkshops) {
-          const submissionData = {
-            ...baseSubmissionData,
-            workshopId: workshop.id,
-          };
+        const workshopQuestions = formFields
+          .filter((field) => field.type === "workshop-selection")
+          .map((field) => field.question);
+        const selectedWorkshops = [];
+        workshopQuestions.forEach((question) => {
+          // Step 3: Accumulate the selected workshop IDs from formData
+          if (formData[question]) {
+            selectedWorkshops.push(...formData[question]);
+          }
+        });
+        if (hasMultiSelectForm && selectedWorkshops.length === 0) {
+          toast.error("Please select at least one workshop");
+          return;
+        }
+        if (hasMultiSelectForm) {
+          for (const workshopId of selectedWorkshops) {
+            const submissionData = {
+              ...baseSubmissionData,
+              workshopId: workshopId,
+            };
+            const response = await axiosRequest.post(
+              "/participant/submit",
+              submissionData
+            );
 
-          const response = await axiosRequest.post(
-            "/participant/submit",
-            submissionData
-          );
+            if (socket) {
+              socket.emit("addEventParticipant", {
+                participant: response.data.participant,
+                roomId: `${eventId}/${workshopId}`,
+              });
+            }
+          }
+        } else {
+          for (const workshopId of workshopsIds) {
+            const submissionData = {
+              ...baseSubmissionData,
+              workshopId: workshopId,
+            };
+            const response = await axiosRequest.post(
+              "/participant/submit",
+              submissionData
+            );
 
-          if (socket) {
-            socket.emit("addEventParticipant", {
-              participant: response.data.participant,
-              roomId: `${eventId}/${workshop.id}`,
-            });
+            if (socket) {
+              socket.emit("addEventParticipant", {
+                participant: response.data.participant,
+                roomId: `${eventId}/${workshopId}`,
+              });
+            }
           }
         }
       }
 
-      const { name, description, deadline } = formData;
+      // const { name, description, deadline } = formData;
       dispatch(resetFormData());
       dispatch(updateFormData({ field: "name", value: name }));
       dispatch(updateFormData({ field: "description", value: description }));
       dispatch(updateFormData({ field: "deadline", value: deadline }));
 
+      const { event } = formData;
+      setShowModal(true);
+
+      toast.success(`Successfully registered for the event: ${event.name}`);
+
       setFullName("");
       setEmail("");
       setPhoneNumber("");
-      setCheckboxValidation({});
-      setValidated(false);
       setShowModal(true);
     } catch (error) {
-      console.error("Error submitting form data: ", error);
+      if (error.request && error.request.response) {
+        try {
+          const response = JSON.parse(error.request.response);
+          toast.error(response.message);
+        } catch (e) {
+          toast.error("An unexpected error occurred. Please try again.");
+        }
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -229,7 +277,6 @@ const RegistrationForm = () => {
   }, [eventId, workshopsIds]);
 
   useEffect(() => {
-    console.log(workshopsIds)
     if (workshopsIds && workshopsIds.length !== 0) {
       axiosRequest
         .post("/workshop/get-many", {
@@ -264,346 +311,348 @@ const RegistrationForm = () => {
       dispatch(setIsEventForm(false));
       dispatch(setAllFull(false));
     }
-  }, [workshopsIds])
+  }, [workshopsIds]);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
   };
   return (
-    <div className="container-fluid vh-100">
+    <div className="container-fluid ">
+     
+  
       <HeadComponent
-        title={formData.name}
-        description={formData.description}
+        title={formData.event ? formData.event.name : "Event Registration"}
+        description={formData.event ? formData.event.description : "Register for the event"}
         image="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"
       />
-
-      <div className="row no-gutters h-100">
-        <div className="col-md-6">
-          <div className="card h-100 border-0">
-            <div className="card-body">
-              <h4 className="form-title mb-2">Registration Form</h4>
-              {formData.name && (
+  
+      <div className="form-container d-flex justify-content-center align-items-center">
+        <div className="card border-0" style={{ width: '100%', maxWidth: '900px' }}>
+          <div className="card-body">
+          {formData.event && (
+              <>
+             <div className="form-section">
+            <h4 className="form-title mb-2">{formData.event.name}</h4>
+            </div>
+            </>
+            )}
+             {/* Image Banner */}
+            <div className="image-banner">
+              <img
+                src="/assets/tsyp.jpg"
+                alt="Event Banner"
+                className="img-fluid"
+              />
+      </div>
+            {formData.event && (
+              <>
                 <div className="form-section">
-                  <div className="form-section-header">Name</div>
-                  <p className="form-section-content">{formData.name}</p>
+                  <div className="form-section-header">Event Name</div>
+                  <p className="form-section-content">{formData.event.name}</p>
                 </div>
-              )}
-              {formData.description && (
                 <div className="form-section">
                   <div className="form-section-header">Description</div>
-                  <p className="form-section-content">{formData.description}</p>
+                  <p className="form-section-content">{formData.event.description}</p>
                 </div>
-              )}
-              {formData.deadline && (
                 <div className="form-section">
                   <div className="form-section-header">Deadline</div>
                   <p className="form-section-content">
                     {new Date(formData.deadline).toLocaleString()}
                   </p>
                 </div>
-              )}
-              {allFull ? (
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <span style={{ textAlign: "center" }}>
-                    {hasMultiSelectForm
-                      ? "All workshops are full"
-                      : "Workshop is full"}
-                  </span>
+              </>
+            )}
+            {allFull ? (
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <span style={{ textAlign: "center" }}>
+                  {hasMultiSelectForm
+                    ? "All sessions are full"
+                    : "Session is full"}
+                </span>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                noValidate
+                className={`needs-validation ${
+                  validated ? "was-validated" : ""
+                }`}
+              >
+                <div className="mb-3">
+                  <label className="form-label" htmlFor="fullName">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="fullName"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                  <div className="invalid-feedback">
+                    Full Name is required.
+                  </div>
                 </div>
-              ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  className={`needs-validation ${validated ? "was-validated" : ""
-                    }`}
-                  noValidate
-                >
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor="fullName">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="fullName"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                    />
-                    <div className="invalid-feedback">
-                      Full Name is required.
-                    </div>
+                <div className="mb-3">
+                  <label className="form-label" htmlFor="email">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    value={email}
+                    onChange={handleEmailChange}
+                    required
+                  />
+                  <div className="invalid-feedback">Email is required.</div>
+                </div>
+                <div className="mb-3">
+                  <label className="form-label" htmlFor="phoneNumber">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    className="form-control"
+                    id="phoneNumber"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    required
+                  />
+                  <div className="invalid-feedback">
+                    Phone Number is required.
                   </div>
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor="email">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      id="email"
-                      value={email}
-                      onChange={handleEmailChange}
-                      required
-                    />
-                    <div className="invalid-feedback">Email is required.</div>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label" htmlFor="phoneNumber">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      className="form-control"
-                      id="phoneNumber"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      required
-                    />
-                    <div className="invalid-feedback">
-                      Phone Number is required.
-                    </div>
-                  </div>
-                  {formFields && formFields.length > 0 ? (
-                    formFields.map((field, index) => (
-                      <div key={index} className="mb-3">
-                        <label className="form-label" htmlFor={field.question}>
-                          {field.question}
-                        </label>
-                        {field.type === "input" && (
-                          <input
-                            type="text"
-                            className="form-control"
-                            id={field.question}
-                            value={formData[field.question] || ""}
-                            onChange={handleInputChange}
-                            required
-                          />
-                        )}
-                        {field.type === "checkbox" && (
-                          <div>
-                            {field.options.map((option, idx) => (
-                              <div key={idx} className="form-check">
-                                <input
-                                  type="checkbox"
-                                  className="form-check-input"
-                                  id={`${field.question}-${idx}`}
-                                  value={option}
-                                  checked={
-                                    formData[field.question]?.includes(
-                                      option
-                                    ) || false
-                                  }
-                                  onChange={(e) =>
-                                    handleCheckboxChange(e, field)
-                                  }
-                                />
-                                <label
-                                  className="form-check-label"
-                                  htmlFor={`${field.question}-${idx}`}
-                                >
-                                  {option}
-                                </label>
-                              </div>
-                            ))}
-                            <div
-                              className="invalid-feedback"
-                              style={{
-                                display:
-                                  validated &&
-                                    !checkboxValidation[field.question]
-                                    ? "block"
-                                    : "none",
-                              }}
-                            >
-                              {field.question} is required.
+                </div>
+                {formFields && formFields.length > 0 ? (
+                  formFields.map((field, index) => (
+                    <div key={index} className="mb-3">
+                      <label className="form-label" htmlFor={field.question}>
+                        {field.question}
+                      </label>
+                      {field.type === "input" && (
+                        <input
+                          type="text"
+                          className="form-control"
+                          id={field.question}
+                          value={formData[field.question] || ""}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      )}
+                      {field.type === "checkbox" && (
+                        <div>
+                          {field.options.map((option, idx) => (
+                            <div key={idx} className="form-check">
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id={`${field.question}-${idx}`}
+                                value={option}
+                                checked={
+                                  formData[field.question]?.includes(
+                                    option
+                                  ) || false
+                                }
+                                onChange={(e) =>
+                                  handleCheckboxChange(e, field)
+                                }
+                                required
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor={`${field.question}-${idx}`}
+                              >
+                                {option}
+                              </label>
                             </div>
+                          ))}
+                          <div className="invalid-feedback">
+                            {field.question} is required.
                           </div>
-                        )}
-                        {field.type === "radio" && (
-                          <div>
-                            {field.options.map((option, idx) => (
-                              <div key={idx} className="form-check">
-                                <input
-                                  type="radio"
-                                  className="form-check-input"
-                                  name={field.question}
-                                  id={`${field.question}-${idx}`}
-                                  value={option}
-                                  checked={formData[field.question] === option}
-                                  onChange={(e) => handleRadioChange(e, field)}
-                                  required
-                                />
-                                <label
-                                  className="form-check-label"
-                                  htmlFor={`${field.question}-${idx}`}
-                                >
-                                  {option}
-                                </label>
-                              </div>
-                            ))}
-                            <div className="invalid-feedback">
-                              {field.question} is required.
+                        </div>
+                      )}
+                      {field.type === "radio" && (
+                        <div>
+                          {field.options.map((option, idx) => (
+                            <div key={idx} className="form-check">
+                              <input
+                                type="radio"
+                                className="form-check-input"
+                                name={field.question}
+                                id={`${field.question}-${idx}`}
+                                value={option}
+                                checked={formData[field.question] === option}
+                                onChange={(e) => handleRadioChange(e, field)}
+                                required
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor={`${field.question}-${idx}`}
+                              >
+                                {option}
+                              </label>
                             </div>
+                          ))}
+                          <div className="invalid-feedback">
+                            {field.question} is required.
                           </div>
-                        )}
-                        {field.type === "file" && (
+                        </div>
+                      )}
+                      {field.type === "file" && (
+                        <div>
                           <input
                             type="file"
                             className="form-control"
                             id={field.question}
                             onChange={handleFileChange}
-                            required
+                            required={field.required}
                           />
-                        )}
-                        {field.type === "dropdown" && (
-                          <select
-                            className="form-select"
-                            id={field.question}
-                            value={formData[field.question] || ""}
-                            onChange={handleInputChange}
-                            required
-                          >
-                            <option value="">Select {field.question}</option>
-                            {field.options.map((option, idx) => (
-                              <option key={idx} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                        {field.type === "date" && (
-                          <Flatpickr
-                            id={field.question}
-                            value={formData[field.question] || ""}
-                            onChange={(date) =>
-                              dispatch(
-                                updateFormData({
-                                  field: field.question,
-                                  value: date[0],
-                                })
-                              )
-                            }
-                            options={{ dateFormat: "Y-m-d" }}
-                            className="form-control"
-                            required
-                          />
-                        )}
-                        {field.type === "time" && (
-                          <Flatpickr
-                            id={field.question}
-                            value={formData[field.question] || ""}
-                            onChange={(time) =>
-                              dispatch(
-                                updateFormData({
-                                  field: field.question,
-                                  value: time[0],
-                                })
-                              )
-                            }
-                            options={{
-                              enableTime: true,
-                              noCalendar: true,
-                              dateFormat: "H:i",
-                            }}
-                            className="form-control"
-                            required
-                          />
-                        )}
-                        {field.type === "workshop-selection" && (
-                          <div>
-                            {field.options.map((option, idx) => {
-                              const workshop = formWorkshops.find(
-                                (element) =>
-                                  element.id.toString() === option.toString()
-                              );
-                              const isFull =
-                                workshop?.numberOfAttendees <=
-                                workshop?.currentParticipants;
-                              return (
-                                !isFull && (
-                                  <div key={idx} className="form-check">
-                                    <input
-                                      type="checkbox"
-                                      className="form-check-input"
-                                      id={`${field.question}-${idx}`}
-                                      value={option}
-                                      checked={
-                                        formData[field.question]?.includes(
-                                          option
-                                        ) || false
-                                      }
-                                      onChange={(e) =>
-                                        handleCheckboxChange(e, field)
-                                      }
-                                    />
-                                    <label
-                                      className="form-check-label"
-                                      htmlFor={`${field.question}-${idx}`}
-                                    >
-                                      {workshop?.name}
-                                    </label>
-                                  </div>
-                                )
-                              );
-                            })}
-                            <div
-                              className="invalid-feedback"
-                              style={{
-                                display:
-                                  validated &&
-                                    !checkboxValidation[field.question]
-                                    ? "block"
-                                    : "none",
-                              }}
-                            >
-                              {field.question} is required.
+                          {fileError && (
+                            <div className="invalid-feedback d-block">
+                              {fileError}
                             </div>
+                          )}
+                        </div>
+                      )}
+                      {field.type === "dropdown" && (
+                        <select
+                          className="form-select"
+                          id={field.question}
+                          value={formData[field.question] || ""}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="">Select {field.question}</option>
+                          {field.options.map((option, idx) => (
+                            <option key={idx} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {field.type === "date" && (
+                        <Flatpickr
+                          id={field.question}
+                          value={formData[field.question] || ""}
+                          onChange={(date) =>
+                            dispatch(
+                              updateFormData({
+                                field: field.question,
+                                value: date[0],
+                              })
+                            )
+                          }
+                          options={{ dateFormat: "Y-m-d" }}
+                          className="form-control"
+                          required
+                        />
+                      )}
+                      {field.type === "time" && (
+                        <Flatpickr
+                          id={field.question}
+                          value={formData[field.question] || ""}
+                          onChange={(time) =>
+                            dispatch(
+                              updateFormData({
+                                field: field.question,
+                                value: time[0],
+                              })
+                            )
+                          }
+                          options={{
+                            enableTime: true,
+                            noCalendar: true,
+                            dateFormat: "H:i",
+                          }}
+                          className="form-control"
+                          required
+                        />
+                      )}
+                      {field.type === "workshop-selection" && (
+                        <div className="form-check" required>
+                          {field.options.map((option, idx) => {
+                            const workshop = formWorkshops.find(
+                              (element) =>
+                                element.id.toString() === option.toString()
+                            );
+                            const isFull =
+                              workshop?.numberOfAttendees <=
+                              workshop?.currentParticipants;
+                            return (
+                              !isFull && (
+                                <div key={idx}>
+                                  <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    id={`${field.question}-${idx}`}
+                                    value={option}
+                                    checked={
+                                      formData[field.question]?.includes(
+                                        option
+                                      ) || false
+                                    }
+                                    onChange={(e) =>
+                                      handleCheckboxChange(e, field)
+                                    }
+                                  />
+                                  <label
+                                    className="form-check-label"
+                                    htmlFor={`${field.question}-${idx}`}
+                                  >
+                                    {workshop?.name}
+                                  </label>
+                                </div>
+                              )
+                            );
+                          })}
+                          <div className="invalid-feedback">
+                            {field.question} is required.
                           </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div>No fields to display</div>
-                  )}
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </form>
-              )}
-              <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                  <Modal.Title>Registration Successful</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  Thank you! Your registration is successful.
-                </Modal.Body>
-                <Modal.Footer>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Close
-                  </button>
-                </Modal.Footer>
-              </Modal>
-            </div>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div>No fields to display</div>
+                )}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitDisabled}
+                >
+                  Submit
+                </button>
+              </form>
+            )}
+            <Modal show={showModal} onHide={() => setShowModal(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Registration Successful</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                Thank you! Your registration is successful.
+              </Modal.Body>
+              <Modal.Footer>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Close
+                </button>
+              </Modal.Footer>
+            </Modal>
           </div>
-        </div>
-        <div className="col-md-6 d-none d-md-block">
-          <div
-            className="bg-cover h-100"
-            style={{ backgroundImage: "url('/assets/tsyp.jpg')" }}
-          ></div>
         </div>
       </div>
     </div>
   );
-};
+  
+  };
 
 export default RegistrationForm;

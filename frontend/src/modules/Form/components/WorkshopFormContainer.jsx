@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { UserData } from "../../../utils/UserData";
 import { useParams } from "react-router-dom";
 import { updateSelectedWorkshopField } from "../../../core/Features/Workshops";
+import CustomButton from "../../../core/components/Button/Button";
 
 function WorkshopFormContainer() {
   const dispatch = useDispatch();
@@ -149,20 +150,23 @@ function WorkshopFormContainer() {
         </div>
       </div>
       <div className="card">
-        <div className="container-fluid mt-4">
-          <div style={{ display: "flex", justifyContent: "end" }}>
-            <button
-              className="btn btn-primary mb-4"
+        <div className="container-fluid">
+        <div
+            className="card-header border-0 d-flex justify-content-end"
+            style={{ alignItems: "center" }}
+          >
+            <CustomButton
+              text="Create Form"
+              iconClass="bx bx-plus me-md-1 mrt-1 mrt-1"
+              backgroundColor="var(--primary-color)"
+              textColor="white"
+              hoverBackgroundColor="#0F205D"
+              hoverTextColor="white"
               onClick={() => {
                 dispatch(toggleFormModal());
                 dispatch(resetFormModal());
               }}
-            >
-              <span>
-                <i className="bx bx-plus me-md-1" />
-                <span className="d-md-inline-block d-none">Create Form</span>
-              </span>
-            </button>
+            />
           </div>
           <div className="table-responsive">
             <table className="table table-striped">

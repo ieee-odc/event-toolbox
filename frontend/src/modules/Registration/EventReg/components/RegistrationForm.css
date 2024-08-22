@@ -1,6 +1,14 @@
 .container-fluid {
-    padding: 0;
-  }
+  padding: 0;
+  margin: 0;
+}
+.form-container {
+  min-height: calc(100vh - 250px); /* Adjust based on your banner height */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
   
   .authentication-wrapper {
     display: flex;
@@ -11,9 +19,10 @@
   
   .card {
     border: none;
-    border-radius: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    background-color: #fff; /* Ensures the card has a white background */
   }
-  
   .card-body {
     padding: 2rem;
   }
@@ -61,6 +70,20 @@
   .form-section-content {
     font-size: 1rem;
     margin: 0;
+  }
+  
+  .image-banner {
+    width: 100%;
+    height: 250px; /* Adjust the height as needed */
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .image-banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover; /* Ensures the image covers the banner area */
   }
   
   

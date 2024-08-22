@@ -21,7 +21,7 @@ const GoogleLoginButton = ({ buttonText, onSuccess, onFailure, action }) => {
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center mb-4">
       <button
         onClick={handleClick}
         disabled={loading}
