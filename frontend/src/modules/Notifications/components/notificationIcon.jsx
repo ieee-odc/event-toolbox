@@ -94,7 +94,9 @@ const NotificationIcon = () => {
   };
 
   const handleIconClick = () => {
+    console.log('Before toggle:', showNotifications);
     dispatch(toggleShowNotifications());
+    console.log('After toggle:', showNotifications);
   };
 
   const handleMarkAllAsRead = async () => {
@@ -144,44 +146,45 @@ const NotificationIcon = () => {
               <div className="dropdown-item">No notifications available</div>
             ) : (
               notifications &&
-              notifications.map((notification) => (
-                <div
-                  key={notification._id}
-                  className={`dropdown-item ${!notification.read ? "unread" : ""
-                    }`}
-                >
-                  <div className="item-icon">
-                    {notification.type === "EventRegistration" && (
-                      <i class="bx bx-calendar-plus"></i>
-                    )}
-                    {notification.type === "WorkshopRegistration" && (
-                      <i class="bx bx-calendar-plus"></i>
-                    )}
-                  </div>
-                  <div className="item-content">
-                    <div className="item-title">
-                      {(notification.user && notification.user.fullName) ||
-                        "Unknown User"}
+              [...notifications].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .map((notification) => (
+                  <div
+                    key={notification._id}
+                    className={`dropdown-item ${!notification.read ? "unread" : ""
+                      }`}
+                  >
+                    <div className="item-icon">
+                      {notification.type === "EventRegistration" && (
+                        <i class="bx bx-calendar-plus"></i>
+                      )}
+                      {notification.type === "WorkshopRegistration" && (
+                        <i class="bx bx-calendar-plus"></i>
+                      )}
                     </div>
-                    <div className="item-text">
-                      {notification.type === "EventRegistration"
-                        ? "Registered for an event"
-                        : "Registered for a session"}
+                    <div className="item-content">
+                      <div className="item-title">
+                        {(notification.user && notification.user.fullName) ||
+                          "Unknown User"}
+                      </div>
+                      <div className="item-text">
+                        {notification.type === "EventRegistration"
+                          ? "Registered for an event"
+                          : "Registered for a session"}
+                      </div>
+                      <div className="item-time">
+                        {formatDistanceToNow(new Date(notification.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </div>
                     </div>
-                    <div className="item-time">
-                      {formatDistanceToNow(new Date(notification.createdAt), {
-                        addSuffix: true,
-                      })}
+                    <div className="item-action">
+                      <i
+                        class="bx bx-x-circle"
+                        onClick={() => deleteNotification(notification._id)}
+                      ></i>
                     </div>
                   </div>
-                  <div className="item-action">
-                    <i
-                      class="bx bx-x-circle"
-                      onClick={() => deleteNotification(notification._id)}
-                    ></i>
-                  </div>
-                </div>
-              ))
+                ))
             )}
           </div>
         </div>

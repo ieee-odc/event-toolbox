@@ -151,9 +151,8 @@ const ParticipantsCard = () => {
   };
 
   const formatResponses = (responses) => {
-    return responses
-      .map(({ question, answer }) => `${question}: ${answer}`)
-      .join("; ");
+    console.log(responses)
+    return responses.map(({ question, answer }) => `${question}: ${answer}`).join("; ");
   };
 
   const generateExcel = () => {
@@ -169,8 +168,8 @@ const ParticipantsCard = () => {
     ];
 
     const excelRows = participants.map((participant) => {
-      const eventResponses = formatResponses(participant.eventResponses);
-      const workshopDetails = participant.workshops
+      const eventResponses = formatResponses(participant.responses);
+      const workshopDetails = (participant.workshops || [])
         .map((workshop) => {
           const workshopResponses = formatResponses(workshop.responses);
 

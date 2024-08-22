@@ -110,7 +110,7 @@ const RegistrationForm = () => {
       if (formData.workshopId) {
         const workshopResponse = await axiosRequest.get(`/workshop/${formData.workshopId}`);
         const workshopDetails = workshopResponse.data.workshop;
-        if (workshopDetails.status === 'free') {
+        if (workshopDetails.status === 'open') {
           return true;
         }
 
@@ -274,32 +274,21 @@ const RegistrationForm = () => {
         }
       }
 
-      // const { name, description, deadline } = formData;
-      dispatch(resetFormData());
+      const { name, description, deadline } = formData;
       dispatch(updateFormData({ field: "name", value: name }));
       dispatch(updateFormData({ field: "description", value: description }));
       dispatch(updateFormData({ field: "deadline", value: deadline }));
 
       const { event } = formData;
-      setShowModal(true);
-
-      toast.success(`Successfully registered for the event: ${event.name}`);
 
       setFullName("");
       setEmail("");
       setPhoneNumber("");
       setShowModal(true);
     } catch (error) {
-      if (error.request && error.request.response) {
-        try {
-          const response = JSON.parse(error.request.response);
-          toast.error(response.message);
-        } catch (e) {
-          toast.error("An unexpected error occurred. Please try again.");
-        }
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+      console.log(error)
+      toast.error("An unexpected error occurred. Please try again.");
+
     }
   };
 
