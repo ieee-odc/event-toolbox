@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("addEventParticipant", async (data) => {
-    const roomId = data.roomId;
+    const roomId = data.roomId.toString();
     io.to(roomId).emit("EventParticipantAdded", data.participant);
   });
 

@@ -108,21 +108,27 @@ const RegistrationForm = () => {
     dispatch(fetchFormData(tokenData.formId));
     try {
       if (formData.workshopId) {
-        const workshopResponse = await axiosRequest.get(`/workshop/${formData.workshopId}`);
+        const workshopResponse = await axiosRequest.get(
+          `/workshop/${formData.workshopId}`
+        );
         const workshopDetails = workshopResponse.data.workshop;
-        if (workshopDetails.status === 'open') {
+        if (workshopDetails.status === "open") {
           return true;
         }
 
-        const eventResponse = await axiosRequest.get(`/events/${formData.eventId}`);
+        const eventResponse = await axiosRequest.get(
+          `/events/${formData.eventId}`
+        );
         const eventDetails = eventResponse.data.event;
-        if (eventDetails.status === 'paid') {
+        if (eventDetails.status === "paid") {
           const hasPaid = await checkPaymentStatus(email);
           if (!hasPaid) {
             return false;
           }
         }
-        const emailIsAllowed = eventDetails.allowedList.some((e) => e === email);
+        const emailIsAllowed = eventDetails.allowedList.some(
+          (e) => e === email
+        );
         if (!emailIsAllowed) {
           toast.error("Email is not allowed for this event.");
           return false;
@@ -137,20 +143,23 @@ const RegistrationForm = () => {
   };
   const checkPaymentStatus = async (email) => {
     try {
-      const response = await axiosRequest.get(`/participant/get-event/ ${eventId}`);
+      const response = await axiosRequest.get(
+        `/participant/get-event/ ${eventId}`
+      );
       const data = response.data.participants;
       const participant = data.find((p) => p.email === email);
       if (!participant) {
-        console.error("Participant not found")
+        console.error("Participant not found");
         return false;
       }
 
       if (participant.status !== "Paid") {
-        toast.error("You must complete the payment to register for this session.");
+        toast.error(
+          "You must complete the payment to register for this session."
+        );
         return false;
       }
       return true;
-
     } catch (error) {
       console.error("Error fetching participants: ", error);
       return false;
@@ -159,10 +168,10 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const verif = await checkWorkshopAndFetchFormData()
+    const verif = await checkWorkshopAndFetchFormData();
     if (!verif) {
       e.stopPropagation();
-      return
+      return;
     }
 
     if (!form.checkValidity()) {
@@ -226,7 +235,6 @@ const RegistrationForm = () => {
           .map((field) => field.question);
         const selectedWorkshops = [];
         workshopQuestions.forEach((question) => {
-          // Step 3: Accumulate the selected workshop IDs from formData
           if (formData[question]) {
             selectedWorkshops.push(...formData[question]);
           }
@@ -245,6 +253,21 @@ const RegistrationForm = () => {
               "/participant/submit",
               submissionData
             );
+            console.log(selectedWorkshops);
+            axiosRequest
+              .post("/notification/add", {
+                from: response.data.participant.id,
+                to: formData.event.organizerId,
+                type: "WorkshopRegistration",
+                message: `A new participant has registered for your workshop: ${selectedWorkshops.name}`,
+                read: false,
+              })
+              .then((res) => {
+                socket.emit("create-notification", {
+                  organizerId: formData.event.organizerId,
+                  notification: res.data.notification,
+                });
+              });
 
             if (socket) {
               socket.emit("addEventParticipant", {
@@ -263,6 +286,23 @@ const RegistrationForm = () => {
               "/participant/submit",
               submissionData
             );
+
+            const workshop = (await axiosRequest.get(`/workshop/${workshopId}`))
+              .data.workshop;
+            axiosRequest
+              .post("/notification/add", {
+                from: response.data.participant.id,
+                to: formData.event.organizerId,
+                type: "WorkshopRegistration",
+                message: `A new participant has registered for your workshop: ${workshop.name}`,
+                read: false,
+              })
+              .then((res) => {
+                socket.emit("create-notification", {
+                  organizerId: formData.event.organizerId,
+                  notification: res.data.notification,
+                });
+              });
 
             if (socket) {
               socket.emit("addEventParticipant", {
@@ -286,9 +326,8 @@ const RegistrationForm = () => {
       setPhoneNumber("");
       setShowModal(true);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("An unexpected error occurred. Please try again.");
-
     }
   };
 
@@ -311,7 +350,7 @@ const RegistrationForm = () => {
     });
 
     return () => newSocket.disconnect();
-  }, [eventId, workshopsIds]);
+  }, [eventId]);
 
   useEffect(() => {
     if (workshopsIds && workshopsIds.length !== 0) {
@@ -355,16 +394,19 @@ const RegistrationForm = () => {
   };
   return (
     <div className="container-fluid ">
-
-
       <HeadComponent
         title={formData.event ? formData.event.name : "Event Registration"}
-        description={formData.event ? formData.event.description : "Register for the event"}
+        description={
+          formData.event ? formData.event.description : "Register for the event"
+        }
         image="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/pages/app-academy-tutor-3.png"
       />
 
       <div className="form-container d-flex justify-content-center align-items-center">
-        <div className="card border-0" style={{ width: '100%', maxWidth: '900px' }}>
+        <div
+          className="card border-0"
+          style={{ width: "100%", maxWidth: "900px" }}
+        >
           <div className="card-body">
             {formData.event && (
               <>
@@ -389,7 +431,9 @@ const RegistrationForm = () => {
                 </div>
                 <div className="form-section">
                   <div className="form-section-header">Description</div>
-                  <p className="form-section-content">{formData.event.description}</p>
+                  <p className="form-section-content">
+                    {formData.event.description}
+                  </p>
                 </div>
                 <div className="form-section">
                   <div className="form-section-header">Deadline</div>
@@ -417,8 +461,9 @@ const RegistrationForm = () => {
               <form
                 onSubmit={handleSubmit}
                 noValidate
-                className={`needs-validation ${validated ? "was-validated" : ""
-                  }`}
+                className={`needs-validation ${
+                  validated ? "was-validated" : ""
+                }`}
               >
                 <div className="mb-3">
                   <label className="form-label" htmlFor="fullName">
@@ -432,9 +477,7 @@ const RegistrationForm = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     required
                   />
-                  <div className="invalid-feedback">
-                    Full Name is required.
-                  </div>
+                  <div className="invalid-feedback">Full Name is required.</div>
                 </div>
                 <div className="mb-3">
                   <label className="form-label" htmlFor="email">
@@ -492,13 +535,10 @@ const RegistrationForm = () => {
                                 id={`${field.question}-${idx}`}
                                 value={option}
                                 checked={
-                                  formData[field.question]?.includes(
-                                    option
-                                  ) || false
+                                  formData[field.question]?.includes(option) ||
+                                  false
                                 }
-                                onChange={(e) =>
-                                  handleCheckboxChange(e, field)
-                                }
+                                onChange={(e) => handleCheckboxChange(e, field)}
                                 required
                               />
                               <label
@@ -688,9 +728,6 @@ const RegistrationForm = () => {
       </div>
     </div>
   );
-
 };
-
-
 
 export default RegistrationForm;
