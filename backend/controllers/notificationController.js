@@ -1,5 +1,4 @@
 const Counter = require("../models/CounterModel.js");
-const Notification = require("../models/NotificationModel.js");
 const Participant = require("../models/ParticipantModel.js");
 
 const addNotification = async (req, res) => {
@@ -9,7 +8,7 @@ const addNotification = async (req, res) => {
       { $inc: { seq: 1 } },
       { new: true, upsert: true }
     );
-    const newNotification = new Notification({ id: counter.seq, ...req.body });
+    const newNotification = new (require("../models/NotificationModel.js"))({ id: counter.seq, ...req.body });
     await newNotification.save();
     res.status(201).json({
       status: "success",
@@ -30,7 +29,7 @@ const getNotifications = async (req, res) => {
         .status(400)
         .json({ error: "Bad Request: No user ID provided" });
     }
-    const notifications = await Notification.find({ to: userId });
+    const notifications = await (require("../models/NotificationModel.js")).find({ to: userId });
 
     const notificationsWithUser = await Promise.all(
       notifications.map(async (notification) => {
@@ -62,7 +61,7 @@ const markAllNotificationsAsRead = async (req, res) => {
         .status(400)
         .json({ error: "Bad Request: No user ID provided" });
     }
-    const result = await Notification.updateMany(
+    const result = await (require("../models/NotificationModel.js")).updateMany(
       { to: userId },
       { $set: { read: true } }
     );
@@ -79,7 +78,7 @@ const markAllNotificationsAsRead = async (req, res) => {
 const deleteNotifications = async (req, res) => {
   try {
     const { id } = req.params;
-    const notification = await Notification.findByIdAndDelete(id);
+    const notification = await (require("../models/NotificationModel.js")).findByIdAndDelete(id);
     if (!notification) {
       return res.status(404).json({ message: "Notification not found" });
     }

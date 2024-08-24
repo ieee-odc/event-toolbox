@@ -8,4 +8,15 @@ export default defineConfig({
     host: "0.0.0.0", // Listen on all network interfaces
     port: 5173, // Use port 5173
   },
+  
+  build: {
+    chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],  // Example: split out vendor code
+        },
+      },
+    },
+  },
 });

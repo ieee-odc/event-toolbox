@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  backend:
+    image: your-dockerhub-username/event-toolbox-backend:latest
+    ports:
+      - "6001:6001"
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend/dist:/app/frontend/dist
+    environment:
+      - MONGO_URI=mongodb+srv://admin:xEvRqDb4uiWtASj0@event-box-cluster.i7qgzec.mongodb.net/?retryWrites=true&w=majority&appName=event-box-cluster
+
+  frontend:
+    image: docker.io/chayma02/event-management-platform-front:latest
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend

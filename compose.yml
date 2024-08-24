@@ -13,6 +13,7 @@ services:
     volumes:
       - /app/backend
       - /app/backend/node_modules
+      - ./frontend/dist:/app/frontend/dist
 
   frontend:
     build:
@@ -25,5 +26,5 @@ services:
       - backend
     volumes:
       - /app/frontend
-      - /frontend/node_modules
+      - /app/frontend/node_modules
 
