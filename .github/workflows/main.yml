@@ -195,16 +195,20 @@ jobs:
         id: extract_branch
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
+      - name: Extract short SHA
+        id: extract_sha
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
 
       - name: Build an image from Dockerfile and tag with SHA and latest
         run: |
           cd ./frontend
-          docker build -t docker.io/chayma02/event-management-platform-front:${{ env.BRANCH_NAME }}-${{ github.sha }} .
-          docker tag docker.io/chayma02/event-management-platform-front:${{ env.BRANCH_NAME }}-${{ github.sha }} docker.io/chayma02/event-management-platform-front:latest
+          docker build -t docker.io/chayma02/event-management-platform-front:${{ env.BRANCH_NAME }}-${{ env.SHORT_SHA }} .
+          docker tag docker.io/chayma02/event-management-platform-front:${{ env.BRANCH_NAME }}-${{ env.SHORT_SHA }} docker.io/chayma02/event-management-platform-front:latest
 
       - name: Push both tags to Docker Hub
         run: |
-          docker push docker.io/chayma02/event-management-platform-front:${{ env.BRANCH_NAME }}-${{ github.sha }}
+          docker push docker.io/chayma02/event-management-platform-front:${{ env.BRANCH_NAME }}-${{ env.SHORT_SHA}}
           docker push docker.io/chayma02/event-management-platform-front:latest
 
 #########################################
