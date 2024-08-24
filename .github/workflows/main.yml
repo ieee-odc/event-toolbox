@@ -208,16 +208,16 @@ jobs:
     #     docker push docker.io/chayma02/event-management-platform-front:${{ github.sha }}
     #     docker push docker.io/chayma02/event-management-platform-front:latest
 
-    - name: Build an image from Dockerfile and tag with SHA and latest
-      run: |
-        cd ./frontend
-        docker build -t docker.io/chayma02/event-management-platform-front:${{ github.sha }} .
-        docker tag docker.io/chayma02/event-management-platform-front:${{ github.sha }} docker.io/chayma02/event-management-platform-front:latest
+      - name: Build an image from Dockerfile and tag with SHA and latest
+        run: |
+          cd ./frontend
+          docker build -t docker.io/chayma02/event-management-platform-front:${{ github.sha }} .
+          docker tag docker.io/chayma02/event-management-platform-front:${{ github.sha }} docker.io/chayma02/event-management-platform-front:latest
 
-    - name: Push both tags to Docker Hub
-      run: |
-        docker push docker.io/chayma02/event-management-platform-front:${{ github.sha }}
-        docker push docker.io/chayma02/event-management-platform-front:latest
+      - name: Push both tags to Docker Hub
+        run: |
+          docker push docker.io/chayma02/event-management-platform-front:${{ github.sha }}
+          docker push docker.io/chayma02/event-management-platform-front:latest
 
 #########################################
 
