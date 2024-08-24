@@ -67,6 +67,12 @@
       .button-container {
         text-align: center; /* Center the button */
       }
+      a {
+        color: white;
+      }
+      .ii a[href] {
+        color: white;
+      }
     </style>
   </head>
   <body>
@@ -93,10 +99,10 @@
         <p>End: [EndTime]</p>
         <!-- <p>Event : [EventName]</p> -->
         <!-- <p>Location: [WorkshopLocation]</p> -->
+        <div>[QRCode]</div>
+
         <div class="button-container">
-          <a
-            href="http://localhost:5173/cancel-registration/[cancelationToken]"
-            class="button button-manage"
+          <a href="[cancelationLink]" class="button button-manage"
             >Cancel Registration</a
           >
         </div>

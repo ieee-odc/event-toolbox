@@ -75,6 +75,17 @@ const EventsSlice = createSlice({
         endDate: endDate.split("T")[0],
       };
     },
+    selectEventById: (state, action) => {
+      state.isEdit = true;
+      const event = state.events.find((event) => event.id === action.payload);
+      const { startDate, endDate, ...otherFields } = event;
+      state.selectedEvent = {
+        ...state.selectedEvent,
+        ...otherFields,
+        startDate: startDate.split("T")[0],
+        endDate: endDate.split("T")[0],
+      };
+    },
     setSelectedEvent: (state, action) => {
       state.selectedEvent = action.payload;
     },
@@ -95,7 +106,7 @@ const EventsSlice = createSlice({
         endDate: "",
         price: "",
         status: "free",
-        coverPhoto: ""
+        coverPhoto: "",
       };
     },
     changeFormState: (state, action) => {
@@ -135,6 +146,7 @@ export const {
   resetEventModal,
   changeFormState,
   setEventsPerPage,
+  selectEventById,
   turnIsLoadingOff,
 } = EventsSlice.actions;
 export default EventsSlice.reducer;
