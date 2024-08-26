@@ -28,6 +28,8 @@ const Register = async (req, res) => {
       username,
       email,
       password,
+      role: 'user',
+      status:'pending',
       provider: 'local',
       createdAt: new Date(),
       lastLoginAt: new Date(),
@@ -38,7 +40,7 @@ const Register = async (req, res) => {
     newUser.password = await bcrypt.hash(password, salt);
 
     await newUser.save();
-    const payload = { id: newUser.id, username: newUser.username };
+    const payload = { id: newUser.id, username: newUser.username, role: newUser.role, status: newUser.status  };
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     res.status(201).json({ token });
@@ -57,7 +59,7 @@ const SignIn = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    const payload = { id: user.id, username: user.username };
+    const payload = { id: user.id, username: user.username, role: user.role,status: user.status  };
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     user.lastLoginAt = new Date();
@@ -117,13 +119,15 @@ const signupWithGoogle = async (req, res) => {
       email,
       password: hashedPassword,
       googleId,
+      role: 'user',
+      status:'pending',
       provider: 'google',
       createdAt: new Date(),
       lastLoginAt: new Date()
     });
     await user.save();
 
-    const payload = { id: user.id, username: user.username };
+    const payload = { id: user.id, username: user.username, status: user.status  };
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     res.status(201).json({ token, user });
@@ -144,7 +148,7 @@ const loginWithGoogle = async (req, res) => {
       return res.status(404).json({ msg: 'User does not exist' });
     }
 
-    const payload = { id: user.id, username: user.username };
+    const payload = { id: user.id, username: user.username, status: user.status  };
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: 3600 });
 
     user.lastLoginAt = new Date();

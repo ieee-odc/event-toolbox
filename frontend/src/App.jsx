@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Button from "./core/components/Button/Button";
@@ -21,8 +21,16 @@ import RegistartionForm from "./modules/Registration/EventReg/components/Regista
 import EventDetail from "./modules/Events/components/EventDetailsQR"
 import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
 import AdminDashboardPage from "./modules/Admin-dashboard/pages/AdminDashboard";
+import { UserData } from "./utils/UserData";
 
 function App() {
+  const [userRole, setUserRole] = useState("user");
+
+  useEffect(() => {
+    const user = UserData()
+    const role = user ? user.role : "user";
+    setUserRole(role);
+  }, []);
   return (
     <div className="App">
       <Toaster />
@@ -34,88 +42,93 @@ function App() {
         <Route path="/resetpassword" element={<ResetPassword />} />
         <Route path="/events/details/:token" element={<EventDetail />} />
 
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute>
-              <AdminDashboardPage />
-            </PrivateRoute>
-          }
-        />
+        {userRole === 'admin' ? (
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute allowedRoles={['admin']}>
+                <AdminDashboardPage />
+              </PrivateRoute>
+            }
+          />
+        ) : (
+          <>
 
 
 
-        <Route
-          path="/participants"
-          element={
-            <PrivateRoute>
-              <Participants />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/workshops"
-          element={
-            <PrivateRoute>
-              <Workshops />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/events"
-          element={
-            <PrivateRoute>
-              <EventsPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/event/:eventId"
-          element={
-            <PrivateRoute>
-              <SingleEventPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/spaces"
-          element={
-            <PrivateRoute>
-              <Spaces />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/forms"
-          element={
-            <PrivateRoute>
-              <Forms />
-            </PrivateRoute>
-          }
-        />
-        <Route path="/form/:token" element={<RegistartionForm />} />
-        <Route
-          path="/cancel-registration/:token"
-          element={<CancelRegistration />}
-        />
-
-        <Route
-          path="/event/:eventId/workshop/:workshopId"
-          element={
-            <PrivateRoute>
-              <SingleWorkshopPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
+            <Route
+              path="/participants"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <Participants />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/workshops"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <Workshops />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/events"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <EventsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/event/:eventId"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <SingleEventPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/spaces"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <Spaces />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/forms"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <Forms />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/form/:token" element={<RegistartionForm />} />
+            <Route
+              path="/cancel-registration/:token"
+              element={<CancelRegistration />}
+            />
+            <Route
+              path="/event/:eventId/workshop/:workshopId"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <SingleWorkshopPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute allowedRoles={['user']}>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+          </>
+        )}
       </Routes>
+
     </div>
   );
 }

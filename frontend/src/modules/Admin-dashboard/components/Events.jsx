@@ -88,7 +88,6 @@ function Events() {
                 const users = [...new Set(updatedEvents.map(event => event.organizerName))];
                 setUniqueUsers(users);
                 const totalOrganizers = users.length;
-                console.log("haaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", users, users.length)
                 dispatch(fetchStatsSuccess({
                     events: updatedEvents,
                     totalParticipants,

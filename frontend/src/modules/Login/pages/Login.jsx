@@ -82,9 +82,11 @@ function Login() {
   const userData = UserData();
   useEffect(() => {
     if (userData) {
-      navigate("/events");
+      const redirectPath = userData.role === "admin" ? "/admin" : "/events";
+      navigate(redirectPath);
     }
-  });
+  }, [userData, navigate]);
+
 
   return (
     <div className="container" style={{ height: "100vh" }}>
