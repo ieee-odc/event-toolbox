@@ -58,6 +58,8 @@ router.use("/form", FormRouter);
 
 const NotificationRouter = require("./routes/NotificationRoutes");
 router.use("/notification", NotificationRouter);
+const AdminRouter = require("./routes/AdminRoutes");
+router.use("/admin", AdminRouter);
 
 app.use("/api", router);
 app.get("/*", function (req, res) {

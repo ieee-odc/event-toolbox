@@ -10,12 +10,13 @@ function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    userType: "organizer", // Default to "organizer"
   });
   const [errors, setErrors] = useState({});
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  const { email, password } = formData;
+  const { email, password, userType } = formData;
 
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,6 +30,7 @@ function Login() {
     if (!password) errors.password = "Password is required";
     return errors;
   };
+  console.log(formData)
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -38,9 +40,26 @@ function Login() {
       return;
     }
     try {
-      const res = await axiosRequest.post("/auth/login", formData);
+      let res;
+
+      // Determine the endpoint based on userType
+      if (formData.userType === "admin") {
+        res = await axiosRequest.post("/admin/adminlogin", {
+          username: formData.email, // Assuming email is used as username
+          password: formData.password,
+        });
+      } else {
+        res = await axiosRequest.post("/auth/login", formData);
+      }
+
       localStorage.setItem("token", res.data.token);
-      navigate("/events");
+
+      // Navigate based on the user's role
+      if (res.data.user.role === "admin" || res.data.user.role === "superadmin") {
+        navigate("/admin");
+      } else {
+        navigate("/events");
+      }
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
@@ -52,11 +71,6 @@ function Login() {
       const tokenId = response.user.accessToken;
       const res = await axiosRequest.post("/auth/loginwithgoogle", { tokenId });
       localStorage.setItem("token", res.data.token);
-      // if (rememberMe) {
-      //   localStorage.setItem("token", res.data.token);
-      // } else {
-      //   sessionStorage.setItem("token", res.data.token);
-      // }
       navigate("/events");
     } catch (err) {
       console.error(
@@ -79,6 +93,7 @@ function Login() {
   const toggleObscureText = () => {
     setObscureText((prev) => !prev);
   };
+
   const userData = UserData();
   useEffect(() => {
     if (userData) {
@@ -90,20 +105,50 @@ function Login() {
     <div className="container" style={{ height: "100vh" }}>
       <div
         className="container-xxl "
-        style={{ display: "flex", height: "90%", margin: "auto 0", flexDirection: "column", alignItems: "center" }}
+        style={{
+          display: "flex",
+          height: "90%",
+          margin: "auto 0",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <div className="authentication-wrapper authentication-basic container-p-y">
           <div className="authentication-inner">
             <div className="card">
               <div className="card-body d-flex flex-column justify-content-center">
                 <h4 className="mb-4">Welcome to Event Box! 👋</h4>
-                <p className="mb-6">Please sign-in to your account and start the adventure</p>
+                <p className="mb-6">
+                  Please sign-in to your account and start the adventure
+                </p>
                 {errors.server && (
                   <div className="alert alert-danger">{errors.server}</div>
                 )}
-                <form id="formAuthentication" onSubmit={onSubmit} className="w-100">
+                <form
+                  id="formAuthentication"
+                  onSubmit={onSubmit}
+                  className="w-100"
+                >
+                  <div className="mb-3 w-100">
+                    <label htmlFor="userType" className="form-label">
+                      Sign in as
+                    </label>
+                    <select
+                      id="userType"
+                      name="userType"
+                      className="form-control"
+                      value={userType}
+                      onChange={onChange}
+                    >
+                      <option value="organizer">Organizer</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+
                   <div className="mb-6 w-100">
-                    <label htmlFor="email" className="form-label">Email or Username</label>
+                    <label htmlFor="email" className="form-label">
+                      Email or Username
+                    </label>
                     <input
                       type="text"
                       className="form-control w-100"
@@ -122,7 +167,9 @@ function Login() {
 
                   <div className="mb-3 w-100">
                     <div className="d-flex justify-content-between">
-                      <label className="form-label" htmlFor="password">Password</label>
+                      <label className="form-label" htmlFor="password">
+                        Password
+                      </label>
                     </div>
                     <div className="input-group input-group-merge d-flex align-items-start w-100">
                       <input
@@ -141,7 +188,10 @@ function Login() {
                         className="input-group-text cursor-pointer"
                         onClick={toggleObscureText}
                       >
-                        <i className={`bx ${obscureText ? "bx-hide" : "bx-show"}`}></i>
+                        <i
+                          className={`bx ${obscureText ? "bx-hide" : "bx-show"
+                            }`}
+                        ></i>
                       </a>
                     </div>
 
@@ -160,11 +210,16 @@ function Login() {
                           checked={rememberMe}
                           onChange={onRememberMeChange}
                         />
-                        <label className="form-check-label" htmlFor="remember-me">
+                        <label
+                          className="form-check-label"
+                          htmlFor="remember-me"
+                        >
                           Remember Me
                         </label>
                       </div>
-                      <a href="auth-forgot-password-basic.html"><span>Forgot Password?</span></a>
+                      <a href="auth-forgot-password-basic.html">
+                        <span>Forgot Password?</span>
+                      </a>
                     </div>
                   </div>
 
@@ -172,33 +227,44 @@ function Login() {
                     <button
                       onClick={onSubmit}
                       className="btn d-grid w-100"
-                      style={{ background: "var(--primary-color)", color: "white" }}
+                      style={{
+                        background: "var(--primary-color)",
+                        color: "white",
+                      }}
                       type="submit"
                     >
                       Login
                     </button>
                   </div>
                 </form>
-                <div className="google-login-container d-flex justify-content-center w-100">
-                  <GoogleLoginButton
-                    className="google-login-button"
-                    buttonText="Sign in with Google"
-                    onSuccess={onGoogleSuccess}
-                    onFailure={onGoogleFailure}
-                    action={(data) => {
-                      return axiosRequest
-                        .post("/auth/loginwithgoogle", data)
-                        .then((response) => { })
-                        .catch((err) => {
-                          console.log(err);
-                        });
-                    }}
-                  />
-                </div>
-                <p className="text-center d-flex align-items-center mt-3">
-                  <span>New on our platform?</span>{" "}
-                  <a href="/SignUp" className="ms-1"><span>Create an account</span></a>
-                </p>
+
+                {userType === "organizer" && (
+                  <div className="google-login-container d-flex justify-content-center w-100">
+                    <GoogleLoginButton
+                      className="google-login-button"
+                      buttonText="Sign in with Google"
+                      onSuccess={onGoogleSuccess}
+                      onFailure={onGoogleFailure}
+                      action={(data) => {
+                        return axiosRequest
+                          .post("/auth/loginwithgoogle", data)
+                          .then((response) => { })
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      }}
+                    />
+                  </div>
+                )}
+
+                {userType === "organizer" && (
+                  <p className="text-center d-flex align-items-center mt-3">
+                    <span>New on our platform?</span>{" "}
+                    <a href="/SignUp" className="ms-1">
+                      <span>Create an account</span>
+                    </a>
+                  </p>
+                )}
               </div>
             </div>
           </div>
