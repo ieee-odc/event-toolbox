@@ -1,16 +1,16 @@
 import React from "react";
 
 import DashboardLayout from "../../../core/components/DashboardLayout/DashboardLayout";
-import EventsTable from "../components/EventsTable";
-import DashboardContainer from "../components/DashboardContainer";
 
-function Participants() {
+import AdminDashboardContainer from "../components/AdminDashboardContainer";
+
+function AdminDashboardPage() {
 
     return (
         <DashboardLayout activeTab="/dashboard">
-            <DashboardContainer />
+            <AdminDashboardContainer />
         </DashboardLayout>
     );
 }
 
-export default Participants;
+export default AdminDashboardPage;

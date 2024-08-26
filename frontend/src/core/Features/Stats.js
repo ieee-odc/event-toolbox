@@ -9,6 +9,7 @@ const statsStore = createSlice({
     totalParticipants: 0,
     currentParticipants: 0,
     totalWorkshops: 0,
+    totalOrganizers: 0,
     eventId: 1,
     workshopId: 2,
     isLoading: false,
@@ -25,6 +26,7 @@ const statsStore = createSlice({
       state.totalParticipants = action.payload.totalParticipants;
       state.currentParticipants = action.payload.currentParticipants;
       state.totalWorkshops = action.payload.totalWorkshops;
+      state.totalOrganizers = action.payload.totalOrganizers;
       state.isLoading = false;
     },
     fetchStatsFailure(state, action) {

@@ -20,6 +20,7 @@ import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
 import EventDetail from "./modules/Events/components/EventDetailsQR"
 import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
+import AdminDashboardPage from "./modules/Admin-dashboard/pages/AdminDashboard";
 
 function App() {
   return (
@@ -32,6 +33,17 @@ function App() {
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
         <Route path="/events/details/:token" element={<EventDetail />} />
+
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute>
+              <AdminDashboardPage />
+            </PrivateRoute>
+          }
+        />
+
+
 
         <Route
           path="/participants"
