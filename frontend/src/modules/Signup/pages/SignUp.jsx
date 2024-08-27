@@ -39,19 +39,20 @@ function SignUp() {
     try {
       const res = await axiosRequest.post("/auth/signup", formData);
       localStorage.setItem("token", res.data.token);
-      navigate("/events");
+      navigate("/pending-approval"); // Redirect to the Pending Approval page
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
     }
   };
+
   const onGoogleSuccess = async (response) => {
     try {
       const res = await axiosRequest.post("/auth/signupwithgoogle", {
         tokenId: response.user.accessToken,
       });
       localStorage.setItem("token", res.data.token);
-      navigate("/events");
+      navigate("/pending-approval"); // Redirect to the Pending Approval page
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });

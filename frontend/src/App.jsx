@@ -22,6 +22,8 @@ import EventDetail from "./modules/Events/components/EventDetailsQR"
 import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
 import AdminDashboardPage from "./modules/Admin-dashboard/pages/AdminDashboard";
 import { UserData } from "./utils/UserData";
+import AdminApproval from "./modules/admin/components/AdminApproval";
+import PendingApproval from "./modules/admin/components/PendingApproval";
 
 function App() {
   const [userRole, setUserRole] = useState("user");
@@ -41,13 +43,14 @@ function App() {
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
         <Route path="/events/details/:token" element={<EventDetail />} />
+        <Route path="/pending-approval" element={<PendingApproval />} />
 
         {userRole === 'admin' ? (
           <Route
             path="/admin"
             element={
               <PrivateRoute allowedRoles={['admin']}>
-                <AdminDashboardPage />
+                <AdminApproval />
               </PrivateRoute>
             }
           />
