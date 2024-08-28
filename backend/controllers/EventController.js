@@ -58,10 +58,10 @@ const updateEvent = async (req, res) => {
 const deleteEvent = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   try {
     const { eventId } = req.params;
-    
+
     const deletedEvent = await Event.findOneAndDelete({ id: eventId }).session(session);
     if (!deletedEvent) {
       await session.abortTransaction();
@@ -78,11 +78,11 @@ const deleteEvent = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
-    
+
     res.status(200).json({
-      message:"Deleted event successfully",
-      status:"success",
-      event:deletedEvent
+      message: "Deleted event successfully",
+      status: "success",
+      event: deletedEvent
     });
   } catch (error) {
     await session.abortTransaction();
@@ -157,7 +157,7 @@ const duplicateEvent = async (req, res) => {
 
     const duplicatedEvent = new Event({
       ...originalEvent.toObject(),
-      name:`${originalEvent.name} Duplicate`,
+      name: `${originalEvent.name} Duplicate`,
       id: counter.seq,
       _id: new mongoose.Types.ObjectId(),
     });
@@ -233,6 +233,43 @@ const duplicateEvent = async (req, res) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
+const selectFormForEvent = async (req, res) => {
+  const { eventId, formId } = req.body;
+
+  try {
+    // Unset eventId in all forms that have the specified eventId
+    await Form.updateMany(
+      { eventId: eventId },
+      { $unset: { eventId: "" } }
+    );
+
+    // Unset formId in all events that have the specified formId
+    await Event.updateMany(
+      { formId: formId },
+      { $unset: { formId: "" } }
+    );
+
+    // Add the new formId to the specified event
+    await Event.updateOne(
+      { id: eventId },
+      { $set: { formId: formId } }
+    );
+
+    // Add the new eventId to the specified form
+    await Form.updateOne(
+      { id: formId },
+      { $set: { eventId: eventId } }
+    );
+
+    res.status(200).send({ message: "Form and event updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      error: "An error occurred while updating the form and event",
+    });
+  }
+};
+
 
 module.exports = {
   createEvent,
@@ -241,5 +278,6 @@ module.exports = {
   getEvents,
   getOrganizerEvents,
   duplicateEvent,
-  getOneEvent
+  getOneEvent,
+  selectFormForEvent
 };

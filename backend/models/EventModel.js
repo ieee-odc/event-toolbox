@@ -40,8 +40,19 @@ const EventSchema = mongoose.Schema(
     coverPhoto: {
       type: String,
     },
+    price: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    status: {
+      type: String,
+      required: true,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 const Event = mongoose.model("Event", EventSchema);

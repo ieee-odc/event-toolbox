@@ -16,17 +16,29 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(cors({
-  origin: [
-    "https://59e0-41-230-216-254.ngrok-free.app",
-    "http://localhost:5173",
-    "https://f2ac-41-230-216-254.ngrok-free.app",
-    "https://secure-totally-doberman.ngrok-free.app",
-  ],
-}));
+app.use(
+  cors({
+    origin: [
+      "https://59e0-41-230-216-254.ngrok-free.app",
+      "http://localhost:5173",
+      "https://f2ac-41-230-216-254.ngrok-free.app",
+      "https://secure-totally-doberman.ngrok-free.app",
+    ],
+  })
+);
 
-// Static files
-const buildPath = path.join(__dirname, "../frontend/dist");
+const allowedOrigins = [
+  "https://59e0-41-230-216-254.ngrok-free.app",
+  "http://localhost:5173",
+  "https://f2ac-41-230-216-254.ngrok-free.app",
+  "https://secure-totally-doberman.ngrok-free.app",
+];
+
+app.use(cors());
+
+const _dirname = path.dirname("");
+const buildPath = path.join(_dirname, "../frontend/dist");
+
 app.use(express.static(buildPath));
 
 // Connect to MongoDB
@@ -45,13 +57,25 @@ db.once("open", () => {
 
 // Routes
 const router = express.Router();
-router.use("/participant", require("./routes/ParticipantRoutes"));
-router.use("/events", require("./routes/EventsRoutes"));
-router.use("/auth", require("./routes/authRoutes"));
-router.use("/workshop", require("./routes/WorkshopRoutes"));
-router.use("/space", require("./routes/SpaceRoutes"));
-router.use("/form", require("./routes/FormRoutes"));
-router.use("/notification", require("./routes/NotificationRoutes"));
+const ParticipantRouter = require("./routes/ParticipantRoutes");
+router.use("/participant", ParticipantRouter);
+const EventRouter = require("./routes/EventsRoutes");
+router.use("/events", EventRouter);
+const authRouter = require("./routes/authRoutes");
+router.use("/auth", authRouter);
+
+const WorkshopRouter = require("./routes/WorkshopRoutes");
+router.use("/workshop", WorkshopRouter);
+
+const SpaceRouter = require("./routes/SpaceRoutes");
+router.use("/space", SpaceRouter);
+
+const FormRouter = require("./routes/FormRoutes");
+router.use("/form", FormRouter);
+
+const NotificationRouter = require("./routes/NotificationRoutes");
+router.use("/notification", NotificationRouter);
+
 app.use("/api", router);
 
 // Serve static files for frontend
@@ -87,14 +111,17 @@ io.on("connection", (socket) => {
     socket.join(organizerId.toString());
   });
 
-  socket.on("addEventParticipant", (data) => {
-    io.to(data.roomId).emit("EventParticipantAdded", data.participant);
+  socket.on("addEventParticipant", async (data) => {
+    const roomId = data.roomId.toString();
+    io.to(roomId).emit("EventParticipantAdded", data.participant);
   });
 
   socket.on("create-notification", (data) => {
-    io.to(data.organizerId.toString()).emit("new-notification", data.notification);
+    const organizerId = data.organizerId;
+    io.to(organizerId.toString()).emit("new-notification", data.notification);
   });
 
+  // Handle disconnection
   socket.on("disconnect", () => {
     console.log("A user disconnected");
   });

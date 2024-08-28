@@ -2,6 +2,8 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path"); // Update path module import
 const filePath = path.join(__dirname, "templates", "email-template.html");
+const QRCode = require("qrcode");
+
 const filePath1 = path.join(
   __dirname,
   "templates",
@@ -9,12 +11,12 @@ const filePath1 = path.join(
 );
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.office365.com",
+  service: "gmail",
   port: 587,
   secure: false, // Use `true` for port 465, `false` for port 587 with STARTTLS
   auth: {
-    user: process.env.OUTLOOK_USER, // Your Outlook email address
-    pass: process.env.OUTLOOK_PASS, // Your Outlook email password
+    user: process.env.GOOGLE_NODEMAILER, // Your Gmail address
+    pass: process.env.GOOGLE_NODEMAILER_key, // Your Gmail app password
   },
   tls: {
     ciphers: "SSLv3",
@@ -34,11 +36,14 @@ const sendEventEmail = async (
   cancelationToken
 ) => {
   try {
-    // Read the HTML template file
-    console.log("email is : " + recipientEmail);
     let htmlTemplate = fs.readFileSync(filePath, "utf-8");
 
-    // Replace placeholders with actual values
+    const qrCodeUrl = await QRCode.toDataURL(
+      `${process.env.FRONTEND_URL}/checkin-registration/${cancelationToken}`
+    );
+
+    const qrCodeBuffer = Buffer.from(qrCodeUrl.split(",")[1], "base64");
+    const cancelationLink = `${process.env.FRONTEND_URL}/cancel-registration/${cancelationToken}`;
     htmlTemplate = htmlTemplate.replace("[ParticipantName]", participantName);
     htmlTemplate = htmlTemplate.replace("[EventName]", eventName);
     htmlTemplate = htmlTemplate.replace("[eventLocation]", eventLocation);
@@ -50,15 +55,25 @@ const sendEventEmail = async (
       "[eventEndDate]",
       eventEndDate.toDateString()
     );
-    htmlTemplate = htmlTemplate.replace("[cancelationToken]", cancelationToken);
+    htmlTemplate = htmlTemplate.replace("[cancelationLink]", cancelationLink);
+    htmlTemplate = htmlTemplate.replace(
+      "[QRCode]",
+      `<img src="cid:qrCode" alt="Event QR Code" />`
+    );
 
-    // Send email
     const info = await transporter.sendMail({
       from: '"Event Management" <event.toolbox@outlook.com>', // sender address
       to: recipientEmail, // list of receivers
       subject: subject, // Subject line
       text: `Hello ${participantName}, You have successfully registered for the event: ${eventName}.`, // plain text body
       html: htmlTemplate, // HTML body
+      attachments: [
+        {
+          filename: "qrCode.png",
+          content: qrCodeBuffer,
+          cid: "qrCode", // same as the cid value in the html img src
+        },
+      ],
     });
 
     console.log("Message sent: %s", info.messageId);
@@ -77,8 +92,14 @@ const sendWorkshopEmail = async (
   cancelationToken
 ) => {
   try {
-    // Read the HTML template file
     let htmlTemplate = fs.readFileSync(filePath1, "utf-8");
+
+    const qrCodeUrl = await QRCode.toDataURL(
+      `${process.env.FRONTEND_URL}/checkin-registration/${cancelationToken}`
+    );
+
+    const qrCodeBuffer = Buffer.from(qrCodeUrl.split(",")[1], "base64");
+    const cancelationLink = `${process.env.FRONTEND_URL}/cancel-registration/${cancelationToken}`;
 
     // Replace placeholders with actual values
     htmlTemplate = htmlTemplate.replace("[ParticipantName]", participantName);
@@ -92,10 +113,12 @@ const sendWorkshopEmail = async (
       "[EndTime]",
       new Date(endTime).toLocaleString()
     );
-    // htmlTemplate = htmlTemplate.replace("[EventName]", eventName);
-    htmlTemplate = htmlTemplate.replace("[cancelationToken]", cancelationToken);
+    htmlTemplate = htmlTemplate.replace("[cancelationLink]", cancelationLink);
+    htmlTemplate = htmlTemplate.replace(
+      "[QRCode]",
+      `<img src="cid:qrCode" alt="Workshop QR Code" />`
+    );
 
-    // Send email
     const info = await transporter.sendMail({
       from: '"Event Management" <event.toolbox@outlook.com>', // sender address
       to: recipientEmail, // list of receivers
@@ -104,6 +127,13 @@ const sendWorkshopEmail = async (
         startTime
       ).toLocaleString()}. End Time: ${new Date(endTime).toLocaleString()}.`, // plain text body
       html: htmlTemplate, // HTML body
+      attachments: [
+        {
+          filename: "qrCode.png",
+          content: qrCodeBuffer,
+          cid: "qrCode", // same as the cid value in the html img src
+        },
+      ],
     });
 
     console.log("Message sent: %s", info.messageId);
