@@ -81,7 +81,6 @@ const sendEventEmail = async (
     console.error("Error sending email:", error);
   }
 };
-
 const sendWorkshopEmail = async (
   recipientEmail,
   subject,
