@@ -152,7 +152,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: test
     steps:
-     - name: login to dockerhub
+      - name: login to dockerhub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME}} 
