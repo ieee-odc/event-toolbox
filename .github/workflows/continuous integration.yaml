@@ -11,7 +11,8 @@ permissions:
   security-events: write
 
 jobs:
- test:
+
+  test:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
