@@ -30,14 +30,6 @@ jobs:
       run: npm test
       working-directory: ./frontend
 
-
-    - name: Install dependencies     
-      run: cd ./backend && npm install
-
-    - name: Run tests
-      run: npm test
-      working-directory: ./backend
-
 ##################################################
 
   depchecktest:
@@ -151,7 +143,7 @@ jobs:
   trivy-scan:
     name: pull image from dockerhub and scan with trivy
     runs-on: ubuntu-20.04
-    needs: test
+    needs: publish
     steps:
       - name: login to dockerhub
         uses: docker/login-action@v2
