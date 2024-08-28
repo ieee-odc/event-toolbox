@@ -15,12 +15,20 @@ import { UserData } from "../../../utils/UserData";
 import { initializeWorkshops } from "../../../core/Features/Workshops";
 import CustomButton from "../../../core/components/Button/Button";
 import { Spinner } from "react-bootstrap";
+import {
+  initializeEvents,
+  selectEvent,
+  selectEventById,
+  updateSelectedEventField,
+} from "../../../core/Features/Events";
+import { useParams } from "react-router-dom";
 
 function FormContainer() {
   const dispatch = useDispatch();
-  const userData = UserData();
+  const { eventId } = useParams();
   const { filteredForms, isLoading } = useSelector((store) => store.formsStore);
   const { workshops } = useSelector((store) => store.workshopsStore);
+  const { selectedEvent } = useSelector((store) => store.eventsStore);
   function formatDate(originalDate) {
     const date = new Date(originalDate);
 
@@ -33,6 +41,12 @@ function FormContainer() {
 
     return formattedDate;
   }
+
+  useEffect(() => {
+    axiosRequest.get(`/events/${eventId}`).then((res) => {
+      dispatch(selectEvent(res.data.event));
+    });
+  }, [eventId]);
 
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
@@ -50,7 +64,7 @@ function FormContainer() {
     axiosRequest.delete(`/form/delete/${formId}`).then((res) => {
       const updatedWorkshops = workshops.map((workshop) => {
         if (workshop.formId === formId) {
-          return { ...workshop, formId: null }; // Update the formId to null
+          return { ...workshop, formId: null };
         }
         return workshop;
       });
@@ -58,6 +72,20 @@ function FormContainer() {
       dispatch(deleteForm(formId));
       toast.success("Form deleted successfully");
     });
+  };
+  const handleRadioChange = (form) => {
+    axiosRequest
+      .post(`/events/select-form`, {
+        eventId: form.eventId,
+        formId: form.id,
+      })
+      .then(() => {
+        dispatch(updateSelectedEventField({ id: "formId", value: form.id }));
+        toast.success(`Selected ${form.name} form`);
+      })
+      .catch((error) => {
+        console.error("Error updating form or event:", error);
+      });
   };
 
   const handleEditClick = (form) => {
@@ -184,8 +212,20 @@ function FormContainer() {
                         : null;
                       return (
                         <tr key={form.id}>
-                          <td>
-                            <a href="">{form.name}</a>
+                          <td style={{ cursor: "pointer" }}>
+                            <input
+                              type="radio"
+                              name="selectedForm"
+                              value={form.id}
+                              checked={selectedEvent.formId === form.id}
+                              onChange={() => handleRadioChange(form)}
+                            />
+                          </td>
+                          <td
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleRadioChange(form)}
+                          >
+                            <a href="#">{form.name}</a>
                           </td>
                           <td>
                             <a href="">{formatDate(form.deadline)}</a>

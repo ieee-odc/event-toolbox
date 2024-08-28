@@ -14,6 +14,17 @@ describe("Space Controller", () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    // Create an organizer if it doesn't exist
+  const existingOrganizer = await Organizer.findOne({ id: 1 });
+  if (!existingOrganizer) {
+    await Organizer.create({
+      id: 1,
+      username: 'testorganizer',
+      email: 'testorganizer@example.com',
+      password: 'password123',
+      provider: 'local'
+    });
+  }
   });
 
   afterAll(async () => {

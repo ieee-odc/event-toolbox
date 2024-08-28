@@ -7,13 +7,14 @@ import {
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 
-function CancelRegistration() {
+function CheckinRegisrations() {
   const { token } = useParams();
   const decodedToken = base64UrlDecode(token);
 
   const [tokenData, setTokenData] = useState(null);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
+    /// eyJwYXJ0aWNpcGFudElkIjoiNjZhYjgyZGRmMjMxZmFlZTM3ODM5Y2VkIiwiZXZlbnRJZCI6Mn0
     try {
       setTokenData(JSON.parse(decodedToken));
     } catch (error) {
@@ -56,11 +57,11 @@ function CancelRegistration() {
         : [...prevSelected, participationId]
     );
   };
-  const handleCancelWholeEvent = async () => {
+  const handleCheckinEvent = async () => {
     setLoading(true);
     try {
       await axiosRequest.post(
-        `/participant/cancel-event/${tokenData.eventId}`,
+        `/participant/checkin-event/${tokenData.eventId}`,
         {
           participantEmail: eventParticipation.email,
         }
@@ -78,15 +79,15 @@ function CancelRegistration() {
     }
   };
 
-  const handleCancelSelectedWorkshops = async () => {
+  const handleCheckinSelectedWorkshop = async () => {
     if (selectedParticipations.length === 0) {
-      toast.error("Select at least one workshop to cancel.");
+      toast.error("Please select at least one workshop to check-in.");
       return;
     }
     setLoading(true);
     try {
       const cancelPromises = selectedParticipations.map((participationId) =>
-        axiosRequest.post(`/participant/cancel-workshop/${participationId}`)
+        axiosRequest.post(`/participant/checkin-workshop/${participationId}`)
       );
       await Promise.all(cancelPromises);
       setParticipations((prevParticipations) =>
@@ -124,77 +125,66 @@ function CancelRegistration() {
                 <span>Loading</span>
               ) : (
                 <div className="card-body">
-                  <h4 className="mb-2">Cancel Registration</h4>
-                  {!eventParticipation ? (
-                    <p>Event Participation already canceled</p>
-                  ) : (
-                    <div>
-                      <p className="mb-6">
-                        You can cancel your registration here.
-                      </p>
+                  <h4 className="mb-2">Check-in Participant</h4>
+                  <div>
+                    <p className="mb-6">
+                      You can check-in the participant registration here.
+                    </p>
 
-                      <div
-                        style={{
-                          marginBottom: 10,
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "5px",
-                        }}
+                    <div
+                      style={{
+                        marginBottom: 10,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "5px",
+                      }}
+                    >
+                      <h5>Check-in the whole event</h5>
+                      <button
+                        type="button"
+                        class="btn btn-primary me-2"
+                        onClick={handleCheckinEvent}
                       >
-                        <h5>Cancel the whole event</h5>
-                        <button
-                          id="deleteButton"
-                          onClick={handleCancelWholeEvent}
-                        >
-                          <p className="mx-1">Cancel</p>
-                          <div className="centered">
-                            {" "}
-                            <i className="bx bxs-trash mx-1"></i>
+                        Check-in
+                      </button>
+                    </div>
+                    {participations.length !== 0 && (
+                      <div>
+                        <h5>Check-in workshops</h5>
+                        {participations.map((participation) => (
+                          <div
+                            key={participation.id}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "5px",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              id={`workshop-${participation._id}`}
+                              checked={selectedParticipations.includes(
+                                participation._id
+                              )}
+                              onChange={() =>
+                                handleCheckboxChange(participation._id)
+                              }
+                            />
+                            <label htmlFor={`workshop-${participation.id}`}>
+                              {participation.workshop.name}
+                            </label>
                           </div>
+                        ))}
+                        <button
+                          type="button"
+                          class="btn btn-primary me-2"
+                          onClick={handleCheckinSelectedWorkshop}
+                        >
+                          Confirm Check-in
                         </button>
                       </div>
-                      {participations.length !== 0 && (
-                        <div>
-                          <h5>Cancel workshops</h5>
-                          {participations.map((participation) => (
-                            <div
-                              key={participation.id}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "5px",
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                id={`workshop-${participation._id}`}
-                                checked={selectedParticipations.includes(
-                                  participation._id
-                                )}
-                                onChange={() =>
-                                  handleCheckboxChange(participation._id)
-                                }
-                              />
-                              <label htmlFor={`workshop-${participation.id}`}>
-                                {participation.workshop.name}
-                              </label>
-                            </div>
-                          ))}
-                          <button
-                            id="deleteButton"
-                            className="w-100"
-                            onClick={handleCancelSelectedWorkshops}
-                          >
-                            <p className="mx-1">Confirm Cancellation</p>
-                            <div className="centered">
-                              {" "}
-                              <i className="bx bxs-trash mx-1"></i>
-                            </div>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -205,4 +195,4 @@ function CancelRegistration() {
   );
 }
 
-export default CancelRegistration;
+export default CheckinRegisrations;

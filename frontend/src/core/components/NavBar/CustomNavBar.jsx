@@ -160,7 +160,6 @@ function CustomNavBar({ toggleSideBar }) {
                 </a>
               </li>
               <li>
-                <div className="dropdown-divider" />
               </li>
               <li>
                 <a className="dropdown-item" >
@@ -206,9 +205,7 @@ function CustomNavBar({ toggleSideBar }) {
                   <span className="align-middle">Pricing</span>
                 </a>
               </li>
-              <li>
-                <div className="dropdown-divider" />
-              </li>
+
               <li>
                 <a
                   className="dropdown-item"

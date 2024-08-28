@@ -1,7 +1,7 @@
-// EventsList.js
-
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { QRCode } from "react-qrcode-logo";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 import "../Events.css";
 import axiosRequest from "../../../utils/AxiosConfig";
 import { UserData } from "./../../../utils/UserData";
@@ -16,11 +16,13 @@ import {
   addEvent,
   setEventsPerPage,
   turnIsLoadingOff,
+  resetEventModal,
 } from "../../../core/Features/Events";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import CustomButton from "../../../core/components/Button/Button";
 import Pagination from "../../../core/components/Pagination/Pagination";
+import { base64UrlEncode } from "../../../utils/helpers/base64Helper";
 
 function EventsList() {
   const dispatch = useDispatch();
@@ -35,7 +37,17 @@ function EventsList() {
     indexOfFirstEvent,
     indexOfLastEvent
   );
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const handleQRCodeClick = (event) => {
+    if (!event.formId) {
+      toast.error("Event does not have a form ID. Please create a form first.");
+      return;
+    }
+    setSelectedEvent(event);
+    setShowQRModal(true);
+  };
   const handleDeleteEvent = async (eventId) => {
     try {
       await axiosRequest.delete(`/events/delete/${eventId}`);
@@ -84,6 +96,7 @@ function EventsList() {
   };
 
   const onAddEventClick = () => {
+    dispatch(resetEventModal());
     dispatch(toggleEventModal());
   };
 
@@ -120,6 +133,18 @@ function EventsList() {
   const handleEventsPerPageChange = (e) => {
     dispatch(setEventsPerPage(Number(e.target.value)));
     setCurrentPage(1); // Reset to the first page
+  };
+  const downloadQRCode = () => {
+    const canvas = document.querySelector("#qr-gen canvas");
+    const pngUrl = canvas
+      .toDataURL("image/png")
+      .replace("image/png", "image/octet-stream");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = `${selectedEvent.name}-qr-code.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   };
 
   return (
@@ -227,11 +252,34 @@ function EventsList() {
                               style={{ margin: 0, color: "white" }}
                             ></i>
                           </div>
+                          <div
+                            onClick={() => {
+                              handleQRCodeClick(event);
+                            }}
+                            style={{
+                              cursor: "pointer",
+                              background: "var(--primary-color)",
+                              padding: 5,
+                              borderRadius: "50%",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              position: "absolute",
+                              top: 15,
+                              right: 40,
+                            }}
+                          >
+                            <i
+                              className="bx bx-qr"
+                              style={{ margin: 0, color: "white" }}
+                            ></i>
+                          </div>
 
                           <div
                             className="card-body p-3 pt-3 cursor-pointer"
                             id="eventCardBody"
                             onClick={() => {
+                              dispatch(selectEvent(event));
                               navigate(`/event/${event.id}`);
                             }}
                           >
@@ -275,7 +323,6 @@ function EventsList() {
                                 {event.location}
                               </p>
                             </div>
-
                             <div className="d-flex align-items-center mb-1">
                               <i className="bx bx-time-five me-2"></i>
                               <b>
@@ -293,7 +340,10 @@ function EventsList() {
                               </p>
                             </div>
                             <div className="d-flex align-items-center mb-1 date-container">
-                              <i className="bx bx-calendar me-2 date-icon"></i>
+                              <i
+                                className="bx bx-calendar me-2 date-icon"
+                                style={{ fontSize: "13px" }}
+                              ></i>
                               <b>
                                 <span className="text mb-0">Dates:</span>
                               </b>
@@ -306,6 +356,17 @@ function EventsList() {
                                   {formatDate(event.endDate)}
                                 </p>
                               </span>
+                            </div>{" "}
+                            <div className="d-flex align-items-center mb-1 date-container">
+                              <i className="bx bx-check me-2 date-icon"></i>
+                              <b>
+                                <span className="text mb-0">Status:</span>
+                              </b>
+                              <span className="dates-span d-flex align-items-center ms-2 mt-1">
+                                <p className="mb-0 date">
+                                  {event.status === "paid" ? "Paid" : "Free"}
+                                </p>
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -315,7 +376,15 @@ function EventsList() {
                         >
                           <button
                             id="deleteButton"
-                            onClick={() => handleDeleteEvent(event.id)}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "Are you sure you want to delete this event?"
+                                )
+                              ) {
+                                handleDeleteEvent(event.id);
+                              }
+                            }}
                           >
                             <p className="mx-1">Delete</p>
                             <div className="centered">
@@ -364,6 +433,35 @@ function EventsList() {
             </div>
           </div>
         </div>
+        <Modal show={showQRModal} onHide={() => setShowQRModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>QR Code for {selectedEvent?.name}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div id="qr-gen" style={{ textAlign: "center" }}>
+              <QRCode
+                value={`${
+                  window.location.origin
+                }/events/details/${base64UrlEncode(
+                  JSON.stringify({
+                    eventId: selectedEvent?.id,
+                    formId: selectedEvent?.formId,
+                  })
+                )}`}
+              />
+
+              <p>This QR code is for event: {selectedEvent?.name}</p>
+            </div>
+          </Modal.Body>
+          <Modal.Footer style={{ display: "flex", gap: 10 }}>
+            <Button variant="secondary" onClick={() => setShowQRModal(false)}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={downloadQRCode}>
+              Download QR Code
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     </div>
   );

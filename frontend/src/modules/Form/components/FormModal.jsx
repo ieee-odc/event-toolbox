@@ -255,7 +255,52 @@ function FormModal() {
                   onChange={handleDateChange}
                 />
               </div>
+              <div className="mb-3" id="pre-set-q-container">
+                <label className="form-label mb-2">Base Questions:</label>
+                <div className="mb-1  ">
+                  <input
+                    type="text"
+                    id="fullName"
+                    style={{
+                      cursor: "not-allowed",
+                      opacity: "0.9",
+                      backgroundColor: "rgb(211, 211, 211, 0.6)"
+                    }}
+                    className="form-control m-0"
+                    value="Full Name"
+                    readOnly
+                  /></div>
+                <div className="mb-1">
+                  <input
+                    type="text"
+                    id="fullName"
 
+                    style={{
+                      cursor: "not-allowed",
+                      opacity: "0.9",
+                      backgroundColor: "rgb(211, 211, 211, 0.6)"
+                    }}
+                    className="form-control"
+                    value="Email"
+                    readOnly
+                  />
+                </div>
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    id="fullName"
+
+                    style={{
+                      cursor: "not-allowed",
+                      opacity: "0.9",
+                      backgroundColor: "rgb(211, 211, 211, 0.6)"
+                    }}
+                    className="form-control"
+                    value="Phone Number"
+                    readOnly
+                  />
+                </div>
+              </div>
               <>
                 {selectedForm?.data.map((element, index) => (
                   <div className="mb-3" key={index}>
@@ -535,7 +580,7 @@ function FormModal() {
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 }

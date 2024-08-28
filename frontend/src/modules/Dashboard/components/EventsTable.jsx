@@ -128,7 +128,7 @@ function EventsTable() {
                                 <tr>
                                     <th className="control sorting_disabled dtr-hidden" rowSpan="1" colSpan="1" style={{ width: 0, display: 'none' }} aria-label=""></th>
 
-                                    <th className="sorting sorting_desc" tabIndex="0" aria-controls="DataTables_Table_0" rowSpan="1" colSpan="1" style={{ width: '462px' }} aria-label="Course Name: activate to sort column ascending" aria-sort="descending">Course Name</th>
+                                    <th className="sorting sorting_desc" tabIndex="0" aria-controls="DataTables_Table_0" rowSpan="1" colSpan="1" style={{ width: '462px' }} aria-label="Course Name: activate to sort column ascending" aria-sort="descending">Event Name</th>
                                     <th className="sorting" tabIndex="0" aria-controls="DataTables_Table_0" rowSpan="1" colSpan="1" style={{ width: '95px' }} aria-label="Time: activate to sort column ascending">Time</th>
                                     <th className="w-25 sorting" tabIndex="0" aria-controls="DataTables_Table_0" rowSpan="1" colSpan="1" style={{ width: '307px' }} aria-label="Progress: activate to sort column ascending">Progress</th>
                                     <th className="w-25 sorting" tabIndex="0" aria-controls="DataTables_Table_0" rowSpan="1" colSpan="1" style={{ width: '307px' }} aria-label="Status: activate to sort column ascending">Status</th>
