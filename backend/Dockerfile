@@ -1,14 +1,20 @@
+# Use an official Node.js image as the base
 FROM node:20-alpine
-WORKDIR /app/backend
-EXPOSE 6001
 
+# Set the working directory inside the container
+WORKDIR /app
 
-COPY package.json package-lock.json .
+# Copy package.json and package-lock.json files to the working directory
+COPY package*.json ./
 
-RUN npm install 
+# Install the dependencies
+RUN npm install
 
+# Copy the rest of the backend code to the working directory
 COPY . .
 
-RUN npm install -g nodemon
+# Expose the port (replace 6001 with the port used in your environment)
+EXPOSE 6001
 
-CMD ["npm", "run","dev"]
+# Start the backend server
+CMD ["node", "server.js"]
