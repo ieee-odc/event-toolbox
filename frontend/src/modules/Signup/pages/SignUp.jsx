@@ -162,9 +162,8 @@ function SignUp() {
                         onClick={toggleObscureText}
                       >
                         <i
-                          className={`bx ${
-                            obscureText ? "bx-hide" : "bx-show"
-                          }`}
+                          className={`bx ${obscureText ? "bx-hide" : "bx-show"
+                            }`}
                         ></i>
                       </span>
                     </div>
@@ -196,7 +195,7 @@ function SignUp() {
                   </div>
                   <div className="mb-2 w-100">
                     <button
-                      onClick={onSubmit}
+                      type="submit"
                       className="btn d-grid w-100"
                       style={{
                         background: "var(--primary-color)",
