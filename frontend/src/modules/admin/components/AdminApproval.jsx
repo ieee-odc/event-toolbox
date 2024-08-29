@@ -40,9 +40,8 @@ const AdminApproval = () => {
 
     return (
         <div className="layout-container">
-            <CustomSideBar openSideBar={openSideBar} toggleSideBar={toggleSideBar} />
             <div className="layout-page">
-                <CustomNavBar />
+
 
                 <div className="container-fluid py-4">
                     <div className="row g-3 mb-4">
