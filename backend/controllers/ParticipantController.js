@@ -128,14 +128,43 @@ const deleteParticipant = async (req, res) => {
 const getEventParticipants = async (req, res) => {
   try {
     const eventId = req.params.eventId;
-    const participants = await Participant.find({
-      eventId,
-    });
+
+    const participants = await Participant.find({ eventId });
+
+    const emailToParticipant = {};
+
+    for (const participant of participants) {
+      const { email, workshopId, responses = [] } = participant;
+
+      if (!emailToParticipant[email]) {
+        const event = await Event.findOne({ id: eventId }).select("name");
+
+        emailToParticipant[email] = {
+          ...participant.toObject(),
+          eventName: event ? event.name : null,
+          eventResponses: responses,
+          workshops: [],
+        };
+      }
+
+      if (workshopId) {
+        const workshop = await Workshop.findOne({ id: workshopId }).select(
+          "name"
+        );
+        emailToParticipant[email].workshops.push({
+          workshopId,
+          workshopName: workshop ? workshop.name : null,
+          responses,
+        });
+      }
+    }
+
+    const groupedParticipants = Object.values(emailToParticipant);
 
     return res.status(200).json({
       status: "success",
-      message: "Participant retrieved",
-      participants: participants,
+      message: "Participants retrieved",
+      participants: groupedParticipants,
     });
   } catch (e) {
     console.error(e);

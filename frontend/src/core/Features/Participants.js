@@ -23,30 +23,6 @@ export const fetchWorkshopData = createAsyncThunk(
 export const initializeParticipants = createAsyncThunk(
   "Participants/initializeParticipants",
   async (participants, { dispatch }) => {
-    // const emailToParticipant = {};
-    // for (const participant of participants) {
-    //   const eventId = participant.eventId;
-    //   const workshopId = participant.workshopId;
-
-    //   if (!emailToParticipant[participant.email]) {
-    //     const eventResponse = await dispatch(fetchEventData(eventId));
-    //     emailToParticipant[participant.email] = {
-    //       ...participant,
-    //       eventName: eventResponse.payload.event.name,
-    //       eventResponses: participant.responses || [],
-    //       workshops: [],
-    //     };
-    //   }
-
-    //   if (workshopId) {
-    //     const workshopResponse = await dispatch(fetchWorkshopData(workshopId));
-    //     emailToParticipant[participant.email].workshops.push({
-    //       workshopId,
-    //       workshopName: workshopResponse.payload.workshop.name,
-    //       responses: participant.responses || [],
-    //     });
-    //   }
-    // }
     return participants;
   }
 );
