@@ -40,7 +40,8 @@ function Login() {
     try {
       const res = await axiosRequest.post("/auth/login", formData);
       localStorage.setItem("token", res.data.token);
-      navigate("/events");
+
+      navigate(res.data.user.role === "user" ? "/events" : "/admin");
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
@@ -52,12 +53,8 @@ function Login() {
       const tokenId = response.user.accessToken;
       const res = await axiosRequest.post("/auth/loginwithgoogle", { tokenId });
       localStorage.setItem("token", res.data.token);
-      // if (rememberMe) {
-      //   localStorage.setItem("token", res.data.token);
-      // } else {
-      //   sessionStorage.setItem("token", res.data.token);
-      // }
-      navigate("/events");
+
+      navigate(res.data.user.role === "user" ? "/events" : "/admin");
     } catch (err) {
       console.error(
         "Login error:",
@@ -83,29 +80,43 @@ function Login() {
   useEffect(() => {
     if (userData) {
       const redirectPath = userData.role === "admin" ? "/admin" : "/events";
+      console.log(redirectPath);
       navigate(redirectPath);
     }
-  }, [userData, navigate]);
-
+  }, [userData]);
 
   return (
     <div className="container" style={{ height: "100vh" }}>
       <div
         className="container-xxl "
-        style={{ display: "flex", height: "90%", margin: "auto 0", flexDirection: "column", alignItems: "center" }}
+        style={{
+          display: "flex",
+          height: "90%",
+          margin: "auto 0",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <div className="authentication-wrapper authentication-basic container-p-y">
           <div className="authentication-inner">
             <div className="card">
               <div className="card-body d-flex flex-column justify-content-center">
                 <h4 className="mb-4">Welcome to Event Box! 👋</h4>
-                <p className="mb-6">Please sign-in to your account and start the adventure</p>
+                <p className="mb-6">
+                  Please sign-in to your account and start the adventure
+                </p>
                 {errors.server && (
                   <div className="alert alert-danger">{errors.server}</div>
                 )}
-                <form id="formAuthentication" onSubmit={onSubmit} className="w-100">
+                <form
+                  id="formAuthentication"
+                  onSubmit={onSubmit}
+                  className="w-100"
+                >
                   <div className="mb-6 w-100">
-                    <label htmlFor="email" className="form-label">Email or Username</label>
+                    <label htmlFor="email" className="form-label">
+                      Email or Username
+                    </label>
                     <input
                       type="text"
                       className="form-control w-100"
@@ -124,7 +135,9 @@ function Login() {
 
                   <div className="mb-3 w-100">
                     <div className="d-flex justify-content-between">
-                      <label className="form-label" htmlFor="password">Password</label>
+                      <label className="form-label" htmlFor="password">
+                        Password
+                      </label>
                     </div>
                     <div className="input-group input-group-merge d-flex align-items-start w-100">
                       <input
@@ -143,7 +156,11 @@ function Login() {
                         className="input-group-text cursor-pointer"
                         onClick={toggleObscureText}
                       >
-                        <i className={`bx ${obscureText ? "bx-hide" : "bx-show"}`}></i>
+                        <i
+                          className={`bx ${
+                            obscureText ? "bx-hide" : "bx-show"
+                          }`}
+                        ></i>
                       </a>
                     </div>
 
@@ -162,11 +179,16 @@ function Login() {
                           checked={rememberMe}
                           onChange={onRememberMeChange}
                         />
-                        <label className="form-check-label" htmlFor="remember-me">
+                        <label
+                          className="form-check-label"
+                          htmlFor="remember-me"
+                        >
                           Remember Me
                         </label>
                       </div>
-                      <a href="auth-forgot-password-basic.html"><span>Forgot Password?</span></a>
+                      <a href="auth-forgot-password-basic.html">
+                        <span>Forgot Password?</span>
+                      </a>
                     </div>
                   </div>
 
@@ -174,8 +196,10 @@ function Login() {
                     <button
                       onClick={onSubmit}
                       className="btn d-grid w-100"
-                      style={{ background: "var(--primary-color)", color: "white" }}
-                      type="submit"
+                      style={{
+                        background: "var(--primary-color)",
+                        color: "white",
+                      }}
                     >
                       Login
                     </button>
@@ -190,7 +214,7 @@ function Login() {
                     action={(data) => {
                       return axiosRequest
                         .post("/auth/loginwithgoogle", data)
-                        .then((response) => { })
+                        .then((response) => {})
                         .catch((err) => {
                           console.log(err);
                         });
@@ -199,7 +223,9 @@ function Login() {
                 </div>
                 <p className="text-center d-flex align-items-center mt-3">
                   <span>New on our platform?</span>{" "}
-                  <a href="/SignUp" className="ms-1"><span>Create an account</span></a>
+                  <a href="/SignUp" className="ms-1">
+                    <span>Create an account</span>
+                  </a>
                 </p>
               </div>
             </div>

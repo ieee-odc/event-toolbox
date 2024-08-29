@@ -29,11 +29,6 @@ import CheckinRegisrations from "./modules/Participants/pages/ParticipantsDetail
 function App() {
   const [userRole, setUserRole] = useState("user");
 
-  useEffect(() => {
-    const user = UserData()
-    const role = user ? user.role : "user";
-    setUserRole(role);
-  }, []);
   return (
     <div className="App">
       <Toaster />
@@ -46,93 +41,84 @@ function App() {
         <Route path="/events/details/:token" element={<EventDetail />} />
         <Route path="/pending-approval" element={<PendingApproval />} />
 
-        {userRole === 'admin' ? (
-          <Route
-            path="/admin"
-            element={
-              <PrivateRoute allowedRoles={['admin']}>
-                <AdminDashboardPage />
-              </PrivateRoute>
-            }
-          />
-        ) : (
-          <>
-
-
-
-            <Route
-              path="/participants"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <Participants />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/workshops"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <Workshops />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/events"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <EventsPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/event/:eventId"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <SingleEventPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/spaces"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <Spaces />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/forms"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <Forms />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/form/:token" element={<RegistartionForm />} />
-            <Route
-              path="/cancel-registration/:token"
-              element={<CancelRegistration />}
-            />
-            <Route
-              path="/event/:eventId/workshop/:workshopId"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <SingleWorkshopPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute allowedRoles={['user']}>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-          </>
-        )}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminDashboardPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/participants"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <Participants />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workshops"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <Workshops />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/events"
+          element={
+            <PrivateRoute allowedRoles={["user", "admin"]}>
+              <EventsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/event/:eventId"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <SingleEventPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/spaces"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <Spaces />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/forms"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <Forms />
+            </PrivateRoute>
+          }
+        />
+        <Route path="/form/:token" element={<RegistartionForm />} />
+        <Route
+          path="/cancel-registration/:token"
+          element={<CancelRegistration />}
+        />
+        <Route
+          path="/event/:eventId/workshop/:workshopId"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <SingleWorkshopPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute allowedRoles={["user"]}>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
       </Routes>
-
     </div>
   );
 }

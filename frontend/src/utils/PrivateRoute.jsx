@@ -1,20 +1,29 @@
 import React, { useMemo } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { UserData } from "./UserData";
+import toast from "react-hot-toast";
 
 function PrivateRoute({ children, allowedRoles }) {
   const user = UserData();
 
-  const isAuthorized = useMemo(() => {
-    return user && allowedRoles.includes(user.role) && user.status === "approved";
-  }, [user, allowedRoles]);
   if (!user) {
     return <Navigate to="/login" />;
   }
-  if (isAuthorized) {
-    return children;
+
+  const isAuthorized =
+    user && allowedRoles.includes(user.role) && user.status === "approved";
+
+  if (user) {
+    if (isAuthorized) {
+      console.log("is authorized");
+      return children;
+    } else {
+      localStorage.clear();
+      return <Navigate to="/login" />;
+    }
   } else {
-    console.log("byebye");
+    localStorage.clear();
+
     return <Navigate to="/login" />;
   }
 }
