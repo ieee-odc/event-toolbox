@@ -70,10 +70,9 @@ const ParticipantsCard = () => {
     }
   };
 
-
-
-  const areAllSelected = selectedParticipants.length > 0 && selectedParticipants.length === filteredParticipants.length;
-
+  const areAllSelected =
+    selectedParticipants.length > 0 &&
+    selectedParticipants.length === filteredParticipants.length;
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -169,8 +168,8 @@ const ParticipantsCard = () => {
     ];
 
     const excelRows = participants.map((participant) => {
-      const eventResponses = formatResponses(participant.eventResponses);
-      const workshopDetails = participant.workshops
+      const eventResponses = formatResponses(participant.responses);
+      const workshopDetails = (participant.workshops || [])
         .map((workshop) => {
           const workshopResponses = formatResponses(workshop.responses);
 

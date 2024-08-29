@@ -15,14 +15,20 @@ import { UserData } from "../../../utils/UserData";
 import { initializeWorkshops } from "../../../core/Features/Workshops";
 import CustomButton from "../../../core/components/Button/Button";
 import { Spinner } from "react-bootstrap";
-import { initializeEvents, updateSelectedEventField } from "../../../core/Features/Events";
+import {
+  initializeEvents,
+  selectEvent,
+  selectEventById,
+  updateSelectedEventField,
+} from "../../../core/Features/Events";
+import { useParams } from "react-router-dom";
 
 function FormContainer() {
   const dispatch = useDispatch();
-  const userData = UserData();
+  const { eventId } = useParams();
   const { filteredForms, isLoading } = useSelector((store) => store.formsStore);
   const { workshops } = useSelector((store) => store.workshopsStore);
-  const { selectedEvent, events } = useSelector((store) => store.eventsStore);
+  const { selectedEvent } = useSelector((store) => store.eventsStore);
   function formatDate(originalDate) {
     const date = new Date(originalDate);
 
@@ -35,6 +41,12 @@ function FormContainer() {
 
     return formattedDate;
   }
+
+  useEffect(() => {
+    axiosRequest.get(`/events/${eventId}`).then((res) => {
+      dispatch(selectEvent(res.data.event));
+    });
+  }, [eventId]);
 
   const [hoveredIcon, setHoveredIcon] = useState(null);
   const [isShareModalOpen, setShareModalOpen] = useState(false);
@@ -52,7 +64,7 @@ function FormContainer() {
     axiosRequest.delete(`/form/delete/${formId}`).then((res) => {
       const updatedWorkshops = workshops.map((workshop) => {
         if (workshop.formId === formId) {
-          return { ...workshop, formId: null }; // Update the formId to null
+          return { ...workshop, formId: null };
         }
         return workshop;
       });
@@ -195,8 +207,8 @@ function FormContainer() {
                     filteredForms.map((form) => {
                       const relatedWorkshop = form.workshopId
                         ? workshops.find(
-                          (workshop) => workshop.id === form.workshopId
-                        )
+                            (workshop) => workshop.id === form.workshopId
+                          )
                         : null;
                       return (
                         <tr key={form.id}>
@@ -225,10 +237,11 @@ function FormContainer() {
                               onClick={() => handleEditClick(form)}
                             >
                               <i
-                                className={`bx bx-edit-alt bx-sm ${hoveredIcon === `edit_${form._id}`
-                                  ? "transform"
-                                  : ""
-                                  }`}
+                                className={`bx bx-edit-alt bx-sm ${
+                                  hoveredIcon === `edit_${form._id}`
+                                    ? "transform"
+                                    : ""
+                                }`}
                                 onMouseEnter={() =>
                                   handleMouseEnter(`edit_${form._id}`)
                                 }
@@ -240,10 +253,11 @@ function FormContainer() {
                               onClick={() => handleDeleteForm(form.id)}
                             >
                               <i
-                                className={`bx bx-trash bx-sm ${hoveredIcon === `delete_${form._id}`
-                                  ? "transform"
-                                  : ""
-                                  }`}
+                                className={`bx bx-trash bx-sm ${
+                                  hoveredIcon === `delete_${form._id}`
+                                    ? "transform"
+                                    : ""
+                                }`}
                                 onMouseEnter={() =>
                                   handleMouseEnter(`delete_${form._id}`)
                                 }
@@ -252,10 +266,11 @@ function FormContainer() {
                             </button>
                             <button className="btn btn-link p-0">
                               <i
-                                className={`bx bx-share bx-sm ${hoveredIcon === `share_${form._id}`
-                                  ? "transform"
-                                  : ""
-                                  }`}
+                                className={`bx bx-share bx-sm ${
+                                  hoveredIcon === `share_${form._id}`
+                                    ? "transform"
+                                    : ""
+                                }`}
                                 onMouseEnter={() =>
                                   handleMouseEnter(`share_${form._id}`)
                                 }

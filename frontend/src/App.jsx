@@ -18,12 +18,13 @@ import SingleEventPage from "./modules/Events/pages/SingleEventPage";
 import SingleWorkshopPage from "./modules/Workshops/pages/SingleWorkshopPage";
 import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
-import EventDetail from "./modules/Events/components/EventDetailsQR"
+import EventDetail from "./modules/Events/components/EventDetailsQR";
 import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
 import AdminDashboardPage from "./modules/Admin-dashboard/pages/AdminDashboard";
 import { UserData } from "./utils/UserData";
 import AdminApproval from "./modules/admin/components/AdminApproval";
 import PendingApproval from "./modules/admin/components/PendingApproval";
+import CheckinRegisrations from "./modules/Participants/pages/ParticipantsDetails";
 
 function App() {
   const [userRole, setUserRole] = useState("user");
