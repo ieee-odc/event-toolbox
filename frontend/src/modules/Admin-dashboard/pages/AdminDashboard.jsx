@@ -9,7 +9,6 @@ function AdminDashboardPage() {
 
     return (
         <DashboardLayout activeTab="/dashboard">
-            <AdminApproval />
             <AdminDashboardContainer />
         </DashboardLayout>
     );

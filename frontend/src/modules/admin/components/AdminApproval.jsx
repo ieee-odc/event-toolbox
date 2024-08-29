@@ -39,95 +39,85 @@ const AdminApproval = () => {
     });
 
     return (
-        <div className="layout-container">
-            <div className="layout-page">
+        <div className="card mb-6 ">
+            <div className="row g-3 mb-4 d-flex align-items-center justify-content-center">
+                <div className="col-md-3 align-items-center justify-content-center text-align-center">
+                    <h4 className="m-3 mt-6" style={{ textAlign: "center" }}>Total Organizers</h4>
+                    <p style={{ textAlign: "center", fontSize: "18px" }}>{organizers.length}</p>
+                </div>
+            </div>
 
-
-                <div className="container-fluid py-4">
-                    <div className="row g-3 mb-4">
-                        <div className="col-md-3">
-                            <Card className="text-center" style={{ backgroundColor: "#007bff", color: "#ffffff" }}>
+            {/* Approval Section */}
+            {loading ? (
+                <p>Loading...</p>
+            ) : error ? (
+                <p>Error: {error}</p>
+            ) : (
+                <div className="row mb-3">
+                    {filteredOrganizers.map((organizer) => (
+                        <div className="col-md-4 m-4" key={organizer.id}>
+                            <Card className="h-100">
                                 <Card.Body>
-                                    <Card.Title>Total Organizers</Card.Title>
-                                    <Card.Text>{organizers.length}</Card.Text>
+                                    <Card.Title>{organizer.username}</Card.Title>
+                                    <Card.Text>Email: {organizer.email}</Card.Text>
+                                    <Card.Text>Requested At: {new Date(organizer.createdAt).toLocaleDateString()}</Card.Text>
+                                    <div className="d-flex justify-content-between">
+                                        <Button variant="success" onClick={() => handleApprove(organizer.id)}>
+                                            Approve
+                                        </Button>
+                                        <Button variant="danger" onClick={() => handleDecline(organizer.id)}>
+                                            Decline
+                                        </Button>
+                                    </div>
                                 </Card.Body>
                             </Card>
                         </div>
-                    </div>
+                    ))}
+                </div>
+            )}
 
-                    {/* Approval Section */}
-                    {loading ? (
-                        <p>Loading...</p>
-                    ) : error ? (
-                        <p>Error: {error}</p>
-                    ) : (
-                        <div className="row">
-                            {filteredOrganizers.map((organizer) => (
-                                <div className="col-md-4 mb-3" key={organizer.id}>
-                                    <Card className="h-100">
-                                        <Card.Body>
-                                            <Card.Title>{organizer.username}</Card.Title>
-                                            <Card.Text>Email: {organizer.email}</Card.Text>
-                                            <Card.Text>Requested At: {new Date(organizer.createdAt).toLocaleDateString()}</Card.Text>
-                                            <div className="d-flex justify-content-between">
-                                                <Button variant="success" onClick={() => handleApprove(organizer.id)}>
-                                                    Approve
-                                                </Button>
-                                                <Button variant="danger" onClick={() => handleDecline(organizer.id)}>
-                                                    Decline
-                                                </Button>
-                                            </div>
-                                        </Card.Body>
-                                    </Card>
-                                </div>
+            {/* Search and Organizers List */}
+            <div className="card">
+                <div className="card-body" >
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <InputGroup className="w-50">
+                            <Form.Control
+                                placeholder="Search by username or email"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <Button variant="outline-secondary">
+                                <i className="bx bx-search" />
+                            </Button>
+                        </InputGroup>
+                        <DropdownButton
+                            id="dropdown-status-filter"
+                            title="Filter by Status"
+                            onSelect={(status) => setStatusFilter(status)}
+                        >
+                            <Dropdown.Item eventKey="">All</Dropdown.Item>
+                            <Dropdown.Item eventKey="Approved">Approved</Dropdown.Item>
+                            <Dropdown.Item eventKey="Declined">Declined</Dropdown.Item>
+                        </DropdownButton>
+                    </div>
+                    <Table striped bordered hover responsive>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Requested At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredOrganizers.map((org) => (
+                                <tr key={org.id}>
+                                    <td>{org.username}</td>
+                                    <td>{org.email}</td>
+                                    <td>{new Date(org.createdAt).toLocaleDateString()}</td>
+                                </tr>
                             ))}
-                        </div>
-                    )}
-
-                    {/* Search and Organizers List */}
-                    <div className="card">
-                        <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <InputGroup className="w-50">
-                                    <Form.Control
-                                        placeholder="Search by username or email"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                    <Button variant="outline-secondary">
-                                        <i className="bx bx-search" />
-                                    </Button>
-                                </InputGroup>
-                                <DropdownButton
-                                    id="dropdown-status-filter"
-                                    title="Filter by Status"
-                                    onSelect={(status) => setStatusFilter(status)}
-                                >
-                                    <Dropdown.Item eventKey="">All</Dropdown.Item>
-                                    <Dropdown.Item eventKey="Approved">Approved</Dropdown.Item>
-                                    <Dropdown.Item eventKey="Declined">Declined</Dropdown.Item>
-                                </DropdownButton>
-                            </div>
-                            <Table striped bordered hover responsive>
-                                <thead>
-                                    <tr>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Requested At</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredOrganizers.map((org) => (
-                                        <tr key={org.id}>
-                                            <td>{org.username}</td>
-                                            <td>{org.email}</td>
-                                            <td>{new Date(org.createdAt).toLocaleDateString()}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        </div>
-                    </div>
+                        </tbody>
+                    </Table>
                 </div>
             </div>
         </div>

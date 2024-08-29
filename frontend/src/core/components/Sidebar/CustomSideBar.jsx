@@ -66,6 +66,7 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
       data-bg-class="bg-menu-theme"
       style={{
         touchAction: "none",
+        position: "fixed",
         userSelect: "none",
         WebkitUserDrag: "none",
         WebkitTapHighlightColor: "rgba(0, 0, 0, 0)",

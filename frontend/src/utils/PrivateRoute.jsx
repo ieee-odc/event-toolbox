@@ -6,7 +6,7 @@ function PrivateRoute({ children, allowedRoles }) {
   const user = UserData();
 
   const isAuthorized = useMemo(() => {
-    return user && allowedRoles.includes(user.role) && user.status === "pending";
+    return user && allowedRoles.includes(user.role) && user.status === "approved";
   }, [user, allowedRoles]);
   if (!user) {
     return <Navigate to="/login" />;
