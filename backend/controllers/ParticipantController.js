@@ -2,7 +2,6 @@ const Counter = require("../models/CounterModel");
 const Participant = require("../models/ParticipantModel");
 const Workshop = require("../models/WorkshopModel");
 const Event = require("../models/EventModel");
-const Notification = require("../models/NotificationModel");
 const Email = require("../controllers/sendEmailController");
 const { base64UrlEncode } = require("../utils/helpers");
 
