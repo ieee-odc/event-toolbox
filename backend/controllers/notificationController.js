@@ -1,5 +1,5 @@
 const Counter = require("../models/CounterModel.js");
-const Notification = require("../models/NotificationModel.js");
+const Notification = require("../models/notificationModel.js");
 const Participant = require("../models/ParticipantModel.js");
 
 const addNotification = async (req, res) => {
