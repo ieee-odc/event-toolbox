@@ -1,4 +1,4 @@
-.menu-item.open:not(.menu-item-closing) > .menu-toggle::after {
+.menu-item.open:not(.menu-item-closing)>.menu-toggle::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -8,17 +8,21 @@
   border: 1px solid;
   border-bottom: 0;
   border-left: 0;
-  transform: translateY(-50%) rotate(135deg); /* Rotate the arrow */
+  transform: translateY(-50%) rotate(135deg);
+  /* Rotate the arrow */
   transition-duration: 0.3s;
 }
+
 #layout-menu {
   background-color: var(--primary-color) !important;
+  height: 100vh;
 }
 
 .menu-link {
   color: white !important;
   font-size: medium !important;
 }
+
 .app-brand-link span {
   color: white !important;
 }

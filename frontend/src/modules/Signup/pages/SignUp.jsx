@@ -38,20 +38,19 @@ function SignUp() {
     }
     try {
       const res = await axiosRequest.post("/auth/signup", formData);
-      localStorage.setItem("token", res.data.token);
-      navigate("/events");
+      navigate("/pending-approval"); // Redirect to the Pending Approval page
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
     }
   };
+
   const onGoogleSuccess = async (response) => {
     try {
       const res = await axiosRequest.post("/auth/signupwithgoogle", {
         tokenId: response.user.accessToken,
       });
-      localStorage.setItem("token", res.data.token);
-      navigate("/events");
+      navigate("/pending-approval"); // Redirect to the Pending Approval page
     } catch (err) {
       console.error(err.response.data);
       setErrors({ server: err.response.data.msg });
@@ -70,7 +69,13 @@ function SignUp() {
     <div className="container" style={{ height: "100vh" }}>
       <div
         className="container-xxl "
-        style={{ display: "flex", height: "90%", margin: "auto 0", flexDirection: "column", alignItems: "center" }}
+        style={{
+          display: "flex",
+          height: "90%",
+          margin: "auto 0",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <div className="authentication-wrapper authentication-basic container-p-y">
           <div className="authentication-inner">
@@ -95,7 +100,10 @@ function SignUp() {
                   }}
                 >
                   <div className="mb-4 form-email-toggle w-100">
-                    <label htmlFor="username" className="col-auto col-form-label">
+                    <label
+                      htmlFor="username"
+                      className="col-auto col-form-label"
+                    >
                       Username
                     </label>
                     <input
@@ -154,7 +162,9 @@ function SignUp() {
                         onClick={toggleObscureText}
                       >
                         <i
-                          className={`bx ${obscureText ? "bx-hide" : "bx-show"}`}
+                          className={`bx ${
+                            obscureText ? "bx-hide" : "bx-show"
+                          }`}
                         ></i>
                       </span>
                     </div>
@@ -188,8 +198,10 @@ function SignUp() {
                     <button
                       onClick={onSubmit}
                       className="btn d-grid w-100"
-                      style={{ background: "var(--primary-color)", color: "white" }}
-                      type="submit"
+                      style={{
+                        background: "var(--primary-color)",
+                        color: "white",
+                      }}
                     >
                       Sign Up
                     </button>
@@ -207,7 +219,7 @@ function SignUp() {
                 </form>
                 <p className="text-center text-place ">
                   <span className="space-right">Already have an account?</span>
-                  <Link to="/Login">
+                  <Link to="/login">
                     <span>Sign in instead</span>
                   </Link>
                 </p>

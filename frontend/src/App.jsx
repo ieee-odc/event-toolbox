@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Button from "./core/components/Button/Button";
@@ -20,9 +20,15 @@ import Dashboard from "./modules/Dashboard/pages/Dashboard";
 import RegistartionForm from "./modules/Registration/EventReg/components/RegistartionForm";
 import EventDetail from "./modules/Events/components/EventDetailsQR";
 import CancelRegistration from "./modules/Participants/pages/CancelRegistration";
-import CheckinRegisrations from "./modules/Participants/pages/ParticipantsDetails";
+import AdminDashboardPage from "./modules/Admin-dashboard/pages/AdminDashboard";
+import { UserData } from "./utils/UserData";
+import AdminApproval from "./modules/admin/components/AdminApproval";
+import PendingApproval from "./modules/admin/components/PendingApproval";
+import CheckinRegistration from "./modules/Participants/pages/ParticipantsDetails";
 
 function App() {
+  const [userRole, setUserRole] = useState("user");
+
   return (
     <div className="App">
       <Toaster />
@@ -33,11 +39,20 @@ function App() {
         <Route path="/forgetpassword" element={<ForgetPassword />} />
         <Route path="/resetpassword" element={<ResetPassword />} />
         <Route path="/events/details/:token" element={<EventDetail />} />
+        <Route path="/pending-approval" element={<PendingApproval />} />
 
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminDashboardPage />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/participants"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <Participants />
             </PrivateRoute>
           }
@@ -45,7 +60,7 @@ function App() {
         <Route
           path="/workshops"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <Workshops />
             </PrivateRoute>
           }
@@ -53,7 +68,7 @@ function App() {
         <Route
           path="/events"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user", "admin"]}>
               <EventsPage />
             </PrivateRoute>
           }
@@ -61,7 +76,7 @@ function App() {
         <Route
           path="/event/:eventId"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <SingleEventPage />
             </PrivateRoute>
           }
@@ -69,7 +84,7 @@ function App() {
         <Route
           path="/spaces"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <Spaces />
             </PrivateRoute>
           }
@@ -77,7 +92,7 @@ function App() {
         <Route
           path="/forms"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <Forms />
             </PrivateRoute>
           }
@@ -91,15 +106,14 @@ function App() {
           path="/checkin-registration/:token"
           element={
             <PrivateRoute>
-              <CheckinRegisrations />
+              <CheckinRegistration />
             </PrivateRoute>
           }
         />
-
         <Route
           path="/event/:eventId/workshop/:workshopId"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <SingleWorkshopPage />
             </PrivateRoute>
           }
@@ -107,7 +121,7 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute>
+            <PrivateRoute allowedRoles={["user"]}>
               <Dashboard />
             </PrivateRoute>
           }
