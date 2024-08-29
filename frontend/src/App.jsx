@@ -24,7 +24,7 @@ import AdminDashboardPage from "./modules/Admin-dashboard/pages/AdminDashboard";
 import { UserData } from "./utils/UserData";
 import AdminApproval from "./modules/admin/components/AdminApproval";
 import PendingApproval from "./modules/admin/components/PendingApproval";
-import CheckinRegisrations from "./modules/Participants/pages/ParticipantsDetails";
+import CheckinRegistration from "./modules/Participants/pages/ParticipantsDetails";
 
 function App() {
   const [userRole, setUserRole] = useState("user");
@@ -101,6 +101,14 @@ function App() {
         <Route
           path="/cancel-registration/:token"
           element={<CancelRegistration />}
+        />
+        <Route
+          path="/checkin-registration/:token"
+          element={
+            <PrivateRoute>
+              <CheckinRegistration />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/event/:eventId/workshop/:workshopId"
