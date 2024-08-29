@@ -7,6 +7,7 @@ import {
   initializeWorkshops,
   setAllFull,
   setIsEventForm,
+  setFormData,
 } from "../../../../core/Features/Registration";
 import axiosRequest from "../../../../utils/AxiosConfig";
 import Flatpickr from "react-flatpickr";
@@ -390,8 +391,70 @@ const RegistrationForm = () => {
   }, [workshopsIds]);
 
   const handleEmailChange = (e) => {
+    axiosRequest
+      .post("/participant/get-by-email", { email: e.target.value })
+      .then((res) => {
+        setFullName(res.data.participant.fullName);
+        setPhoneNumber(res.data.participant.phoneNumber);
+      })
+      .catch((err) => {});
     setEmail(e.target.value);
   };
+
+  const saveToLocalStorage = () => {
+    const responses = formFields.map((field) => ({
+      question: field.question,
+      answer: formData[field.question] || "",
+    }));
+
+    const baseSubmissionData = {
+      fullName,
+      email,
+      phoneNumber,
+      status: "Pending",
+      eventId,
+      responses,
+    };
+
+    // Check if all required fields are filled
+    if (
+      fullName.trim() &&
+      email.trim() &&
+      phoneNumber.trim() &&
+      responses.length > 0
+    ) {
+      localStorage.setItem(
+        "formSubmissionData",
+        JSON.stringify(baseSubmissionData)
+      );
+    }
+  };
+
+  useEffect(() => {
+    saveToLocalStorage();
+  }, [fullName, email, phoneNumber, formData]);
+
+  const retrieveFromLocalStorage = () => {
+    const savedData = localStorage.getItem("formSubmissionData");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setFullName(parsedData.fullName || "");
+      setEmail(parsedData.email || "");
+      setPhoneNumber(parsedData.phoneNumber || "");
+
+      const restoredFormData = {};
+      parsedData.responses.forEach((response) => {
+        restoredFormData[response.question] = response.answer;
+      });
+
+      dispatch(setFormData(restoredFormData));
+    }
+  };
+
+  useEffect(() => {
+    retrieveFromLocalStorage();
+  }, []);
+
   return (
     <div className="container-fluid ">
       <HeadComponent
