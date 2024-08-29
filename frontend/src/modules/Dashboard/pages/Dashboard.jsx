@@ -7,7 +7,7 @@ import DashboardContainer from "../components/DashboardContainer";
 function Participants() {
 
     return (
-        <DashboardLayout activeTab="/participants">
+        <DashboardLayout activeTab="/dashboard">
             <DashboardContainer />
         </DashboardLayout>
     );

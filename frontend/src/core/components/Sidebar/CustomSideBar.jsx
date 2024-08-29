@@ -1,42 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CustomSideBar.css";
+import { UserData } from "../../../utils/UserData";
 function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
   const navigate = useNavigate();
-  const [routes, setRoutes] = useState([
-    // {
-    //   name: "Events",
-    //   icon: "bx bx-party",
-    //   route: "/events",
-    //   isActive: activeTab === "/events",
-    //   isSubMenuOpen: false,
-    //   childRoutes: [
-    //     {
-    //       name: "Spaces",
-    //       icon: "bx bx-home-alt",
-    //       route: "/spaces",
-    //       isActive: activeTab === "/spaces",
-    //     },
-    //     {
-    //       name: "Participants",
-    //       icon: "bx bx-user",
-    //       route: "/participants",
-    //       isActive: activeTab === "/participants",
-    //     },
-    //     {
-    //       name: "Forms",
-    //       icon: "bx bx-file",
-    //       route: "/forms",
-    //       isActive: activeTab === "/forms",
-    //     },
-    //     {
-    //       name: "Workshops",
-    //       icon: "bx bx-hard-hat",
-    //       route: "/workshops",
-    //       isActive: activeTab === "/workshops",
-    //     },
-    //   ],
-    // },
+  const [userRole, setUserRole] = useState("user");
+  useEffect(() => {
+    const user = UserData()
+    const role = user.role;
+    setUserRole(role);
+  }, []);
+  const routes = userRole === 'admin' ? [
+    {
+      name: "Admin Dashboard",
+      icon: "bx bxs-dashboard",
+      route: "/admin",
+      isActive: activeTab === "/admin",
+      isSubMenuOpen: false,
+    },
+  ] : [
     {
       name: "Dashboard",
       icon: "bx bxs-dashboard",
@@ -51,7 +33,7 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
       isActive: activeTab === "/events",
       isSubMenuOpen: false,
     },
-  ]);
+  ];
 
   // useEffect(() => {
   //   let isAnyChildActive = false;
@@ -84,6 +66,7 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
       data-bg-class="bg-menu-theme"
       style={{
         touchAction: "none",
+        position: "fixed",
         userSelect: "none",
         WebkitUserDrag: "none",
         WebkitTapHighlightColor: "rgba(0, 0, 0, 0)",
@@ -183,9 +166,8 @@ function CustomSideBar({ openSideBar, toggleSideBar, activeTab }) {
         {routes.map((route, index) => (
           <li
             key={index}
-            className={`menu-item ${route.isActive ? "active" : ""} ${
-              route.isSubMenuOpen ? "open" : ""
-            }`}
+            className={`menu-item ${route.isActive ? "active" : ""} ${route.isSubMenuOpen ? "open" : ""
+              }`}
           >
             <a
               className="menu-link"

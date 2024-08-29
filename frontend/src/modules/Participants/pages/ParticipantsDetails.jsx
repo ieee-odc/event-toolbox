@@ -7,7 +7,7 @@ import {
 import axiosRequest from "../../../utils/AxiosConfig";
 import toast from "react-hot-toast";
 
-function CheckinRegisrations() {
+function CheckinRegistration() {
   const { token } = useParams();
   const decodedToken = base64UrlDecode(token);
 
@@ -66,14 +66,11 @@ function CheckinRegisrations() {
           participantEmail: eventParticipation.email,
         }
       );
-      toast.success("Event registration cancelled successfully.");
+      toast.success("Participant Checked in successfully.");
 
       setEventParticipation(null);
     } catch (error) {
-      console.error("Error cancelling event registration", error);
-      toast.error(
-        "Failed to cancel event registration. Please try again later."
-      );
+      toast.error("Failed to checkin participant. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -195,4 +192,4 @@ function CheckinRegisrations() {
   );
 }
 
-export default CheckinRegisrations;
+export default CheckinRegistration;

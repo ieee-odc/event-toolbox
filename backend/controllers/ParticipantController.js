@@ -127,14 +127,43 @@ const deleteParticipant = async (req, res) => {
 const getEventParticipants = async (req, res) => {
   try {
     const eventId = req.params.eventId;
-    const participants = await Participant.find({
-      eventId,
-    });
+
+    const participants = await Participant.find({ eventId });
+
+    const emailToParticipant = {};
+
+    for (const participant of participants) {
+      const { email, workshopId, responses = [] } = participant;
+
+      if (!emailToParticipant[email]) {
+        const event = await Event.findOne({ id: eventId }).select("name");
+
+        emailToParticipant[email] = {
+          ...participant.toObject(),
+          eventName: event ? event.name : null,
+          eventResponses: responses,
+          workshops: [],
+        };
+      }
+
+      if (workshopId) {
+        const workshop = await Workshop.findOne({ id: workshopId }).select(
+          "name"
+        );
+        emailToParticipant[email].workshops.push({
+          workshopId,
+          workshopName: workshop ? workshop.name : null,
+          responses,
+        });
+      }
+    }
+
+    const groupedParticipants = Object.values(emailToParticipant);
 
     return res.status(200).json({
       status: "success",
-      message: "Participant retrieved",
-      participants: participants,
+      message: "Participants retrieved",
+      participants: groupedParticipants,
     });
   } catch (e) {
     console.error(e);
@@ -408,6 +437,31 @@ const getCancelationData = async (req, res) => {
   }
 };
 
+const retrieveParticipantBasedOnEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const participant = await Participant.findOne({
+      email: { $regex: email, $options: "i" }, // 'i' for case-insensitive search
+    });
+    if (!participant) {
+      return res.status(404).json({ message: "Participant not found" });
+    }
+    return res.status(200).json({
+      status: "success",
+      message: "Participant retrieved",
+      participant: {
+        email: participant.email,
+        fullName: participant.fullName,
+        phoneNumber: participant.phoneNumber,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error!", error });
+  }
+};
+
 module.exports = {
   addParticipant,
   deleteParticipant,
@@ -420,4 +474,5 @@ module.exports = {
   cancelWorkshopRegistration,
   checkInWorkshopParticipant,
   checkInEventParticipants,
+  retrieveParticipantBasedOnEmail,
 };

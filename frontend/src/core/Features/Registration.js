@@ -46,6 +46,9 @@ const registrationSlice = createSlice({
     setIsEventForm: (state, action) => {
       state.isEventForm = action.payload;
     },
+    setFormData: (state, action) => {
+      state.formData = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -96,6 +99,7 @@ export const {
   resetFormData,
   setAllFull,
   setHeadData,
+  setFormData,
   setIsEventForm,
 } = registrationSlice.actions;
 

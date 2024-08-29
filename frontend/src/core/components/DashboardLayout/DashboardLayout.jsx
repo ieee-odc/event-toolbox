@@ -17,7 +17,7 @@ function DashboardLayout({ children, activeTab, isModalOpen }) {
       />
       <div
         className="layout-page"
-        style={{ display: "flex", flexDirection: "column" }}
+        style={{ display: "flex", flexDirection: "column", marginLeft: "250px" }}
         onClick={() => {
           if (openSideBar) {
             toggleSideBar();
