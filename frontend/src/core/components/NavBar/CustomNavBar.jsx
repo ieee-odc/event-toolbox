@@ -1,6 +1,6 @@
 import React from "react";
-import NotificationIcon from '../../../modules/Notifications/components/notificationIcon'
-import "./NavBar.css"
+import NotificationIcon from "../../../modules/Notifications/components/notificationIcon";
+import "./NavBar.css";
 
 function CustomNavBar({ toggleSideBar }) {
   return (
@@ -159,10 +159,9 @@ function CustomNavBar({ toggleSideBar }) {
                   </div>
                 </a>
               </li>
+              <li></li>
               <li>
-              </li>
-              <li>
-                <a className="dropdown-item" >
+                <a className="dropdown-item">
                   <i className="bx bx-user me-2" />
                   <span className="align-middle">My Profile</span>
                 </a>
@@ -211,6 +210,10 @@ function CustomNavBar({ toggleSideBar }) {
                   className="dropdown-item"
                   href="auth-login-cover.html"
                   target="_blank"
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = "/login";
+                  }}
                 >
                   <i className="bx bx-power-off me-2" />
                   <span className="align-middle">Log Out</span>
