@@ -65,7 +65,7 @@ const AdminApproval = () => {
                                         <Button variant="success" onClick={() => handleApprove(organizer.id)}>
                                             Approve
                                         </Button>
-                                        <Button variant="danger" onClick={() => handleDecline(organizer.id)}>
+                                        <Button variant="danger" style={{ backgroundColor: "#d75e60" }} onClick={() => handleDecline(organizer.id)}>
                                             Decline
                                         </Button>
                                     </div>
